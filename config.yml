@@ -1,0 +1,20 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "recettes"
+    label: "Recettes"
+    folder: "content/recettes"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Nom", name: "title", widget: "string" }
+      - { label: "Présentation", name: "presentation", widget: "text" }
+      - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "Vidéo YouTube (URL)", name: "video", widget: "string", required: false }
+      - { label: "Liste des courses", name: "ingredients", widget: "list", required: true }
+      - { label: "Étapes", name: "steps", widget: "list", required: true }
