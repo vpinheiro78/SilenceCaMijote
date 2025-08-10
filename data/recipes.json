@@ -3,24 +3,24 @@
         "nom": "Tarte aux pommes",
         "presentation": "Une tarte classique aux pommes caramélisées",
         "categorie": "Dessert",
-        "image": "assets\recettes/tarte_pommes.jpg"
+        "image": "assets/recettes/tarte_pommes.jpg"
     },
     {
         "nom": "Boeuf bourguignon",
         "presentation": "Un mijoté de boeuf au vin rouge",
         "categorie": "Viande",
-        "image": "assets\recettes/boeuf_bourguignon.jpg"
+        "image": "assets/recettes/boeuf_bourguignon.jpg"
     },
     {
         "nom": "Saumon grillé",
         "presentation": "Filet de saumon grillé avec légumes",
         "categorie": "Poisson",
-        "image": "assets\recettes/saumon_grille.jpg"
+        "image": "assets/recettes/saumon_grille.jpg"
     },
     {
         "nom": "Gratin dauphinois",
         "presentation": "Pommes de terre crémeuses au four",
         "categorie": "Accompagnement",
-        "image": "assets\recettes/gratin_dauphinois.jpg"
+        "image": "assets/recettes/gratin_dauphinois.jpg"
     }
 ]
