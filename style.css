@@ -1,37 +1,54 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #fff8f0;
-    color: #333;
+    padding: 0;
 }
 header {
-    text-align: center;
-    padding: 20px;
-    background-color: #ff7043;
-    color: white;
-}
-header img {
-    max-width: 100%;
-    height: auto;
-    margin-top: 10px;
-}
-.recettes {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff3e6;
+}
+.logo {
+    height: 50px;
+    cursor: pointer;
+}
+.search-section {
+    padding: 10px;
+    text-align: center;
+}
+.categories {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.category {
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+}
+.category.dessert { background-color: red; }
+.category.viande { background-color: blue; }
+.category.poisson { background-color: green; }
+.category.accompagnement { background-color: orange; }
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
     padding: 20px;
 }
-.recette-card {
-    background: white;
-    border-radius: 8px;
+.recipe-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    width: 300px;
     text-align: center;
-    padding: 10px;
+    background-color: white;
 }
-.recette-card img {
+.recipe-card img {
     width: 100%;
-    height: auto;
+    height: 150px;
+    object-fit: cover;
 }

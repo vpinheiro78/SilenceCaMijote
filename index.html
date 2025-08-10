@@ -8,19 +8,23 @@
 </head>
 <body>
     <header>
+        <img src="images/logo.png" alt="Logo" class="logo" onclick="window.location.href='admin/index.html'">
         <h1>Silence, ça mijote</h1>
-        <p>Recettes simples et savoureuses</p>
-        <img src="assets/uploads/banner.jpg" alt="Bannière YouTube">
     </header>
-    <main>
-        <section class="recettes">
-            <h2>Dernières recettes</h2>
-            <div class="recette-card">
-                <img src="assets/uploads/ratatouille.jpg" alt="Ratatouille">
-                <h3><a href="recette-exemple.html">Ratatouille maison</a></h3>
-                <p>Un plat méditerranéen coloré et parfumé.</p>
-            </div>
-        </section>
-    </main>
+
+    <section class="search-section">
+        <input type="text" id="searchInput" placeholder="Rechercher une recette...">
+    </section>
+
+    <section class="categories">
+        <button class="category dessert" onclick="filterCategory('Dessert')">Dessert</button>
+        <button class="category viande" onclick="filterCategory('Viande')">Viande</button>
+        <button class="category poisson" onclick="filterCategory('Poisson')">Poisson</button>
+        <button class="category accompagnement" onclick="filterCategory('Accompagnement')">Accompagnement</button>
+    </section>
+
+    <main id="recipeContainer" class="recipe-grid"></main>
+
+    <script src="script.js"></script>
 </body>
 </html>
