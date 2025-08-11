@@ -1,54 +1,31 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+:root{
+  --bg:#faf5f0; --terracotta:#b04a32; --blue:#2a4d69; --green:#2a9d8f; --orange:#f39c12; --yellow:#f4d03f;
 }
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff3e6;
-}
-.logo {
-    height: 100px;
-    cursor: pointer;
-}
-.search-section {
-    padding: 10px;
-    text-align: center;
-}
-.categories {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.category {
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-    color: white;
-    border-radius: 5px;
-}
-.category.dessert { background-color: red; }
-.category.viande { background-color: blue; }
-.category.poisson { background-color: green; }
-.category.accompagnement { background-color: orange; }
-.recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    padding: 20px;
-}
-.recipe-card {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
-    text-align: center;
-    background-color: white;
-}
-.recipe-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-}
+*{box-sizing:border-box}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;color:#222}
+.site-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.site-header h1{margin:0;color:var(--terracotta);font-size:1.3rem}
+.admin-link img{height:46px;width:46px;object-fit:contain;border-radius:6px}
+.container{max-width:1100px;margin:18px auto;padding:0 12px}
+.blurb{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px;box-shadow:0 3px 8px rgba(0,0,0,0.05);text-align:center;font-size:15px}
+.search-row{display:flex;justify-content:center;margin-bottom:12px}
+#search{width:92%;max-width:720px;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:16px}
+.categories{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px}
+.cat-btn{padding:8px 14px;border-radius:20px;border:none;color:#fff;cursor:pointer;font-weight:700;letter-spacing:0.2px}
+.cat-dessert{background:var(--terracotta)}
+.cat-viande{background:var(--blue)}
+.cat-poisson{background:var(--green)}
+.cat-accompagnement{background:var(--orange)}
+.cat-autre{background:var(--yellow);color:#222}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding-bottom:30px}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.06);position:relative;cursor:pointer;transition:transform .15s}
+.card:hover{transform:translateY(-6px)}
+.card img{width:100%;height:200px;object-fit:cover;display:block}
+.card .content{padding:12px}
+.card h3{margin:0 0 8px;color:var(--terracotta);font-size:1.1rem}
+.card p{margin:0 0 10px;color:#555;font-size:0.95rem}
+.badge-video{position:absolute;left:10px;top:10px;background:#2a4d69;color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
+.rating{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:0.95rem}
+.stars{color:#f5c542}
+.site-footer{text-align:center;padding:20px;color:#777;margin-top:20px}
+@media (max-width:800px){ .grid{grid-template-columns:repeat(1,1fr)} .card img{height:170px} .admin-link img{height:42px} }
