@@ -3,28 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silence, ça mijote</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Recettes - Silence, ça mijote</title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <header>
-        <img src="assets/logo.png" alt="Logo" class="logo" onclick="window.location.href='admin/index.html'">
         <h1>Silence, ça mijote</h1>
     </header>
-
-    <section class="search-section">
-        <input type="text" id="searchInput" placeholder="Rechercher une recette...">
-    </section>
-
-    <section class="categories">
-        <button class="category dessert" onclick="filterCategory('Dessert')">Dessert</button>
-        <button class="category viande" onclick="filterCategory('Viande')">Viande</button>
-        <button class="category poisson" onclick="filterCategory('Poisson')">Poisson</button>
-        <button class="category accompagnement" onclick="filterCategory('Accompagnement')">Accompagnement</button>
-    </section>
-
-    <main id="recipeContainer" class="recipe-grid"></main>
-
-    <script src="script.js"></script>
+    <main>
+        <div id="recipe-list"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="assets/app.js"></script>
 </body>
 </html>
