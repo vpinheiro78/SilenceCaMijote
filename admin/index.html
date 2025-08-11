@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Silence, ça mijote</title>
+<link rel="stylesheet" href="../style.css"/>
+</head>
+<body>
+<header class="site-header"><h1>Admin</h1><a href="../index.html">Retour</a></header>
+<main style="max-width:1000px;margin:20px auto;padding:12px">
+  <section>
+    <h2>Créer une recette</h2>
+    <form id="createForm">
+      <label>Titre<input name="titre" required/></label><br/>
+      <label>Description<textarea name="description"></textarea></label><br/>
+      <label>Catégorie<select name="categorie"><option value="dessert">dessert</option><option value="viande">viande</option><option value="poisson">poisson</option><option value="accompagnement">accompagnement</option><option value="autre">autre</option></select></label><br/>
+      <label>URL image<input name="photo_url" placeholder="ou utilisez upload"/></label><br/>
+      <label>Lien vidéo<input name="lien_video" placeholder="https://www.youtube.com/watch?v=..."/></label><br/>
+      <label>Ingrédients (séparés par | )<input name="ingredients" placeholder="oeufs | farine | sucre"/></label><br/>
+      <label>Préparation (étapes séparées par | )<input name="preparation" placeholder="Etape1 | Etape2"/></label><br/>
+      <button type="submit">Créer</button>
+    </form>
+  </section>
+
+  <section style="margin-top:20px">
+    <h2>Modifier / Supprimer</h2>
+    <div id="list"></div>
+  </section>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { SUPABASE_URL, SUPABASE_KEY } from '../config.js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+async function loadList(){
+  const { data } = await supabase.from('recettes').select('*').order('created_at',{ascending:false})
+  const list = document.getElementById('list')
+  list.innerHTML = ''
+  data.forEach(r => {
+    const div = document.createElement('div')
+    div.className = 'card'
+    div.style.padding='10px'
+    div.innerHTML = `<strong>${r.titre}</strong> — ${r.categorie} <br/> <button data-id="${r.id}" class="edit">Modifier</button> <button data-id="${r.id}" class="delete">Supprimer</button>`
+    list.appendChild(div)
+  })
+  document.querySelectorAll('.delete').forEach(b=>b.addEventListener('click', async e=>{
+    if(!confirm('Supprimer cette recette ?')) return
+    const id = e.target.dataset.id
+    await supabase.from('recettes').delete().eq('id', id)
+    loadList()
+  }))
+  document.querySelectorAll('.edit').forEach(b=>b.addEventListener('click', async e=>{
+    const id = e.target.dataset.id
+    const { data } = await supabase.from('recettes').select('*').eq('id', id).single()
+    if(!data) return alert('Introuvable')
+    const f = document.getElementById('createForm')
+    f.titre.value = data.titre
+    f.description.value = data.description || ''
+    f.categorie.value = data.categorie || 'dessert'
+    f.photo_url.value = data.photo_url || ''
+    f.lien_video.value = data.lien_video || ''
+    f.ingredients.value = (data.ingredients||[]).join(' | ')
+    f.preparation.value = (data.preparation||[]).join(' | ')
+    f.onsubmit = async ev => {
+      ev.preventDefault()
+      const body = {
+        titre: f.titre.value,
+        description: f.description.value,
+        categorie: f.categorie.value,
+        photo_url: f.photo_url.value,
+        lien_video: f.lien_video.value,
+        ingredients: f.ingredients.value.split('|').map(s=>s.trim()),
+        preparation: f.preparation.value.split('|').map(s=>s.trim())
+      }
+      await supabase.from('recettes').update(body).eq('id', id)
+      f.reset()
+      f.onsubmit = createSubmit
+      loadList()
+    }
+  }))
+}
+
+const createSubmit = async ev => {
+  ev.preventDefault()
+  const f = ev.target
+  const body = {
+    titre: f.titre.value,
+    description: f.description.value,
+    categorie: f.categorie.value,
+    photo_url: f.photo_url.value,
+    lien_video: f.lien_video.value,
+    ingredients: f.ingredients.value ? f.ingredients.value.split('|').map(s=>s.trim()) : [],
+    preparation: f.preparation.value ? f.preparation.value.split('|').map(s=>s.trim()) : []
+  }
+  await supabase.from('recettes').insert(body)
+  f.reset()
+  loadList()
+}
+
+document.getElementById('createForm').onsubmit = createSubmit
+loadList()
+</script>
+</body>
+</html>
