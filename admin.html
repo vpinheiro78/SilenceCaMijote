@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Recettes</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <header>
+        <h1>Administration des recettes</h1>
+    </header>
+    <main>
+        <form id="recipe-form">
+            <input type="text" id="title" placeholder="Titre de la recette" required><br>
+            <textarea id="content" placeholder="Description" required></textarea><br>
+            <input type="url" id="image_url" placeholder="URL de l'image" required><br>
+            <button type="submit">Ajouter</button>
+        </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="assets/admin.js"></script>
+</body>
+</html>

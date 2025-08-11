@@ -1,36 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Silence, ça mijote</title>
-<link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recettes - Silence, ça mijote</title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<header class="site-header">
-  <h1>Silence, ça mijote</h1>
-  <a class="admin-link" href="admin/index.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
-</header>
-
-<section class="hero">
-  <div class="site-blurb" id="site-blurb">Bienvenue sur Silence Ca Mijote!, un espace chaleureux où la passion de la cuisine se partage avec amour. Ici, chaque recette est soigneusement préparée et partagée pour vous inspirer à créer des plats savoureux et authentiques. Que vous soyez débutant ou chef aguerri, nos recettes simples et gourmandes vous accompagnent au quotidien pour éveiller vos papilles et réchauffer les cœurs. Venez découvrir, cuisiner et surtout savourer des moments pleins de convivialité !</div>
-  <div class="search-row">
-    <input id="search" type="search" placeholder="Rechercher une recette..." />
-  </div>
-  <div class="categories" id="categories">
-    <button data-cat="all" class="cat-btn">Toutes</button>
-    <button data-cat="dessert" class="cat-btn cat-dessert">Dessert</button>
-    <button data-cat="viande" class="cat-btn cat-viande">Viande</button>
-    <button data-cat="poisson" class="cat-btn cat-poisson">Poisson</button>
-    <button data-cat="accompagnement" class="cat-btn cat-accompagnement">Accompagnement</button>
-    <button data-cat="autre" class="cat-btn cat-autre">Autre</button>
-  </div>
-</section>
-
-<main id="recipes" class="grid"></main>
-
-<footer class="site-footer">© 2025 Silence, ça mijote</footer>
-
-<script type="module" src="script.js"></script>
+    <header>
+        <h1>Silence, ça mijote</h1>
+    </header>
+    <main>
+        <div id="recipe-list"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="assets/app.js"></script>
 </body>
 </html>
