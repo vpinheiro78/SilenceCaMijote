@@ -33,79 +33,151 @@
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { SUPABASE_URL, SUPABASE_KEY, BUCKET_NAME } from '../config.js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)await supabase.storage.from(photos-recettes).upload(name, f)
 
-if(!sessionStorage.getItem('isAdmin')){ location.href = 'login.html'; }
+// Mets ici ton URL et ta clé d'API Supabase (remplace par les tiennes)
+const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 
-const form = document.getElementById('recipeForm'), listDiv = document.getElementById('list'), uploadBtn = document.getElementById('uploadBtn'), uploadStatus = document.getElementById('uploadStatus')
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const form = document.getElementById('recipeForm')
+const listDiv = document.getElementById('list')
+const uploadBtn = document.getElementById('uploadBtn')
+const uploadStatus = document.getElementById('uploadStatus')
+
 let uploadedPath = ''
 
-uploadBtn.addEventListener('click', async ()=>{
-  const f = form.elements['imagefile'].files[0]
-  if(!f) return alert('Choisissez d'abord un fichier')
-  const name = `${Date.now()}_${f.name.replace(/\s+/g,'_')}`
+uploadBtn.addEventListener('click', async () => {
+  const fileInput = form.elements['imagefile']
+  const file = fileInput.files[0]
+  if (!file) {
+    alert('Choisissez d\'abord un fichier')
+    return
+  }
+
+  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+
   uploadStatus.innerText = 'Upload en cours...'
-  const { data, error } = await supabase.storage.from(BUCKET_NAME).upload(name, f)
-  if(error){ uploadStatus.innerText = 'Erreur upload'; console.error(error); return }
+
+  // Upload dans le bucket 'photos-recettes' (le nom doit correspondre au bucket créé dans Supabase Storage)
+  const { data, error } = await supabase.storage.from('photos-recettes').upload(fileName, file)
+
+  if (error) {
+    console.error('Erreur upload :', error)
+    uploadStatus.innerText = 'Erreur lors de l\'upload'
+    return
+  }
+
   uploadedPath = data.path
-  const publicUrl = supabase.storage.from(BUCKET_NAME).getPublicUrl(uploadedPath).data.publicUrl
-  form.elements['photo_url'].value = publicUrl
-  uploadStatus.innerText = 'Upload OK'
+
+  // Récupérer l'URL publique de l'image uploadée
+  const { data: publicUrlData } = supabase.storage.from('photos-recettes').getPublicUrl(uploadedPath)
+  form.elements['photo_url'].value = publicUrlData.publicUrl
+  uploadStatus.innerText = 'Upload réussi !'
 })
 
-async function loadList(){
-  const { data } = await supabase.from('recettes').select('*').order('created_at',{ascending:false})
+// Charge et affiche la liste des recettes
+async function loadList() {
+  const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Erreur chargement recettes:', error)
+    listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'
+    return
+  }
+
   listDiv.innerHTML = ''
-  data.forEach(r=>{
-    const el = document.createElement('div'); el.className='card'; el.style.padding='12px'; el.style.marginBottom='10px'
-    el.innerHTML = `<strong>${r.titre}</strong> — ${r.categorie} <br/><button data-id="${r.id}" class="edit">Modifier</button> <button data-id="${r.id}" class="del">Supprimer</button>`
-    listDiv.appendChild(el)
+  data.forEach(r => {
+    const card = document.createElement('div')
+    card.className = 'card'
+    card.style.padding = '12px'
+    card.style.marginBottom = '10px'
+    card.innerHTML = `
+      <strong>${r.titre}</strong> — ${r.categorie} <br/>
+      <button data-id="${r.id}" class="edit">Modifier</button>
+      <button data-id="${r.id}" class="del">Supprimer</button>
+    `
+    listDiv.appendChild(card)
   })
-  listDiv.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async e=>{
-    if(!confirm('Supprimer cette recette ?')) return
-    await supabase.from('recettes').delete().eq('id', e.target.dataset.id)
-    loadList()
-  }))
-  listDiv.querySelectorAll('.edit').forEach(b=>b.addEventListener('click', async e=>{
-    const id = e.target.dataset.id
-    const { data } = await supabase.from('recettes').select('*').eq('id', id).single()
-    if(!data) return alert('Introuvable')
-    form.elements['id'].value = data.id
-    form.elements['titre'].value = data.titre || ''
-    form.elements['description'].value = data.description || ''
-    form.elements['categorie'].value = data.categorie || 'dessert'
-    form.elements['photo_url'].value = data.photo_url || data.image_url || ''
-    form.elements['lien_video'].value = data.lien_video || data.lien_youtube || ''
-    form.elements['ingredients'].value = (data.ingredients||[]).join('\n')
-    form.elements['preparation'].value = (data.preparation||[]).join('\n')
-  }))
+
+  // Gestion suppression
+  listDiv.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      if (!confirm('Supprimer cette recette ?')) return
+      const id = e.target.dataset.id
+      const { error } = await supabase.from('recettes').delete().eq('id', id)
+      if (error) {
+        alert('Erreur lors de la suppression')
+        console.error(error)
+      } else {
+        loadList()
+      }
+    })
+  })
+
+  // Gestion édition
+  listDiv.querySelectorAll('.edit').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      const id = e.target.dataset.id
+      const { data, error } = await supabase.from('recettes').select('*').eq('id', id).single()
+      if (error || !data) {
+        alert('Recette introuvable')
+        return
+      }
+      form.elements['id'].value = data.id
+      form.elements['titre'].value = data.titre || ''
+      form.elements['description'].value = data.description || ''
+      form.elements['categorie'].value = data.categorie || 'dessert'
+      form.elements['photo_url'].value = data.photo_url || ''
+      form.elements['lien_video'].value = data.lien_video || ''
+      form.elements['ingredients'].value = (data.ingredients || []).join('\n')
+      form.elements['preparation'].value = (data.preparation || []).join('\n')
+    })
+  })
 }
 
-form.addEventListener('submit', async e=>{
+form.addEventListener('submit', async e => {
   e.preventDefault()
   const id = form.elements['id'].value || null
-  const body = {
+  const recette = {
     titre: form.elements['titre'].value,
     description: form.elements['description'].value,
     categorie: form.elements['categorie'].value,
     photo_url: form.elements['photo_url'].value || null,
     lien_video: form.elements['lien_video'].value || null,
-    ingredients: form.elements['ingredients'].value ? form.elements['ingredients'].value.split('\n').map(s=>s.trim()).filter(Boolean) : [],
-    preparation: form.elements['preparation'].value ? form.elements['preparation'].value.split('\n').map(s=>s.trim()).filter(Boolean) : []
+    ingredients: form.elements['ingredients'].value
+      ? form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean)
+      : [],
+    preparation: form.elements['preparation'].value
+      ? form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
+      : []
   }
-  if(id){
-    await supabase.from('recettes').update(body).eq('id', id)
-    alert('Recette mise à jour')
+
+  let response
+  if (id) {
+    response = await supabase.from('recettes').update(recette).eq('id', id)
   } else {
-    await supabase.from('recettes').insert(body)
-    alert('Recette créée')
+    response = await supabase.from('recettes').insert(recette)
   }
-  form.reset(); uploadedPath=''; uploadStatus.innerText=''
+
+  if (response.error) {
+    alert('Erreur lors de la sauvegarde')
+    console.error(response.error)
+    return
+  }
+
+  alert(id ? 'Recette mise à jour' : 'Recette créée')
+  form.reset()
+  uploadedPath = ''
+  uploadStatus.innerText = ''
   loadList()
 })
 
-document.getElementById('resetBtn').addEventListener('click', ()=>{ form.reset(); uploadedPath=''; uploadStatus.innerText='' })
+document.getElementById('resetBtn').addEventListener('click', () => {
+  form.reset()
+  uploadedPath = ''
+  uploadStatus.innerText = ''
+})
 
 loadList()
 </script>
