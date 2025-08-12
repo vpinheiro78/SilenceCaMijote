@@ -1,24 +1,22 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Silence, ça mijote</title>
-<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
-  <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.svg" alt="Logo" /></a>
+  <a class="admin-link" href="admin/index.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
 </header>
 
-<main class="container">
-  <div class="blurb" id="site-blurb">Ce site recense nos recettes quotidiennes, faites avec amour et passion.</div>
-
+<section class="hero">
+  <div class="site-blurb" id="site-blurb">Ce site recense nos recettes quotidiennes, faites avec amour et passion.</div>
   <div class="search-row">
     <input id="search" type="search" placeholder="Rechercher une recette..." />
   </div>
-
   <div class="categories" id="categories">
     <button data-cat="all" class="cat-btn">Toutes</button>
     <button data-cat="dessert" class="cat-btn cat-dessert">Dessert</button>
@@ -27,9 +25,9 @@
     <button data-cat="accompagnement" class="cat-btn cat-accompagnement">Accompagnement</button>
     <button data-cat="autre" class="cat-btn cat-autre">Autre</button>
   </div>
+</section>
 
-  <section id="recipes" class="grid" aria-live="polite"></section>
-</main>
+<main id="recipes" class="grid"></main>
 
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 

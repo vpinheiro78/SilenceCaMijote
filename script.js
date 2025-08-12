@@ -26,17 +26,3 @@ document.getElementById('searchInput').addEventListener('input', e => {
     displayRecipes(recipes.filter(r => r.nom.toLowerCase().includes(val) || r.presentation.toLowerCase().includes(val)));
 });
 fetchRecipes();
-
-async function loadRecettes() {
-    const { data, error } = await supabase
-        .from("recettes")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error("Erreur chargement recettes:", error);
-        return;
-    }
-
-    afficherRecettes(data);
-}

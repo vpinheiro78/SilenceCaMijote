@@ -1,45 +1,33 @@
-async function loadRecettes() {
-    const { data, error } = await supabase
-        .from("recettes")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error("Erreur chargement recettes:", error);
-        return;
-    }
-
-    afficherRecettes(data);
-}
-
-
-
 [
-
-
-
-    {
-        "nom": "Tarte aux pommes",
-        "presentation": "Une tarte classique aux pommes caramélisées",
-        "categorie": "Dessert",
-        "image": "assets/recettes/tarte_pommes.jpg"
-    },
-    {
-        "nom": "Boeuf bourguignon",
-        "presentation": "Un mijoté de boeuf au vin rouge",
-        "categorie": "Viande",
-        "image": "assets/recettes/boeuf_bourguignon.jpg"
-    },
-    {
-        "nom": "Saumon grillé",
-        "presentation": "Filet de saumon grillé avec légumes",
-        "categorie": "Poisson",
-        "image": "assets/recettes/saumon_grille.jpg"
-    },
-    {
-        "nom": "Gratin dauphinois",
-        "presentation": "Pommes de terre crémeuses au four",
-        "categorie": "Accompagnement",
-        "image": "assets/recettes/gratin_dauphinois.jpg"
-    }
+  {
+    "titre": "Cataplana Easy",
+    "description": "Version simple de la cataplana.",
+    "categorie": "poisson",
+    "photo_url": "https://ttkgzzamsfnittbqqvft.supabase.co/storage/v1/object/public/photos-recettes/cataplana.jpg",
+    "ingredients": [
+      "poisson",
+      "tomates",
+      "poivron"
+    ],
+    "preparation": [
+      "Etape 1",
+      "Etape 2"
+    ],
+    "lien_video": "https://www.youtube.com/watch?v=XXXX"
+  },
+  {
+    "titre": "Ratatouille maison",
+    "description": "Légumes du soleil.",
+    "categorie": "accompagnement",
+    "photo_url": "https://ttkgzzamsfnittbqqvft.supabase.co/storage/v1/object/public/photos-recettes/ratatouille.jpg",
+    "ingredients": [
+      "courgette",
+      "aubergine"
+    ],
+    "preparation": [
+      "Couper",
+      "Cuire"
+    ],
+    "lien_video": ""
+  }
 ]

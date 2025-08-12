@@ -1,47 +1,45 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Recette</title>
-<link rel="stylesheet" href="style.css"/></head>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Recette</title>
+<link rel="stylesheet" href="style.css" />
+</head>
 <body>
-<header class="site-header"><h1>Silence, ça mijote</h1><a class="admin-link" href="admin/login.html"><img src="assets/logo.svg" alt="logo"/></a></header>
-<main style="max-width:900px;margin:20px auto;padding:12px" id="main">
-  <div id="detail-area"></div>
-</main>
-<footer class="site-footer">© 2025 Silence, ça mijote</footer>
+<header class="site-header">
+  <h1>Silence, ça mijote</h1>
+  <a class="admin-link" href="admin/index.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
+</header>
 
+<main id="recipe-detail" style="max-width:900px;margin:20px auto;padding:0 12px"></main>
+
+<footer class="site-footer">© 2025 Silence, ça mijote</footer>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { SUPABASE_URL, SUPABASE_KEY } from './config.js'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-function starHtml(avg){ const full = Math.round(Number(avg)||0); return '★'.repeat(full) + '☆'.repeat(Math.max(0,5-full)); }
-
-function getParam(name){ return new URLSearchParams(location.search).get(name) }
-
-function photoUrlFromRow(r){
-  const p = r.photo_url || r.image_url || r.photo || r.image || ''
-  if(!p) return 'assets/placeholder.jpg'
-  if(p.startsWith('http')) return p
-  if(p.indexOf('/storage/v1')!==-1) return p
-  return `${SUPABASE_URL}/storage/v1/object/public/photos-recettes/${p}`
+function starHtmlRow(avg){
+  if(avg===null) avg=0
+  const full = Math.round(avg)
+  return '★'.repeat(full) + '☆'.repeat(Math.max(0,5-full))
 }
 
 async function load(){
-  const id = getParam('id')
-  if(!id){ document.getElementById('detail-area').innerText = 'Recette introuvable'; return }
-  let { data, error } = await supabase.from('recettes_avec_notes').select('*').eq('id', id).single()
-  if(error || !data){ const r = await supabase.from('recettes').select('*').eq('id', id).single(); data = r.data }
-  if(!data){ document.getElementById('detail-area').innerText = 'Recette introuvable'; return }
+  const params = new URLSearchParams(location.search)
+  const id = params.get('id')
+  if(!id){ document.getElementById('recipe-detail').innerText='Recette introuvable'; return }
+  const { data, error } = await supabase.from('recettes_avec_notes').select('*').eq('id', id).single()
+  if(error || !data){ document.getElementById('recipe-detail').innerText='Recette introuvable'; console.error(error); return }
   const r = data
-  const photo = photoUrlFromRow(r)
-  const avg = r.moyenne_notes ?? r.note_moyenne ?? 0
-  document.getElementById('detail-area').innerHTML = `
+  document.getElementById('recipe-detail').innerHTML = `
     <article class="card">
-      <img src="${photo}" alt="${r.titre}"/>
+      <img src="${r.photo_url || 'assets/placeholder.jpg'}" alt="${r.titre}" />
       <div class="content">
         <h2>${r.titre}</h2>
-        <div class="rating"><span class="stars">${starHtml(avg)}</span> <strong>(${(Number(avg)||0).toFixed(1)})</strong></div>
-        <p><em>${r.description||''}</em></p>
+        <div class="rating"><span class="stars">${starHtmlRow(r.moyenne_notes || r.note_moyenne || 0)}</span> <strong>(${(r.moyenne_notes||r.note_moyenne||0).toFixed(1)})</strong></div>
+        <p><em>${r.description || ''}</em></p>
         <h3>Ingrédients</h3>
         <ul>${(r.ingredients||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
         <h3>Préparation</h3>
@@ -52,18 +50,16 @@ async function load(){
     </article>
   `
 
-  // Rating buttons
   const voteRow = document.createElement('div')
-  voteRow.style.marginTop = '12px'
-  voteRow.innerHTML = '<strong>Votre note :</strong> ' + [1,2,3,4,5].map(n=>`<button data-n="${n}" class="vote-btn">${n}★</button>`).join(' ')
-  document.getElementById('detail-area').appendChild(voteRow)
+  voteRow.innerHTML = '<div style="margin-top:12px"><strong>Votre note :</strong> ' + [1,2,3,4,5].map(n=>`<button data-n="${n}" class="vote-btn">${n}★</button>`).join(' ') + '</div>'
+  document.getElementById('recipe-detail').appendChild(voteRow)
   voteRow.querySelectorAll('.vote-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const val = parseInt(btn.dataset.n)
       await supabase.from('notes').insert({recette_id: id, note: val})
       const { data: updated } = await supabase.from('recettes_avec_notes').select('*').eq('id', id).single()
       if(updated){
-        document.querySelector('.rating .stars').innerText = starHtml(updated.moyenne_notes)
+        document.querySelector('.rating .stars').innerText = '★'.repeat(Math.round(updated.moyenne_notes)) + '☆'.repeat(5-Math.round(updated.moyenne_notes))
         document.querySelector('.rating strong').innerText = '(' + (updated.moyenne_notes||0).toFixed(1) + ')'
       }
     })
