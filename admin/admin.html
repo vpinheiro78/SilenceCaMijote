@@ -33,8 +33,8 @@
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { https://ttkgzzamsfnittbqqvft.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY, photos-recettes } from '../config.js'
-const supabase = createClient(https://ttkgzzamsfnittbqqvft.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY)
+import { SUPABASE_URL, SUPABASE_KEY, BUCKET_NAME } from '../config.js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)await supabase.storage.from(photos-recettes).upload(name, f)
 
 if(!sessionStorage.getItem('isAdmin')){ location.href = 'login.html'; }
 
@@ -46,10 +46,10 @@ uploadBtn.addEventListener('click', async ()=>{
   if(!f) return alert('Choisissez d'abord un fichier')
   const name = `${Date.now()}_${f.name.replace(/\s+/g,'_')}`
   uploadStatus.innerText = 'Upload en cours...'
-  const { data, error } = await supabase.storage.from(photos-recettes).upload(name, f)
+  const { data, error } = await supabase.storage.from(BUCKET_NAME).upload(name, f)
   if(error){ uploadStatus.innerText = 'Erreur upload'; console.error(error); return }
   uploadedPath = data.path
-  const publicUrl = supabase.storage.from(photos-recettes).getPublicUrl(uploadedPath).data.publicUrl
+  const publicUrl = supabase.storage.from(BUCKET_NAME).getPublicUrl(uploadedPath).data.publicUrl
   form.elements['photo_url'].value = publicUrl
   uploadStatus.innerText = 'Upload OK'
 })
