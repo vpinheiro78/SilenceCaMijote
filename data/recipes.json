@@ -1,4 +1,23 @@
+async function loadRecettes() {
+    const { data, error } = await supabase
+        .from("recettes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Erreur chargement recettes:", error);
+        return;
+    }
+
+    afficherRecettes(data);
+}
+
+
+
 [
+
+
+
     {
         "nom": "Tarte aux pommes",
         "presentation": "Une tarte classique aux pommes caramélisées",
