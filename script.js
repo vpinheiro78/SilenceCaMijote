@@ -2,8 +2,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // 📌 À remplacer par tes infos Supabase
-const supabaseUrl = 'https://TON-PROJET.supabase.co'
-const supabaseKey = 'TA_CLE_PUBLIQUE_ANONYME'
+const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Sélecteurs HTML
