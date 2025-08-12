@@ -11,8 +11,8 @@
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { https://ttkgzzamsfnittbqqvft.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY } from './config.js'
-const supabase = createClient(https://ttkgzzamsfnittbqqvft.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY)
+import { SUPABASE_URL, SUPABASE_KEY } from './config.js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 function starHtml(avg){ const full = Math.round(Number(avg)||0); return '★'.repeat(full) + '☆'.repeat(Math.max(0,5-full)); }
 
@@ -23,7 +23,7 @@ function photoUrlFromRow(r){
   if(!p) return 'assets/placeholder.jpg'
   if(p.startsWith('http')) return p
   if(p.indexOf('/storage/v1')!==-1) return p
-  return `${https://ttkgzzamsfnittbqqvft.supabase.co}/storage/v1/object/public/photos-recettes/${p}`
+  return `${SUPABASE_URL}/storage/v1/object/public/photos-recettes/${p}`
 }
 
 async function load(){
