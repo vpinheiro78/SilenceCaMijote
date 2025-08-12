@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Sélecteurs HTML
 const recipesContainer = document.getElementById('recipes')
-const searchInput = document.getElementById('search')
+const searchInput = document.getElementById('search')                                                                                         
 const categoryButtons = document.querySelectorAll('.cat-btn')
 
 let allRecipes = []
@@ -53,8 +53,8 @@ function filterRecipes() {
 // Chargement depuis Supabase
 async function loadRecipes() {
   const { data, error } = await supabase
-    .from('recipes') // 📌 nom exact de ta table
-    .select('id, title, description, photo_url, category')
+    .from('recettes') // 📌 nom exact de ta table
+    .select('id, titre, description, photo_url, categorie')
     .order('id', { ascending: false })
 
   if (error) {
