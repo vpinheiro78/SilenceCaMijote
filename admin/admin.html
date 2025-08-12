@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Silence ça mijote</title>
+<link rel="stylesheet" href="../style.css"/></head>
+<body>
+<header class="site-header"><h1>Admin</h1><a href="../index.html">Retour site</a></header>
+<main style="max-width:1100px;margin:18px auto;padding:12px">
+  <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
+    <h2>Créer / Modifier une recette</h2>
+    <form id="recipeForm">
+      <input type="hidden" name="id" />
+      <label>Titre<br/><input name="titre" required style="width:100%;padding:12px;font-size:16px"/></label><br/><br/>
+      <label>Description<br/><textarea name="description" rows="3" style="width:100%;padding:12px;font-size:15px"></textarea></label><br/>
+      <label>Catégorie<br/>
+        <select name="categorie" style="padding:10px;font-size:15px">
+          <option value="dessert">dessert</option><option value="viande">viande</option><option value="poisson">poisson</option><option value="accompagnement">accompagnement</option><option value="autre">autre</option>
+        </select>
+      </label><br/><br/>
+      <label>Image (fichier)<br/><input type="file" name="imagefile" accept="image/*" /></label><br/>
+      <button type="button" id="uploadBtn">Uploader l'image</button> <span id="uploadStatus" style="margin-left:8px;color:#333"></span><br/><br/>
+      <label>Ou URL image<br/><input name="photo_url" style="width:100%;padding:10px;font-size:15px" placeholder="https://..."/></label><br/><br/>
+      <label>Vidéo YouTube (URL)<br/><input name="lien_video" style="width:100%;padding:10px;font-size:15px" placeholder="https://www.youtube.com/watch?v=..."/></label><br/><br/>
+      <label>Ingrédients (un par ligne)<br/><textarea name="ingredients" rows="4" style="width:100%;padding:12px;font-size:15px" placeholder="1 aubergine&#10;2 courgettes"></textarea></label><br/>
+      <label>Préparation / Étapes (une étape par ligne)<br/><textarea name="preparation" rows="6" style="width:100%;padding:12px;font-size:15px" placeholder="Étape 1&#10;Étape 2"></textarea></label><br/><br/>
+      <button type="submit">Enregistrer</button> <button type="button" id="resetBtn">Réinitialiser</button>
+    </form>
+  </section>
+
+  <section style="margin-top:18px">
+    <h2>Recettes existantes</h2>
+    <div id="list"></div>
+  </section>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { SUPABASE_URL, SUPABASE_KEY, BUCKET_NAME } from '../config.js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+if(!sessionStorage.getItem('isAdmin')){ location.href = 'login.html'; }
+
+const form = document.getElementById('recipeForm'), listDiv = document.getElementById('list'), uploadBtn = document.getElementById('uploadBtn'), uploadStatus = document.getElementById('uploadStatus')
+let uploadedPath = ''
+
+uploadBtn.addEventListener('click', async ()=>{
+  const f = form.elements['imagefile'].files[0]
+  if(!f) return alert('Choisissez d'abord un fichier')
+  const name = `${Date.now()}_${f.name.replace(/\s+/g,'_')}`
+  uploadStatus.innerText = 'Upload en cours...'
+  const { data, error } = await supabase.storage.from(BUCKET_NAME).upload(name, f)
+  if(error){ uploadStatus.innerText = 'Erreur upload'; console.error(error); return }
+  uploadedPath = data.path
+  const publicUrl = supabase.storage.from(BUCKET_NAME).getPublicUrl(uploadedPath).data.publicUrl
+  form.elements['photo_url'].value = publicUrl
+  uploadStatus.innerText = 'Upload OK'
+})
+
+async function loadList(){
+  const { data } = await supabase.from('recettes').select('*').order('created_at',{ascending:false})
+  listDiv.innerHTML = ''
+  data.forEach(r=>{
+    const el = document.createElement('div'); el.className='card'; el.style.padding='12px'; el.style.marginBottom='10px'
+    el.innerHTML = `<strong>${r.titre}</strong> — ${r.categorie} <br/><button data-id="${r.id}" class="edit">Modifier</button> <button data-id="${r.id}" class="del">Supprimer</button>`
+    listDiv.appendChild(el)
+  })
+  listDiv.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async e=>{
+    if(!confirm('Supprimer cette recette ?')) return
+    await supabase.from('recettes').delete().eq('id', e.target.dataset.id)
+    loadList()
+  }))
+  listDiv.querySelectorAll('.edit').forEach(b=>b.addEventListener('click', async e=>{
+    const id = e.target.dataset.id
+    const { data } = await supabase.from('recettes').select('*').eq('id', id).single()
+    if(!data) return alert('Introuvable')
+    form.elements['id'].value = data.id
+    form.elements['titre'].value = data.titre || ''
+    form.elements['description'].value = data.description || ''
+    form.elements['categorie'].value = data.categorie || 'dessert'
+    form.elements['photo_url'].value = data.photo_url || data.image_url || ''
+    form.elements['lien_video'].value = data.lien_video || data.lien_youtube || ''
+    form.elements['ingredients'].value = (data.ingredients||[]).join('\n')
+    form.elements['preparation'].value = (data.preparation||[]).join('\n')
+  }))
+}
+
+form.addEventListener('submit', async e=>{
+  e.preventDefault()
+  const id = form.elements['id'].value || null
+  const body = {
+    titre: form.elements['titre'].value,
+    description: form.elements['description'].value,
+    categorie: form.elements['categorie'].value,
+    photo_url: form.elements['photo_url'].value || null,
+    lien_video: form.elements['lien_video'].value || null,
+    ingredients: form.elements['ingredients'].value ? form.elements['ingredients'].value.split('\n').map(s=>s.trim()).filter(Boolean) : [],
+    preparation: form.elements['preparation'].value ? form.elements['preparation'].value.split('\n').map(s=>s.trim()).filter(Boolean) : []
+  }
+  if(id){
+    await supabase.from('recettes').update(body).eq('id', id)
+    alert('Recette mise à jour')
+  } else {
+    await supabase.from('recettes').insert(body)
+    alert('Recette créée')
+  }
+  form.reset(); uploadedPath=''; uploadStatus.innerText=''
+  loadList()
+})
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{ form.reset(); uploadedPath=''; uploadStatus.innerText='' })
+
+loadList()
+</script>
+</body></html>
