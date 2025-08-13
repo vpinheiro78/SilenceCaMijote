@@ -30,11 +30,12 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 .site-footer{text-align:center;padding:20px;color:#777;margin-top:20px}
 @media (max-width:800px){ .grid{grid-template-columns:repeat(1,1fr)} .card img{height:170px} .admin-link img{height:42px} }
 
-/* Uniformiser la taille des photos de recette avec un ratio fixe */
+/* Uniformiser la taille des photos de recette */
 .recipe-img {
-  width: 100%;
-  aspect-ratio: 4 / 3; /* largeur / hauteur = 4:3 */
-  object-fit: cover;   /* remplit le cadre en rognant */
-  border-radius: 8px;  /* coins arrondis optionnels */
+  width: 100%;         /* occupe toute la largeur dispo */
+  height: 200px;       /* hauteur fixe */
+  object-fit: cover;   /* rogne sans déformer */
+  border-radius: 8px;  /* optionnel : coins arrondis */
   display: block;
 }
+
