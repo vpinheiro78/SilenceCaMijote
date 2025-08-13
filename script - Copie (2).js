@@ -1,7 +1,7 @@
 // Import Supabase
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// 📌 Infos Supabase
+// 📌 À remplacer par tes infos Supabase
 const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -26,7 +26,7 @@ function displayRecipes(recipes) {
     <article class="recipe-card">
       <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
       <h2>${r.titre}</h2>
-      <p>${r.description || ''}</p>
+      <p>${r.description}</p>
     </article>
   `).join('')
 }
@@ -35,22 +35,15 @@ function displayRecipes(recipes) {
 function filterRecipes() {
   let filtered = allRecipes
 
-  // Filtre catégorie
   if (currentCategory !== 'all') {
-    filtered = filtered.filter(r => {
-      const catBase = (r.categorie || '').toLowerCase().trim()
-      const catButton = currentCategory.toLowerCase().trim()
-      return catBase.startsWith(catButton) // tolère pluriels (ex: "desserts")
-    })
+    filtered = filtered.filter(r => r.category && r.category.toLowerCase() === currentCategory.toLowerCase())
   }
 
-  // Recherche texte
   if (currentSearch.trim() !== '') {
     const searchLower = currentSearch.toLowerCase()
     filtered = filtered.filter(r =>
       (r.titre && r.titre.toLowerCase().includes(searchLower)) ||
-      (r.description && r.description.toLowerCase().includes(searchLower)) ||
-      (r.categorie && r.categorie.toLowerCase().includes(searchLower))
+      (r.description && r.description.toLowerCase().includes(searchLower))
     )
   }
 
@@ -61,7 +54,7 @@ function filterRecipes() {
 async function loadRecipes() {
   const { data, error } = await supabase
     .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url')
+    .select('id, titre, description, photo_url, categorie')
     .order('id', { ascending: false })
 
   if (error) {
