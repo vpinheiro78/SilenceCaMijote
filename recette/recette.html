@@ -167,6 +167,7 @@
   function afficherRecette(recette) {
     document.getElementById('titre').innerText = recette.titre;
     document.getElementById('imageRecette').src = recette.photo_url || '';
+	document.getElementById('description').innerText = description.titre;
     document.getElementById('imageRecette').alt = recette.nom;
 
     // Ingrédients
