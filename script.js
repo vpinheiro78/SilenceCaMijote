@@ -51,6 +51,8 @@ function filterRecipes() {
       (r.titre && r.titre.toLowerCase().includes(searchLower)) ||
       (r.description && r.description.toLowerCase().includes(searchLower)) ||
       (r.categorie && r.categorie.toLowerCase().includes(searchLower))
+      (r.ingredients && Array.isArray(r.ingredients) && r.ingredients.join(', ').toLowerCase().includes(searchLower)) ||
+      (r.ingredients && typeof r.ingredients === 'string' && r.ingredients.toLowerCase().includes(searchLower))
     )
   }
 
