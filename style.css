@@ -48,3 +48,38 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 }
 .recipe-card:hover { transform: translateY(-6px); }
 
+@media screen and (max-width: 700px) {
+  .recette-header {
+    flex-direction: column;
+  }
+  #imageRecette {
+    width: 100%;
+    margin-top: 15px;
+  }
+}
+
+.recette-header {
+  display: flex;
+  gap: 20px;                 /* espace entre description et image */
+  align-items: flex-start;   /* alignement vertical en haut */
+  margin-bottom: 20px;
+}
+
+/* Description à gauche */
+#description {
+  flex: 1;                   /* prend tout l'espace disponible */
+  background: #fff3e0;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  line-height: 1.5;
+}
+
+/* Image à droite */
+#imageRecette {
+  width: 300px;              /* taille fixe */
+  height: auto;
+  border-radius: 15px;
+  object-fit: cover;
+}
+
