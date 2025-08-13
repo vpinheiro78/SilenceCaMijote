@@ -22,20 +22,13 @@ function displayRecipes(recipes) {
     return
   }
 
-  recipesContainer.innerHTML = recipes.map(r => `
-    <a href="recette/recette.html?id=${r.id}" class="recipe-card">
-      <div class="recipe-img-wrapper">
-        <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
-        ${r.lien_youtube ? `
-          <div class="video-badge">
-            ▶
-          </div>
-        ` : ''}
-      </div>
-      <h2>${r.titre}</h2>
-      <p>${r.description || ''}</p>
-    </a>
-  `).join('')
+ recipesContainer.innerHTML = recipes.map(r => `
+  <a href="recette/recette.html?id=${r.id}" class="recipe-card">
+    <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
+    <h2>${r.titre}</h2>
+    <p>${r.description || ''}</p>
+  </a>
+`).join('')
 }
 
 // Fonction de filtrage
