@@ -205,8 +205,8 @@ const etapes = Array.isArray(recette.preparation)
     // Vidéo YouTube intégrée + mini-player flottant
     const videoContainer = document.getElementById('videoContainer');
     videoContainer.innerHTML = '';
-    if (recette.youtube_url) {
-      const match = recette.youtube_url.match(/(?:v=|youtu\.be\/)([^&]+)/);
+    if (recette.lien_youtube) {
+      const match = recette.lien_youtube.match(/(?:v=|youtu\.be\/)([^&]+)/);
       if (match && match[1]) {
         const videoId = match[1];
 
