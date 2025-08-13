@@ -27,9 +27,11 @@
   .container.show { opacity: 1; transform: translateY(0); }
 
   img {
-    width: 100%;
+    width: 50%;          /* image plus petite */
+    max-width: 400px;    /* limite maximale */
+    display: block;
+    margin: 0 auto 20px auto; /* centré horizontalement avec marge en bas */
     border-radius: 15px;
-    margin-bottom: 20px;
     transition: transform 0.5s ease;
   }
   img:hover { transform: scale(1.03); }
