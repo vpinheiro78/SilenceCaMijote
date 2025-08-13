@@ -47,4 +47,3 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   transition: transform 0.15s;
 }
 .recipe-card:hover { transform: translateY(-6px); }
-
