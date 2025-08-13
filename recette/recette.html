@@ -165,9 +165,9 @@
   }
 
   function afficherRecette(recette) {
-    document.getElementById('titre').innerText = recette.nom;
-    document.getElementById('imageRecette').src = recette.image_url || '';
-    document.getElementById('imageRecette').alt = recette.nom;
+    document.getElementById('titre').innerText = recette.titre;
+    document.getElementById('imageRecette').src = recette.photo_url || '';
+    document.getElementById('imageRecette').alt = recette.titre;
 
     // Ingrédients
     const ingredientsContainer = document.getElementById('ingredients');
@@ -182,9 +182,9 @@
     } else { ingredientsContainer.innerText = recette.ingredients; }
 
     // Instructions en étapes numérotées
-    const instructionsContainer = document.getElementById('instructions');
+    const instructionsContainer = document.getElementById('preparation');
     instructionsContainer.innerHTML = '';
-    const etapes = Array.isArray(recette.instructions) ? recette.instructions : [recette.instructions];
+    const etapes = Array.isArray(recette.preparation) ? recette.preparation : [recette.preparation];
     etapes.forEach((etape, index) => {
       const div = document.createElement('div');
       div.className = 'etape-card';
