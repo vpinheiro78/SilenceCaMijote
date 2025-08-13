@@ -38,12 +38,3 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   border-radius: 8px;  /* coins arrondis optionnels */
   display: block;
 }
-
-.recipe-card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-.recipe-card:hover { transform: translateY(-6px); }
