@@ -37,6 +37,8 @@ function displayRecipes(recipes) {
       </div>
       <h2>${r.titre}</h2>
       <p>${r.description || ''}</p>
+      ${r.note_moyenne ? `<div class="rating">${generateStars(r.note_moyenne)}</div>` : ''}
+
     </a>
   `).join('')
 }
@@ -73,7 +75,7 @@ if (currentSearch.trim() !== '') {
 async function loadRecipes() {
   const { data, error } = await supabase
     .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url,ingredients,lien_youtube')
+    .select('id, titre, description, categorie, photo_url,ingredients,note_moyenne,lien_youtube')
     .order('id', { ascending: false })
 
   if (error) {
@@ -85,6 +87,21 @@ async function loadRecipes() {
   allRecipes = data
   filterRecipes()
 }
+
+//génération étoile
+function generateStars(rating) {
+  const maxStars = 5
+  const fullStars = Math.floor(rating)
+  const halfStar = rating % 1 >= 0.5 ? 1 : 0
+  const emptyStars = maxStars - fullStars - halfStar
+
+  return `
+    ${'<span class="star full">★</span>'.repeat(fullStars)}
+    ${halfStar ? '<span class="star half">★</span>' : ''}
+    ${'<span class="star empty">★</span>'.repeat(emptyStars)}
+  `
+}
+
 
 // Gestion des événements
 searchInput.addEventListener('input', (e) => {
