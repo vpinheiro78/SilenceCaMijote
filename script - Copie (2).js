@@ -24,8 +24,8 @@ function displayRecipes(recipes) {
 
   recipesContainer.innerHTML = recipes.map(r => `
     <article class="recipe-card">
-      <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
-      <h2>${r.titre}</h2>
+      <img src="${r.photo_url}" alt="Photo de ${r.title}" class="recipe-img"/>
+      <h2>${r.title}</h2>
       <p>${r.description}</p>
     </article>
   `).join('')
@@ -42,7 +42,7 @@ function filterRecipes() {
   if (currentSearch.trim() !== '') {
     const searchLower = currentSearch.toLowerCase()
     filtered = filtered.filter(r =>
-      (r.titre && r.titre.toLowerCase().includes(searchLower)) ||
+      (r.title && r.title.toLowerCase().includes(searchLower)) ||
       (r.description && r.description.toLowerCase().includes(searchLower))
     )
   }
