@@ -16,6 +16,7 @@ let currentCategory = 'all'
 let currentSearch = ''
 
 // Fonction d'affichage
+// Fonction d'affichage
 function displayRecipes(recipes) {
   if (!recipes || recipes.length === 0) {
     recipesContainer.innerHTML = `<p>Aucune recette trouvée.</p>`
@@ -28,7 +29,9 @@ function displayRecipes(recipes) {
         <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
         ${r.lien_youtube ? `
           <div class="video-badge">
-            ▶
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
+              <path d="M23.498 6.186a2.98 2.98 0 0 0-2.094-2.112C19.34 3.5 12 3.5 12 3.5s-7.34 0-9.404.574A2.98 2.98 0 0 0 .502 6.186C0 8.26 0 12 0 12s0 3.74.502 5.814a2.98 2.98 0 0 0 2.094 2.112C4.66 20.5 12 20.5 12 20.5s7.34 0 9.404-.574a2.98 2.98 0 0 0 2.094-2.112C24 15.74 24 12 24 12s0-3.74-.502-5.814ZM9.75 15.5v-7l6 3.5-6 3.5Z"/>
+            </svg>
           </div>
         ` : ''}
       </div>
