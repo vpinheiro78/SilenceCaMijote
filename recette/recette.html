@@ -182,9 +182,9 @@
     } else { ingredientsContainer.innerText = recette.ingredients; }
 
     // Instructions en étapes numérotées
-    const instructionsContainer = document.getElementById('preparation');
+    const instructionsContainer = document.getElementById('instructions');
     instructionsContainer.innerHTML = '';
-    const etapes = Array.isArray(recette.preparation) ? recette.preparation : [recette.preparation];
+    const etapes = Array.isArray(recette.instructions) ? recette.instructions : [recette.instructions];
     etapes.forEach((etape, index) => {
       const div = document.createElement('div');
       div.className = 'etape-card';
