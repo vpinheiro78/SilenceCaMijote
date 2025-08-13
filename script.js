@@ -61,7 +61,7 @@ function filterRecipes() {
 async function loadRecipes() {
   const { data, error } = await supabase
     .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url')
+    .select('id, titre, description, categorie, photo_url,ingredients')
     .order('id', { ascending: false })
 
   if (error) {
