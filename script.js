@@ -84,13 +84,3 @@ categoryButtons.forEach(btn => {
 
 // Lancement
 loadRecipes()
-
-/* Uniformiser la taille des photos de recette */
-.recipe-img {
-  width: 100%;         /* occupe toute la largeur dispo */
-  height: 200px;       /* hauteur fixe */
-  object-fit: cover;   /* rogne sans déformer */
-  border-radius: 8px;  /* optionnel : coins arrondis */
-  display: block;
-}
-

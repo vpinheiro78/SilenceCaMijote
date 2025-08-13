@@ -29,3 +29,13 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 .stars{color:#f5c542}
 .site-footer{text-align:center;padding:20px;color:#777;margin-top:20px}
 @media (max-width:800px){ .grid{grid-template-columns:repeat(1,1fr)} .card img{height:170px} .admin-link img{height:42px} }
+
+/* Uniformiser la taille des photos de recette */
+.recipe-img {
+  width: 100%;         /* occupe toute la largeur dispo */
+  height: 200px;       /* hauteur fixe */
+  object-fit: cover;   /* rogne sans déformer */
+  border-radius: 8px;  /* optionnel : coins arrondis */
+  display: block;
+}
+
