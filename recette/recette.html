@@ -1,238 +1,198 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recette</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: linear-gradient(120deg, #fff8f0, #ffe6d1);
-    color: #333;
-  }
-
-  .container {
-    max-width: 900px;
-    margin: auto;
-    background: #fff;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease;
-  }
-  .container.show { opacity: 1; transform: translateY(0); }
-
-  img {
-    width: 50%;          /* image plus petite */
-    max-width: 200px;    /* limite maximale */
-    display: block;
-    margin: 0 auto 20px auto; /* centré horizontalement avec marge en bas */
-    border-radius: 15px;
-    transition: transform 0.5s ease;
-  }
-  img:hover { transform: scale(1.03); }
-
-  h1 { color: #d35400; font-size: 2.5em; margin-bottom: 15px; }
-  h2 { color: #e67e22; margin-top: 25px; margin-bottom: 12px; }
-  p { line-height: 1.6; margin-bottom: 12px; }
-
-  a.button {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 18px;
-    background-color: #e67e22;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: background 0.3s ease;
-  }
-  a.button:hover { background-color: #d35400; }
-
-  .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
-  .fade-in.show { opacity: 1; transform: translateY(0); }
-
-  iframe {
-    width: 100%;
-    height: 500px;
-    border-radius: 15px;
-    margin: 20px 0;
-  }
-
-  #videoFloat {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 320px;
-    height: 180px;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-    z-index: 1000;
-    display: none;
-  }
-
-  .ingredient-card {
-    display: inline-block;
-    background: #ffe6d1;
-    padding: 8px 12px;
-    margin: 5px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 0.95em;
-    transition: transform 0.3s ease;
-  }
-  .ingredient-card:hover { transform: scale(1.05); background: #ffd1a4; }
-
-  .etape-card {
-    background: #fff3e0;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-  }
-  .etape-card.show { opacity: 1; transform: translateY(0); }
-
-  .etape-num {
-    display: inline-block;
-    background: #e67e22;
-    color: white;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    margin-right: 10px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recette</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    /* Layout description + image */
+    .description-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .description-text {
+      flex: 2;
+      background: #fff8f0;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .description-image {
+      flex: 1;
+    }
+    .description-image img {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    /* Étapes */
+    .etape-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .etape-card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .etape-num {
+      background: #ff6600;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Vidéo */
+    #videoContainer iframe {
+      width: 100%;
+      height: 315px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    #videoFloat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      height: 170px;
+      border: none;
+      border-radius: 10px;
+      display: none;
+      z-index: 999;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container" id="recetteContainer">
-  <a href="../index.html" class="button">← Retour aux recettes</a>
-<h1 id="titre" class="fade-in">Chargement...</h1>
+  <h1 id="titreRecette"></h1>
 
-<div class="recette-header fade-in">
-  <div id="description"></div>
-  <img id="imageRecette" class="recipe-img" src="" alt="Recette">
-</div>
+  <div id="descriptionContainer" class="description-container"></div>
 
-  <!-- Vidéo YouTube intégrée -->
-  <div id="videoContainer" class="fade-in"></div>
+  <h2>Ingrédients</h2>
+  <ul id="ingredients"></ul>
 
-  <h2 class="fade-in">Ingrédients</h2>
-  <div id="ingredients" class="fade-in"></div>
+  <h2>Préparation</h2>
+  <div id="instructions"></div>
 
-  <h2 class="fade-in">Préparation</h2>
-  <div id="instructions" class="fade-in"></div>
-</div>
+  <div id="videoContainer"></div>
+  <iframe id="videoFloat"></iframe>
 
-<!-- Mini-player YouTube flottant -->
-<iframe id="videoFloat"></iframe>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    // ⚠️ Mets ici tes infos Supabase
+    const supabaseUrl = "https://ttkgzzamsfnittbqqvft.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY";
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+    // Récupère l'ID de la recette dans l'URL
+    const params = new URLSearchParams(window.location.search);
+    const recetteId = params.get('id');
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const recetteId = urlParams.get('id');
+    async function chargerRecette() {
+      if (!recetteId) {
+        document.body.innerHTML = "<p>Aucune recette sélectionnée.</p>";
+        return;
+      }
 
-  const container = document.getElementById('recetteContainer');
-  const fadeElems = document.querySelectorAll('.fade-in');
-  const videoFloat = document.getElementById('videoFloat');
+      const { data, error } = await supabase
+        .from('recettes')
+        .select('*')
+        .eq('id', recetteId)
+        .single();
 
-  if (!recetteId) {
-    document.getElementById('titre').innerText = "Recette non trouvée";
-  } else { fetchRecette(recetteId); }
+      if (error || !data) {
+        document.body.innerHTML = "<p>Recette introuvable.</p>";
+        return;
+      }
 
-  async function fetchRecette(id) {
-    const { data, error } = await supabase
-      .from('recettes')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error || !data) {
-      console.error(error);
-      document.getElementById('titre').innerText = "Erreur lors du chargement";
-      return;
+      afficherRecette(data);
     }
 
-    afficherRecette(data);
-  }
+    function afficherRecette(recette) {
+      document.getElementById('titreRecette').textContent = recette.titre;
 
-  function afficherRecette(recette) {
-    document.getElementById('titre').innerText = recette.titre;
-    document.getElementById('imageRecette').src = recette.photo_url || '';
-    document.getElementById('imageRecette').alt = recette.nom;
-	document.getElementById('description').innerText = recette.description || '';
+      // Description + image
+      document.getElementById('descriptionContainer').innerHTML = `
+        <div class="description-text">
+          <p>${recette.description || ''}</p>
+        </div>
+        <div class="description-image">
+          <img src="${recette.image}" alt="${recette.titre}">
+        </div>
+      `;
 
-    // Ingrédients
-    const ingredientsContainer = document.getElementById('ingredients');
-    ingredientsContainer.innerHTML = '';
-    if (Array.isArray(recette.ingredients)) {
-      recette.ingredients.forEach(i => {
-        const card = document.createElement('span');
-        card.className = 'ingredient-card';
-        card.innerText = i;
-        ingredientsContainer.appendChild(card);
+      // Ingrédients
+      const ingredientsContainer = document.getElementById('ingredients');
+      ingredientsContainer.innerHTML = '';
+      const ingredients = Array.isArray(recette.ingredients)
+        ? recette.ingredients
+        : (recette.ingredients || '').split(/\r?\n|;/).map(s => s.trim()).filter(Boolean);
+
+      ingredients.forEach(ing => {
+        const li = document.createElement('li');
+        li.textContent = ing;
+        ingredientsContainer.appendChild(li);
       });
-    } else { ingredientsContainer.innerText = recette.ingredients; }
 
-    // Instructions en étapes numérotées
-    const instructionsContainer = document.getElementById('instructions');
-    instructionsContainer.innerHTML = '';
-const etapes = Array.isArray(recette.preparation) 
-  ? recette.preparation 
-  : (recette.preparation || '').split(/\r?\n|;/).map(s => s.trim()).filter(Boolean);
-  
-    etapes.forEach((etape, index) => {
-      const div = document.createElement('div');
-      div.className = 'etape-card';
-      div.innerHTML = `<span class="etape-num">${index+1}</span> <p>${etape}</p>`;
-      instructionsContainer.appendChild(div);
-    });
+      // Étapes
+      const instructionsContainer = document.getElementById('instructions');
+      instructionsContainer.innerHTML = '';
+      const etapes = Array.isArray(recette.preparation)
+        ? recette.preparation
+        : (recette.preparation || '').split(/\r?\n|;/).map(s => s.trim()).filter(Boolean);
 
-    // Vidéo YouTube intégrée + mini-player flottant
-    const videoContainer = document.getElementById('videoContainer');
-    videoContainer.innerHTML = '';
-    if (recette.lien_youtube) {
-      const match = recette.lien_youtube.match(/(?:v=|youtu\.be\/)([^&]+)/);
-      if (match && match[1]) {
-        const videoId = match[1];
+      etapes.forEach((etape, index) => {
+        const div = document.createElement('div');
+        div.className = 'etape-card';
+        div.innerHTML = `<span class="etape-num">${index + 1}</span> <p>${etape}</p>`;
+        instructionsContainer.appendChild(div);
+      });
 
-        // Player intégré
-        const iframeTop = document.createElement('iframe');
-        iframeTop.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-        iframeTop.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        iframeTop.allowFullscreen = true;
-        videoContainer.appendChild(iframeTop);
+      instructionsContainer.querySelectorAll('.etape-card').forEach((el, i) =>
+        setTimeout(() => el.classList.add('show'), i * 200)
+      );
 
-        // Mini-player flottant
-        videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-        videoFloat.style.display = 'none';
+      // Vidéo
+      const videoContainer = document.getElementById('videoContainer');
+      videoContainer.innerHTML = '';
 
-        window.addEventListener('scroll', () => {
-          videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
-        });
+      const lienYoutube = recette.video || '';
+      if (lienYoutube) {
+        const match = lienYoutube.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+        if (match && match[1]) {
+          const videoId = match[1];
+
+          // Player principal
+          const iframeTop = document.createElement('iframe');
+          iframeTop.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+          iframeTop.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          iframeTop.allowFullscreen = true;
+          videoContainer.appendChild(iframeTop);
+
+          // Mini player flottant
+          const videoFloat = document.getElementById('videoFloat');
+          videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+          window.addEventListener('scroll', () => {
+            videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
+          });
+        }
       }
     }
 
-    // Animations fade-in
-    container.classList.add('show');
-    fadeElems.forEach((el, i) => setTimeout(() => el.classList.add('show'), i*150));
-    document.querySelectorAll('.etape-card').forEach((el, i) => setTimeout(() => el.classList.add('show'), i*200));
-  }
-</script>
+    chargerRecette();
+  </script>
 
 </body>
 </html>
