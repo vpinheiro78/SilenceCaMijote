@@ -125,5 +125,10 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   color: lightgray;
 }
 
+.votes {
+  font-size: 0.85em;
+  color: #666;
+  margin-left: 5px;
+}
 
 
