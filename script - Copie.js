@@ -16,19 +16,31 @@ let currentCategory = 'all'
 let currentSearch = ''
 
 // Fonction d'affichage
+// Fonction d'affichage
 function displayRecipes(recipes) {
   if (!recipes || recipes.length === 0) {
     recipesContainer.innerHTML = `<p>Aucune recette trouvée.</p>`
     return
   }
 
- recipesContainer.innerHTML = recipes.map(r => `
-  <a href="recette/recette.html?id=${r.id}" class="recipe-card">
-    <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
-    <h2>${r.titre}</h2>
-    <p>${r.description || ''}</p>
-  </a>
-`).join('')
+  recipesContainer.innerHTML = recipes.map(r => `
+    <a href="recette/recette.html?id=${r.id}" class="recipe-card">
+      <div class="recipe-img-wrapper">
+        <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
+        ${r.lien_youtube ? `
+          <div class="video-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
+              <path d="M23.498 6.186a2.98 2.98 0 0 0-2.094-2.112C19.34 3.5 12 3.5 12 3.5s-7.34 0-9.404.574A2.98 2.98 0 0 0 .502 6.186C0 8.26 0 12 0 12s0 3.74.502 5.814a2.98 2.98 0 0 0 2.094 2.112C4.66 20.5 12 20.5 12 20.5s7.34 0 9.404-.574a2.98 2.98 0 0 0 2.094-2.112C24 15.74 24 12 24 12s0-3.74-.502-5.814ZM9.75 15.5v-7l6 3.5-6 3.5Z"/>
+            </svg>
+          </div>
+        ` : ''}
+      </div>
+      <h2>${r.titre}</h2>
+      <p>${r.description || ''}</p>
+      ${r.note_moyenne ? `<div class="rating">${generateStars(r.note_moyenne)}</div>` : ''}
+
+    </a>
+  `).join('')
 }
 
 // Fonction de filtrage
@@ -63,7 +75,7 @@ if (currentSearch.trim() !== '') {
 async function loadRecipes() {
   const { data, error } = await supabase
     .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url,ingredients,lien_youtube')
+    .select('id, titre, description, categorie, photo_url,ingredients,note_moyenne,lien_youtube')
     .order('id', { ascending: false })
 
   if (error) {
@@ -75,6 +87,21 @@ async function loadRecipes() {
   allRecipes = data
   filterRecipes()
 }
+
+//génération étoile
+function generateStars(rating) {
+  const maxStars = 5
+  const fullStars = Math.floor(rating)
+  const halfStar = rating % 1 >= 0.5 ? 1 : 0
+  const emptyStars = maxStars - fullStars - halfStar
+
+  return `
+    ${'<span class="star full">★</span>'.repeat(fullStars)}
+    ${halfStar ? '<span class="star half">★</span>' : ''}
+    ${'<span class="star empty">★</span>'.repeat(emptyStars)}
+  `
+}
+
 
 // Gestion des événements
 searchInput.addEventListener('input', (e) => {
