@@ -202,20 +202,19 @@ function afficherEtoilesInteractives(recetteId) {
     star.innerHTML = '☆';
     star.dataset.value = i;
 
-  // Survol
-  star.addEventListener('mouseover', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s => {
-      s.classList.toggle('hover', s.dataset.value <= i);
+    // Survol
+    star.addEventListener('mouseover', () => {
+      document.querySelectorAll('#starsContainer .star').forEach(s => {
+        s.classList.toggle('hover', s.dataset.value <= i);
+      });
     });
-  });
 
-  // Fin du survol
-  star.addEventListener('mouseleave', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s => {
-      s.classList.remove('hover');
+    // Fin du survol
+    star.addEventListener('mouseleave', () => {
+      document.querySelectorAll('#starsContainer .star').forEach(s => {
+        s.classList.remove('hover');
+      });
     });
-  });
-
 
     // Clic = envoi de la note
     star.addEventListener('click', async () => {

@@ -121,6 +121,11 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   -webkit-text-fill-color: transparent;
 }
 
+.star.hover,
+.star.selected {
+  color: #f39c12;    /* couleur orange pour survol et sélection */
+}
+
 .star.empty {
   color: gray;
 }
