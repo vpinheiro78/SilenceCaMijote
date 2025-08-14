@@ -223,7 +223,7 @@ function afficherEtoilesInteractives(recetteId) {
 
       // Envoi dans Supabase
       const { error } = await supabase
-        .from('notes_recettes') // ⚠️ table pour stocker les notes individuelles
+        .from('note') // ⚠️ table pour stocker les notes individuelles
         .insert([{ recette_id: recetteId, note: i }]);
 
       if (error) {
