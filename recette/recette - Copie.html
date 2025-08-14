@@ -131,6 +131,16 @@
 
   <h2 class="fade-in">Préparation</h2>
   <div id="instructions" class="fade-in"></div>
+   
+   <!-- Bloc notation -->
+  <h2 class="fade-in">Votre note</h2>
+  <div id="ratingSection" class="fade-in">
+    <div id="starsContainer">
+      <!-- étoiles dynamiques -->
+    </div>
+    <p id="ratingMessage" style="margin-top:8px; color:#e67e22; font-weight:bold;"></p>
+  </div>
+   
 </div>
 
 <!-- Mini-player YouTube flottant -->
@@ -175,6 +185,59 @@
     document.getElementById('imageRecette').src = recette.photo_url || '';
     document.getElementById('imageRecette').alt = recette.nom;
 	document.getElementById('description').innerText = recette.description || '';
+
+// ---- Fonction affichage étoiles interactives ----
+function afficherEtoilesInteractives(recetteId) {
+  const starsContainer = document.getElementById('starsContainer');
+  const ratingMessage = document.getElementById('ratingMessage');
+  let currentRating = 0;
+
+  // Création des 5 étoiles
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.classList.add('star');
+    star.innerHTML = '★';
+    star.dataset.value = i;
+
+    // Survol
+    star.addEventListener('mouseover', () => {
+      document.querySelectorAll('#starsContainer .star').forEach(s => {
+        s.classList.toggle('hover', s.dataset.value <= i);
+      });
+    });
+
+    // Fin du survol
+    star.addEventListener('mouseleave', () => {
+      document.querySelectorAll('#starsContainer .star').forEach(s => {
+        s.classList.remove('hover');
+      });
+    });
+
+    // Clic = envoi de la note
+    star.addEventListener('click', async () => {
+      currentRating = i;
+      document.querySelectorAll('#starsContainer .star').forEach(s => {
+        s.classList.toggle('selected', s.dataset.value <= i);
+      });
+      ratingMessage.textContent = `Vous avez noté ${i} étoile${i > 1 ? 's' : ''}`;
+
+      // Envoi dans Supabase
+      const { error } = await supabase
+        .from('notes') // ⚠️ table pour stocker les notes individuelles
+        .insert([{ recette_id: recetteId, note: i }]);
+
+      if (error) {
+        console.error('Erreur enregistrement note:', error);
+        ratingMessage.textContent = "Erreur lors de l'envoi de la note.";
+      } else {
+        ratingMessage.textContent += " ✅ Merci pour votre avis !";
+      }
+    });
+
+    starsContainer.appendChild(star);
+  }
+}
+
 
     // Ingrédients
     const ingredientsContainer = document.getElementById('ingredients');
@@ -231,6 +294,9 @@ const etapes = Array.isArray(recette.preparation)
     container.classList.add('show');
     fadeElems.forEach((el, i) => setTimeout(() => el.classList.add('show'), i*150));
     document.querySelectorAll('.etape-card').forEach((el, i) => setTimeout(() => el.classList.add('show'), i*200));
+
+	// Afficher étoiles interactives
+	afficherEtoilesInteractives(recette.id);
   }
 </script>
 

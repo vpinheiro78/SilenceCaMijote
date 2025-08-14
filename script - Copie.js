@@ -75,7 +75,7 @@ if (currentSearch.trim() !== '') {
 async function loadRecipes() {
   const { data, error } = await supabase
     .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url,ingredients,note_moyenne,lien_youtube')
+    .select('id, titre, description, categorie, photo_url,ingredients,note_moyenne,lien_youtube,nombre_votes')
     .order('id', { ascending: false })
 
   if (error) {

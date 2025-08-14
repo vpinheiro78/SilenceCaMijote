@@ -13,7 +13,7 @@
     color: #333;
   }
 
-  .container {
+  .container {<div id="ingredients">
     max-width: 900px;
     margin: auto;
     background: #fff;
@@ -128,6 +128,9 @@
 
   <h2 class="fade-in">Ingrédients</h2>
   <div id="ingredients" class="fade-in"></div>
+  
+  <button id="createShoppingList" class="button">Créer ma liste de courses</button>
+  <div id="shoppingListContainer" style="margin-top:15px;"></div>
 
   <h2 class="fade-in">Préparation</h2>
   <div id="instructions" class="fade-in"></div>
@@ -240,16 +243,88 @@ function afficherEtoilesInteractives(recetteId) {
 
 
     // Ingrédients
-    const ingredientsContainer = document.getElementById('ingredients');
-    ingredientsContainer.innerHTML = '';
-    if (Array.isArray(recette.ingredients)) {
-      recette.ingredients.forEach(i => {
-        const card = document.createElement('span');
-        card.className = 'ingredient-card';
-        card.innerText = i;
-        ingredientsContainer.appendChild(card);
-      });
-    } else { ingredientsContainer.innerText = recette.ingredients; }
+// Ingrédients sélectionnables
+const ingredientsContainer = document.getElementById('ingredients');
+ingredientsContainer.innerHTML = '';
+if (Array.isArray(recette.ingredients)) {
+  recette.ingredients.forEach(i => {
+    const card = document.createElement('span');
+    card.className = 'ingredient-card';
+    card.innerText = i;
+    card.dataset.selected = 'false';
+    
+    card.addEventListener('click', () => {
+      card.dataset.selected = card.dataset.selected === 'true' ? 'false' : 'true';
+      card.style.background = card.dataset.selected === 'true' ? '#ffd1a4' : '#ffe6d1';
+    });
+
+    ingredientsContainer.appendChild(card);
+  });
+} else {
+  ingredientsContainer.innerText = recette.ingredients;
+}
+
+// Gestion bouton liste de courses
+const createBtn = document.getElementById('createShoppingList');
+const shoppingListContainer = document.getElementById('shoppingListContainer');
+
+createBtn.addEventListener('click', () => {
+  const selectedIngredients = Array.from(ingredientsContainer.children)
+    .filter(c => c.dataset.selected === 'true')
+    .map(c => c.innerText);
+
+  if (selectedIngredients.length === 0) {
+    alert("Veuillez sélectionner au moins un ingrédient !");
+    return;
+  }
+
+  shoppingListContainer.innerHTML = ''; // reset
+  const listDiv = document.createElement('div');
+  listDiv.style.padding = '20px';
+  listDiv.style.background = '#fff8f0';
+  listDiv.style.borderRadius = '15px';
+  listDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+  listDiv.style.width = '300px';
+  listDiv.style.textAlign = 'center';
+  listDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">
+                       <h3>Ma liste de courses</h3>
+                       <ul style="text-align:left;">${selectedIngredients.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+
+  shoppingListContainer.appendChild(listDiv);
+
+  // Charger html2canvas si nécessaire
+  if (!window.html2canvas) {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = () => captureList(listDiv, selectedIngredients);
+    document.body.appendChild(script);
+  } else {
+    captureList(listDiv, selectedIngredients);
+  }
+});
+
+function captureList(element, selectedIngredients){
+  html2canvas(element).then(canvas => {
+    const img = canvas.toDataURL('image/png');
+    
+    const downloadLink = document.createElement('a');
+    downloadLink.href = img;
+    downloadLink.download = 'liste_courses.png';
+    downloadLink.textContent = 'Télécharger la liste';
+    downloadLink.className = 'button';
+    downloadLink.style.marginRight = '8px';
+
+    const whatsappLink = document.createElement('a');
+    whatsappLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent('Ma liste de courses :\n') + encodeURIComponent(selectedIngredients.join('\n'))}`;
+    whatsappLink.target = '_blank';
+    whatsappLink.textContent = 'Partager sur WhatsApp';
+    whatsappLink.className = 'button';
+
+    shoppingListContainer.appendChild(downloadLink);
+    shoppingListContainer.appendChild(whatsappLink);
+  });
+}
+
 
     // Instructions en étapes numérotées
     const instructionsContainer = document.getElementById('instructions');
