@@ -146,24 +146,31 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   transition: transform 0.2s ease, background 0.3s ease;
 }
 
+#createShoppingList:hover {
+  transform: translateY(-3px);
+  background: #963d29; /* terracotta plus foncé */
+}
+
+#createShoppingList:active {
+  transform: translateY(0);
+  background: #7b3222;
+}
+
 .btn-liste-courses {
   background: var(--terracotta);
   color: white;
   font-size: 1rem;
   font-weight: bold;
-  padding: 12px 22px;
+  padding: 12px 20px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px; /* espace entre icône et texte */
   transition: background 0.3s, transform 0.2s;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .btn-liste-courses:hover {
-  background: #943a27;
+  background: #943a27; /* terracotta plus foncé */
   transform: translateY(-2px);
 }
 
@@ -171,8 +178,3 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   transform: translateY(0);
 }
 
-.btn-liste-courses svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
-}
