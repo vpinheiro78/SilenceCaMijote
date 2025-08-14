@@ -345,17 +345,7 @@ const etapes = Array.isArray(recette.preparation)
     const videoContainer = document.getElementById('videoContainer');
     videoContainer.innerHTML = '';
     if (recette.lien_youtube) {
-      function getYouTubeId(url) {
-  const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-  const match = url.match(regex);
-  return match ? match[1] : null;
-}
-
-const videoId = getYouTubeId(recette.lien_youtube);
-if (videoId) {
-  // Player intégré et mini-player flottant
-}
-
+      const match = recette.lien_youtube.match(/(?:v=|youtu\.be\/)([^&]+)/);
       if (match && match[1]) {
         const videoId = match[1];
 
