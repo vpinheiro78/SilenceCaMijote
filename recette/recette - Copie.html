@@ -340,50 +340,31 @@ const etapes = Array.isArray(recette.preparation)
       div.innerHTML = `<span class="etape-num">${index+1}</span> <p>${etape}</p>`;
       instructionsContainer.appendChild(div);
     });
-// Vidéo YouTube intégrée + mini-player flottant (classique + Shorts)
-const videoContainer = document.getElementById('videoContainer');
-videoContainer.innerHTML = '';
 
-if (recette.lien_youtube) {
+    // Vidéo YouTube intégrée + mini-player flottant
+    const videoContainer = document.getElementById('videoContainer');
+    videoContainer.innerHTML = '';
+    if (recette.lien_youtube) {
+      const match = recette.lien_youtube.match(/(?:v=|youtu\.be\/)([^&]+)/);
+      if (match && match[1]) {
+        const videoId = match[1];
 
-  function getYouTubeId(url) {
-    try {
-      let videoId = null;
+        // Player intégré
+        const iframeTop = document.createElement('iframe');
+        iframeTop.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        iframeTop.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframeTop.allowFullscreen = true;
+        videoContainer.appendChild(iframeTop);
 
-      // Short URL : youtu.be/xxxx ou /shorts/xxxx
-      if (url.includes('youtu.be/')) {
-        videoId = url.split('youtu.be/')[1].split(/[?&]/)[0];
-      } else if (url.includes('/shorts/')) {
-        videoId = url.split('/shorts/')[1].split(/[?&]/)[0];
-      } else if (url.includes('watch?v=')) {
-        videoId = url.split('watch?v=')[1].split(/[&]/)[0];
+        // Mini-player flottant
+        videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        videoFloat.style.display = 'none';
+
+        window.addEventListener('scroll', () => {
+          videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
+        });
       }
-
-      return videoId;
-    } catch(e) {
-      return null;
     }
-  }
-
-  const videoId = getYouTubeId(recette.lien_youtube);
-
-  if (videoId) {
-    // Player intégré
-    const iframeTop = document.createElement('iframe');
-    iframeTop.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-    iframeTop.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-    iframeTop.allowFullscreen = true;
-    videoContainer.appendChild(iframeTop);
-
-    // Mini-player flottant
-    videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-    videoFloat.style.display = 'none';
-
-    window.addEventListener('scroll', () => {
-      videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
-    });
-  }
-}
 
     // Animations fade-in
     container.classList.add('show');
