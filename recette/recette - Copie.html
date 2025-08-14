@@ -341,15 +341,21 @@ const etapes = Array.isArray(recette.preparation)
       instructionsContainer.appendChild(div);
     });
 
-   // Vidéo YouTube intégrée + mini-player flottant
+// Vidéo YouTube intégrée + mini-player flottant (compatible Shorts)
 const videoContainer = document.getElementById('videoContainer');
 videoContainer.innerHTML = '';
-if (recette.lien_youtube) {
-  const match = recette.lien_youtube.match(/(?:v=|youtu\.be\/)([^&]+)/);
-  
-  if (match && match[1]) {
-    const videoId = match[1];
 
+if (recette.lien_youtube) {
+
+  function getYouTubeId(url) {
+    const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  }
+
+  const videoId = getYouTubeId(recette.lien_youtube);
+
+  if (videoId) {
     // Player intégré
     const iframeTop = document.createElement('iframe');
     iframeTop.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
