@@ -202,19 +202,6 @@ const etapes = Array.isArray(recette.preparation)
       instructionsContainer.appendChild(div);
     });
 
-    // notation
-<div class="rate-recipe">
-  <p>Notez cette recette :</p>
-  <div class="star-rating">
-    <span data-value="1">★</span>
-    <span data-value="2">★</span>
-    <span data-value="3">★</span>
-    <span data-value="4">★</span>
-    <span data-value="5">★</span>
-  </div>
-  <p id="rating-message"></p>
-</div>
-
     // Vidéo YouTube intégrée + mini-player flottant
     const videoContainer = document.getElementById('videoContainer');
     videoContainer.innerHTML = '';
@@ -246,6 +233,17 @@ const etapes = Array.isArray(recette.preparation)
     document.querySelectorAll('.etape-card').forEach((el, i) => setTimeout(() => el.classList.add('show'), i*200));
   }
 </script>
-
+    // notation
+<div class="rate-recipe">
+  <p>Notez cette recette :</p>
+  <div class="star-rating">
+    <span data-value="1">★</span>
+    <span data-value="2">★</span>
+    <span data-value="3">★</span>
+    <span data-value="4">★</span>
+    <span data-value="5">★</span>
+  </div>
+  <p id="rating-message"></p>
+</div>
 </body>
 </html>
