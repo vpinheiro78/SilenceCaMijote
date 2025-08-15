@@ -1,45 +1,8 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Silence ça mijote</title>
-<link rel="stylesheet" href="../style.css"/></head>
-<body>
-<header class="site-header"><h1>Admin</h1><a href="../index.html">Retour site</a></header>
-<main style="max-width:1100px;margin:18px auto;padding:12px">
-  <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
-    <h2>Créer / Modifier une recette</h2>
-    <form id="recipeForm">
-      <input type="hidden" name="id" />
-      <label>Titre<br/><input name="titre" required style="width:100%;padding:12px;font-size:16px"/></label><br/><br/>
-      <label>Description<br/><textarea name="description" rows="3" style="width:100%;padding:12px;font-size:15px"></textarea></label><br/>
-      <label>Catégorie<br/>
-        <select name="categorie" style="padding:10px;font-size:15px">
-          <option value="dessert">dessert</option><option value="viande">viande</option><option value="poisson">poisson</option><option value="accompagnement">accompagnement</option><option value="autre">autre</option>
-        </select>
-      </label><br/><br/>
-      <label>Image (fichier)<br/><input type="file" name="imagefile" accept="image/*" /></label><br/>
-      <button type="button" id="uploadBtn">Uploader l'image</button> <span id="uploadStatus" style="margin-left:8px;color:#333"></span><br/><br/>
-      <label>Ou URL image<br/><input name="photo_url" style="width:100%;padding:10px;font-size:15px" placeholder="https://..."/></label><br/><br/>
-      <label>Vidéo YouTube (URL)<br/><input name="lien_youtube" style="width:100%;padding:10px;font-size:15px" placeholder="https://www.youtube.com/watch?v=..."/></label><br/><br/>
-      <label>Ingrédients (un par ligne)<br/><textarea name="ingredients" rows="4" style="width:100%;padding:12px;font-size:15px" placeholder="1 aubergine&#10;2 courgettes"></textarea></label><br/>
-      <label>Préparation / Étapes (une étape par ligne)<br/><textarea name="preparation" rows="6" style="width:100%;padding:12px;font-size:15px" placeholder="Étape 1&#10;Étape 2"></textarea></label><br/><br/>
-      <button type="submit">Enregistrer</button> <button type="button" id="resetBtn">Réinitialiser</button>
-    </form>
-  </section>
-
-  <section style="margin-top:18px">
-    <h2>Recettes existantes</h2>
-    <div id="list"></div>
-  </section>
-</main>
-
 <script type="module">
-
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-// Mets ici ton URL et ta clé d'API Supabase (remplace par les tiennes)
 
 const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
-
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const form = document.getElementById('recipeForm')
@@ -49,51 +12,35 @@ const uploadStatus = document.getElementById('uploadStatus')
 
 let uploadedPath = ''
 
+// ===== Upload image =====
 uploadBtn.addEventListener('click', async () => {
   const fileInput = form.elements['imagefile']
   const file = fileInput.files[0]
-  if (!file) {
-    alert('Choisissez d\'abord un fichier')
-    return
-  }
+  if (!file) { alert('Choisissez d\'abord un fichier'); return }
 
-  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
-
+  const fileName = `${Date.now()}_${file.name.replace(/\s+/g,'_')}`
   uploadStatus.innerText = 'Upload en cours...'
 
-  // Upload dans le bucket 'photos-recettes' (le nom doit correspondre au bucket créé dans Supabase Storage)
   const { data, error } = await supabase.storage.from('photos-recettes').upload(fileName, file)
-
-  if (error) {
-    console.error('Erreur upload :', error)
-    uploadStatus.innerText = 'Erreur lors de l\'upload'
-    return
-  }
+  if (error) { console.error(error); uploadStatus.innerText='Erreur lors de l\'upload'; return }
 
   uploadedPath = data.path
-
-  // Récupérer l'URL publique de l'image uploadée
   const { data: publicUrlData } = supabase.storage.from('photos-recettes').getPublicUrl(uploadedPath)
   form.elements['photo_url'].value = publicUrlData.publicUrl
   uploadStatus.innerText = 'Upload réussi !'
 })
 
-// Charge et affiche la liste des recettes
+// ===== Charger la liste =====
 async function loadList() {
-  const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
-
-  if (error) {
-    console.error('Erreur chargement recettes:', error)
-    listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'
-    return
-  }
+  const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending:false })
+  if (error) { console.error(error); listDiv.innerHTML='<p>Erreur de chargement des recettes.</p>'; return }
 
   listDiv.innerHTML = ''
   data.forEach(r => {
     const card = document.createElement('div')
     card.className = 'card'
-    card.style.padding = '12px'
-    card.style.marginBottom = '10px'
+    card.style.padding='12px'
+    card.style.marginBottom='10px'
     card.innerHTML = `
       <strong>${r.titre}</strong> — ${r.categorie} <br/>
       <button data-id="${r.id}" class="edit">Modifier</button>
@@ -102,36 +49,60 @@ async function loadList() {
     listDiv.appendChild(card)
   })
 
-// Gestion suppression avec suppression de la photo
-listDiv.querySelectorAll('.del').forEach(btn => {
-  btn.addEventListener('click', async e => {
-    const id = e.target.dataset.id
-    await deleteRecette(id)
+  // ===== Suppression =====
+  listDiv.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      const id = e.target.dataset.id
+      await deleteRecette(id)
+    })
   })
-})
 
-
-  // Gestion édition
+  // ===== Édition =====
   listDiv.querySelectorAll('.edit').forEach(btn => {
     btn.addEventListener('click', async e => {
       const id = e.target.dataset.id
       const { data, error } = await supabase.from('recettes').select('*').eq('id', id).single()
-      if (error || !data) {
-        alert('Recette introuvable')
-        return
-      }
+      if (error || !data) { alert('Recette introuvable'); return }
+
       form.elements['id'].value = data.id
       form.elements['titre'].value = data.titre || ''
       form.elements['description'].value = data.description || ''
       form.elements['categorie'].value = data.categorie || 'dessert'
       form.elements['photo_url'].value = data.photo_url || ''
       form.elements['lien_youtube'].value = data.lien_youtube || ''
-      form.elements['ingredients'].value = (data.ingredients || []).join('\n')
-      form.elements['preparation'].value = (data.preparation || []).join('\n')
+      form.elements['ingredients'].value = (data.ingredients||[]).join('\n')
+      form.elements['preparation'].value = (data.preparation||[]).join('\n')
     })
   })
 }
 
+// ===== Supprimer recette + image =====
+async function deleteRecette(id) {
+  if (!confirm("Voulez-vous vraiment supprimer cette recette ?")) return;
+
+  try {
+    const { data: recette, error: getError } = await supabase
+      .from('recettes').select('photo_url').eq('id', id).single()
+    if (getError) throw getError
+
+    const { error: deleteError } = await supabase.from('recettes').delete().eq('id', id)
+    if (deleteError) throw deleteError
+
+    if (recette?.photo_url) {
+      const path = recette.photo_url.split('/o/')[1].split('?')[0]
+      const { error: storageError } = await supabase.storage.from('photos-recettes').remove([decodeURIComponent(path)])
+      if (storageError) console.warn("Image non supprimée :", storageError.message)
+    }
+
+    alert("Recette supprimée avec succès !")
+    loadList()
+  } catch (err) {
+    console.error(err)
+    alert("Erreur lors de la suppression")
+  }
+}
+
+// ===== Soumission formulaire =====
 form.addEventListener('submit', async e => {
   e.preventDefault()
   const id = form.elements['id'].value || null
@@ -142,141 +113,45 @@ form.addEventListener('submit', async e => {
     photo_url: form.elements['photo_url'].value || null,
     lien_youtube: form.elements['lien_youtube'].value || null,
     ingredients: form.elements['ingredients'].value
-      ? form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean)
+      ? form.elements['ingredients'].value.split('\n').map(i=>i.trim()).filter(Boolean)
       : [],
     preparation: form.elements['preparation'].value
-      ? form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
+      ? form.elements['preparation'].value.split('\n').map(s=>s.trim()).filter(Boolean)
       : []
   }
 
-  let response
-  if (id) {
-    response = await supabase.from('recettes').update(recette).eq('id', id)
-  } else {
-    response = await supabase.from('recettes').insert(recette)
-  }
-
-  if (response.error) {
-    alert('Erreur lors de la sauvegarde')
-    console.error(response.error)
-    return
-  }
-
-  alert(id ? 'Recette mise à jour' : 'Recette créée')
-  form.reset()
-  uploadedPath = ''
-  uploadStatus.innerText = ''
-  loadList()
-  // 🔹 SUPPRIMER une recette et sa photo
-async function deleteRecette(id) {
-  if (!confirm("Voulez-vous vraiment supprimer cette recette ?")) return;
-
   try {
-    // 1️⃣ Récupérer l'ancienne image avant suppression
-    const { data: recette, error: getError } = await supabase
-      .from('recettes')
-      .select('image')
-      .eq('id', id)
-      .single();
+    if (id) {
+      // Récupérer ancienne image si remplacée
+      const { data: ancienne, error: getOld } = await supabase.from('recettes').select('photo_url').eq('id', id).single()
+      if (getOld) throw getOld
 
-    if (getError) throw getError;
-
-    // 2️⃣ Supprimer la recette de la BDD
-    const { error: deleteError } = await supabase
-      .from('recettes')
-      .delete()
-      .eq('id', id);
-
-    if (deleteError) throw deleteError;
-
-    // 3️⃣ Supprimer l'image du bucket si elle existe
-    if (recette?.image) {
-      const { error: storageError } = await supabase
-        .storage
-        .from('photos') // nom du bucket
-        .remove([recette.image]);
-
-      if (storageError) {
-        console.warn("Image non supprimée :", storageError.message);
-      }
-    }
-
-    alert("Recette supprimée avec succès !");
-    loadList();
-
-  } catch (err) {
-    console.error("Erreur suppression :", err.message);
-    alert("Erreur lors de la suppression.");
-  }
-}
-
-// 🔹 METTRE À JOUR une recette (supprime l'ancienne image si remplacée)
-async function updateRecette(id, formData) {
-  try {
-    const nouvelleImage = formData.get('image');
-    let imagePath = null;
-
-    if (nouvelleImage && nouvelleImage.size > 0) {
-      // 1️⃣ Récupérer l'ancienne image
-      const { data: ancienneRecette, error: getOldError } = await supabase
-        .from('recettes')
-        .select('image')
-        .eq('id', id)
-        .single();
-
-      if (getOldError) throw getOldError;
-
-      // 2️⃣ Supprimer l'ancienne image si elle existe
-      if (ancienneRecette?.image) {
-        const { error: delOldError } = await supabase
-          .storage
-          .from('photos')
-          .remove([ancienneRecette.image]);
-
-        if (delOldError) {
-          console.warn("Ancienne image non supprimée :", delOldError.message);
-        }
+      if (uploadedPath && ancienne?.photo_url) {
+        const oldPath = ancienne.photo_url.split('/o/')[1].split('?')[0]
+        await supabase.storage.from('photos-recettes').remove([decodeURIComponent(oldPath)])
       }
 
-      // 3️⃣ Uploader la nouvelle image
-      const fileName = `${Date.now()}-${nouvelleImage.name}`;
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('photos')
-        .upload(`photos/${fileName}`, nouvelleImage);
-
-      if (uploadError) throw uploadError;
-
-      imagePath = uploadData.path;
+      const { error: updateError } = await supabase.from('recettes').update(recette).eq('id', id)
+      if (updateError) throw updateError
+      alert('Recette mise à jour')
+    } else {
+      const { error: insertError } = await supabase.from('recettes').insert(recette)
+      if (insertError) throw insertError
+      alert('Recette créée')
     }
 
-    // 4️⃣ Mettre à jour la recette
-    const updateData = {
-      titre: formData.get('titre'),
-      description: formData.get('description'),
-      lien_youtube: formData.get('lien_youtube'),
-    };
-    if (imagePath) updateData.image = imagePath;
-
-    const { error: updateError } = await supabase
-      .from('recettes')
-      .update(updateData)
-      .eq('id', id);
-
-    if (updateError) throw updateError;
-
-    alert("Recette mise à jour !");
-    loadList();
-
-  } catch (err) {
-    console.error("Erreur mise à jour :", err.message);
-    alert("Erreur lors de la mise à jour.");
+    form.reset()
+    uploadedPath = ''
+    uploadStatus.innerText = ''
+    loadList()
+  } catch(err) {
+    console.error(err)
+    alert("Erreur lors de l'enregistrement")
   }
-}
-
 })
 
-document.getElementById('resetBtn').addEventListener('click', () => {
+// ===== Réinitialiser formulaire =====
+document.getElementById('resetBtn').addEventListener('click', ()=>{
   form.reset()
   uploadedPath = ''
   uploadStatus.innerText = ''
@@ -284,4 +159,3 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 loadList()
 </script>
-</body></html>
