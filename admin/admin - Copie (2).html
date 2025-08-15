@@ -194,6 +194,9 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 loadList()
 // === TEST ENVOI EMAIL via supabase.functions.invoke ===
+const sendBtn = document.getElementById('sendTestEmail')
+const emailInput = document.getElementById('testEmail')
+const emailStatus = document.getElementById('emailStatus')
 
 sendBtn.addEventListener('click', async () => {
   const recipient = emailInput.value.trim()
@@ -207,9 +210,6 @@ sendBtn.addEventListener('click', async () => {
   try {
     const { data, error } = await supabase.functions.invoke('sendEmail', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${supabaseKey}` // clé service Supabase
-      },
       body: JSON.stringify({
         to: recipient,
         subject: 'Objet test',
@@ -229,7 +229,6 @@ sendBtn.addEventListener('click', async () => {
     console.error(err)
   }
 })
-
 
 </script>
 </body></html>
