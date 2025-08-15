@@ -120,25 +120,6 @@ categoryButtons.forEach(btn => {
 
 // Lancement
 loadRecipes()
-
-// 🔹 Fonction pour afficher le nombre d'abonnés
-async function updateSubscriberCount() {
-  const { count, error } = await supabase
-    .from('abonnes')
-    .select('id', { count: 'exact', head: true })
-
-  if (error) {
-    console.error('Erreur récupération nombre d\'abonnes:', error)
-    return
-  }
-
-  document.getElementById('subscriberCount').innerText = `${count} abonné${count > 1 ? 's' : ''}`
-}
-
-// Appel initial pour afficher le compteur au chargement
-updateSubscriberCount()
-
-
 // Formulaire d'abonnement
 const subscribeForm = document.getElementById('subscribeForm')
 const subscribeMessage = document.getElementById('subscribeMessage')
