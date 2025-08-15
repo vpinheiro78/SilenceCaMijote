@@ -120,3 +120,33 @@ categoryButtons.forEach(btn => {
 
 // Lancement
 loadRecipes()
+// Formulaire d'abonnement
+const subscribeForm = document.getElementById('subscribeForm')
+const subscribeMessage = document.getElementById('subscribeMessage')
+
+subscribeForm.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const email = subscribeForm.email.value.trim()
+  if (!email) return
+
+  // Ajout dans Supabase
+  const { data, error } = await supabase
+    .from('abonnes')
+    .insert([{ email }])
+
+  if (error) {
+    if (error.code === '23505') {
+      subscribeMessage.style.color = 'orange'
+      subscribeMessage.innerText = "Vous êtes déjà abonné !"
+    } else {
+      subscribeMessage.style.color = 'red'
+      subscribeMessage.innerText = "Erreur, réessayez."
+      console.error(error)
+    }
+    return
+  }
+
+  subscribeMessage.style.color = 'green'
+  subscribeMessage.innerText = "Merci pour votre abonnement !"
+  subscribeForm.reset()
+})

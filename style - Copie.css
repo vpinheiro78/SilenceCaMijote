@@ -108,7 +108,7 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 }
 
 .star {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
 }
 
 .star.full {
@@ -116,13 +116,18 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 }
 
 .star.half {
-  background: linear-gradient(90deg, gold 50%, lightgray 50%);
+  background: linear-gradient(90deg, gold 50%, gray 50%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+.star.hover,
+.star.selected {
+  color: #f39c12;    /* couleur orange pour survol et sélection */
+}
+
 .star.empty {
-  color: lightgray;
+  color: gray;
 }
 
 .votes {
@@ -132,18 +137,20 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
 }
 
 #createShoppingList {
-  display: inline-block;
-  margin: 18px auto;
-  padding: 12px 28px;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #fff;
   background: var(--terracotta);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 12px 22px;
   border: none;
-  border-radius: 50px;
+  border-radius: 25px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  transition: transform 0.2s ease, background 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* espace entre icône et texte */
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+
 }
 
 .btn-liste-courses {
