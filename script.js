@@ -101,24 +101,6 @@ function generateStars(rating) {
     ${'<span class="star empty">★</span>'.repeat(emptyStars)}
   `
 }
-// 📌 Newsletter - compteur d'abonnés
-const subscriberCount = document.getElementById('subscriberCount')
-
-// Fonction pour mettre à jour le compteur
-async function updateSubscriberCount() {
-  const { data, error } = await supabase.from('abonnes').select('id')
-  const count = data ? data.length : 0
-
-  // Ligne mise à jour avec style
-  subscriberCount.innerHTML = `👩‍🍳 <strong>${count}</strong> abonné${count > 1 ? 's' : ''}`
-  subscriberCount.style.background = '#fff3e0'
-  subscriberCount.style.padding = '6px 12px'
-  subscriberCount.style.borderRadius = '12px'
-  subscriberCount.style.display = 'inline-block'
-  subscriberCount.style.color = '#b04a32'
-  subscriberCount.style.fontWeight = '600'
-  subscriberCount.style.marginTop = '6px'
-}
 
 
 // Gestion des événements
