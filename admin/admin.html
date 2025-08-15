@@ -29,6 +29,17 @@
     <h2>Recettes existantes</h2>
     <div id="list"></div>
   </section>
+
+<!-- SECTION TEST EMAIL -->
+<section style="margin-top:30px; background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
+  <h2>Test Envoi Email</h2>
+  <label>Adresse email destinataire<br/>
+    <input type="email" id="testEmail" placeholder="exemple@domaine.com" style="width:100%;padding:10px;font-size:15px"/>
+  </label><br/><br/>
+  <button type="button" id="sendTestEmail">Envoyer Email</button>
+  <p id="emailStatus" style="margin-top:8px;color:#333;font-weight:bold"></p>
+</section>
+
 </main>
 
 <script type="module">
@@ -182,5 +193,44 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 })
 
 loadList()
+// === TEST ENVOI EMAIL ===
+const sendBtn = document.getElementById('sendTestEmail');
+const emailInput = document.getElementById('testEmail');
+const emailStatus = document.getElementById('emailStatus');
+
+sendBtn.addEventListener('click', async () => {
+  const recipient = emailInput.value.trim();
+  if (!recipient) {
+    alert('Veuillez entrer une adresse email');
+    return;
+  }
+
+  emailStatus.innerText = 'Envoi en cours...';
+
+  try {
+    const res = await fetch('/functions/sendEmail', { // chemin vers ton Edge Function
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: recipient,
+        subject: 'Objet test',
+        text: 'Test envoi email camijote'
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      emailStatus.innerText = 'Email envoyé avec succès !';
+    } else {
+      emailStatus.innerText = 'Erreur : ' + (data.error || 'Impossible d\'envoyer l\'email');
+      console.error(data);
+    }
+  } catch (err) {
+    emailStatus.innerText = 'Erreur lors de la requête';
+    console.error(err);
+  }
+});
+
+
 </script>
 </body></html>
