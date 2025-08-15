@@ -102,14 +102,20 @@ async function loadList() {
     listDiv.appendChild(card)
   })
 
-// Gestion suppression avec suppression de la photo
-listDiv.querySelectorAll('.del').forEach(btn => {
-  btn.addEventListener('click', async e => {
-    const id = e.target.dataset.id
-    await deleteRecette(id)
+  // Gestion suppression
+  listDiv.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      if (!confirm('Supprimer cette recette ?')) return
+      const id = e.target.dataset.id
+      const { error } = await supabase.from('recettes').delete().eq('id', id)
+      if (error) {
+        alert('Erreur lors de la suppression')
+        console.error(error)
+      } else {
+        loadList()
+      }
+    })
   })
-})
-
 
   // Gestion édition
   listDiv.querySelectorAll('.edit').forEach(btn => {
@@ -167,113 +173,6 @@ form.addEventListener('submit', async e => {
   uploadedPath = ''
   uploadStatus.innerText = ''
   loadList()
-  // 🔹 SUPPRIMER une recette et sa photo
-async function deleteRecette(id) {
-  if (!confirm("Voulez-vous vraiment supprimer cette recette ?")) return;
-
-  try {
-    // 1️⃣ Récupérer l'ancienne image avant suppression
-    const { data: recette, error: getError } = await supabase
-      .from('recettes')
-      .select('image')
-      .eq('id', id)
-      .single();
-
-    if (getError) throw getError;
-
-    // 2️⃣ Supprimer la recette de la BDD
-    const { error: deleteError } = await supabase
-      .from('recettes')
-      .delete()
-      .eq('id', id);
-
-    if (deleteError) throw deleteError;
-
-    // 3️⃣ Supprimer l'image du bucket si elle existe
-    if (recette?.image) {
-      const { error: storageError } = await supabase
-        .storage
-        .from('photos') // nom du bucket
-        .remove([recette.image]);
-
-      if (storageError) {
-        console.warn("Image non supprimée :", storageError.message);
-      }
-    }
-
-    alert("Recette supprimée avec succès !");
-    loadList();
-
-  } catch (err) {
-    console.error("Erreur suppression :", err.message);
-    alert("Erreur lors de la suppression.");
-  }
-}
-
-// 🔹 METTRE À JOUR une recette (supprime l'ancienne image si remplacée)
-async function updateRecette(id, formData) {
-  try {
-    const nouvelleImage = formData.get('image');
-    let imagePath = null;
-
-    if (nouvelleImage && nouvelleImage.size > 0) {
-      // 1️⃣ Récupérer l'ancienne image
-      const { data: ancienneRecette, error: getOldError } = await supabase
-        .from('recettes')
-        .select('image')
-        .eq('id', id)
-        .single();
-
-      if (getOldError) throw getOldError;
-
-      // 2️⃣ Supprimer l'ancienne image si elle existe
-      if (ancienneRecette?.image) {
-        const { error: delOldError } = await supabase
-          .storage
-          .from('photos')
-          .remove([ancienneRecette.image]);
-
-        if (delOldError) {
-          console.warn("Ancienne image non supprimée :", delOldError.message);
-        }
-      }
-
-      // 3️⃣ Uploader la nouvelle image
-      const fileName = `${Date.now()}-${nouvelleImage.name}`;
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('photos')
-        .upload(`photos/${fileName}`, nouvelleImage);
-
-      if (uploadError) throw uploadError;
-
-      imagePath = uploadData.path;
-    }
-
-    // 4️⃣ Mettre à jour la recette
-    const updateData = {
-      titre: formData.get('titre'),
-      description: formData.get('description'),
-      lien_youtube: formData.get('lien_youtube'),
-    };
-    if (imagePath) updateData.image = imagePath;
-
-    const { error: updateError } = await supabase
-      .from('recettes')
-      .update(updateData)
-      .eq('id', id);
-
-    if (updateError) throw updateError;
-
-    alert("Recette mise à jour !");
-    loadList();
-
-  } catch (err) {
-    console.error("Erreur mise à jour :", err.message);
-    alert("Erreur lors de la mise à jour.");
-  }
-}
-
 })
 
 document.getElementById('resetBtn').addEventListener('click', () => {
