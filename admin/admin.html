@@ -1,55 +1,10 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Silence ça mijote</title>
-<link rel="stylesheet" href="../style.css"/></head>
-<body>
-<header class="site-header"><h1>Admin</h1><a href="../index.html">Retour site</a></header>
-<main style="max-width:1100px;margin:18px auto;padding:12px">
-  <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
-    <h2>Créer / Modifier une recette</h2>
-    <form id="recipeForm">
-      <input type="hidden" name="id" />
-      <label>Titre<br/><input name="titre" required style="width:100%;padding:12px;font-size:16px"/></label><br/><br/>
-      <label>Description<br/><textarea name="description" rows="3" style="width:100%;padding:12px;font-size:15px"></textarea></label><br/>
-      <label>Catégorie<br/>
-        <select name="categorie" style="padding:10px;font-size:15px">
-          <option value="dessert">dessert</option><option value="viande">viande</option><option value="poisson">poisson</option><option value="accompagnement">accompagnement</option><option value="autre">autre</option>
-        </select>
-      </label><br/><br/>
-      <label>Image (fichier)<br/><input type="file" name="imagefile" accept="image/*" /></label><br/>
-      <button type="button" id="uploadBtn">Uploader l'image</button> <span id="uploadStatus" style="margin-left:8px;color:#333"></span><br/><br/>
-      <label>Ou URL image<br/><input name="photo_url" style="width:100%;padding:10px;font-size:15px" placeholder="https://..."/></label><br/><br/>
-      <label>Vidéo YouTube (URL)<br/><input name="lien_youtube" style="width:100%;padding:10px;font-size:15px" placeholder="https://www.youtube.com/watch?v=..."/></label><br/><br/>
-      <label>Ingrédients (un par ligne)<br/><textarea name="ingredients" rows="4" style="width:100%;padding:12px;font-size:15px" placeholder="1 aubergine&#10;2 courgettes"></textarea></label><br/>
-      <label>Préparation / Étapes (une étape par ligne)<br/><textarea name="preparation" rows="6" style="width:100%;padding:12px;font-size:15px" placeholder="Étape 1&#10;Étape 2"></textarea></label><br/><br/>
-      <button type="submit">Enregistrer</button> <button type="button" id="resetBtn">Réinitialiser</button>
-    </form>
-  </section>
-
-  <section style="margin-top:18px">
-    <h2>Recettes existantes</h2>
-    <div id="list"></div>
-  </section>
-
-<!-- SECTION TEST EMAIL -->
-<section style="margin-top:30px; background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
-  <h2>Test Envoi Email</h2>
-  <label>Adresse email destinataire<br/>
-    <input type="email" id="testEmail" placeholder="exemple@domaine.com" style="width:100%;padding:10px;font-size:15px"/>
-  </label><br/><br/>
-  <button type="button" id="sendTestEmail">Envoyer Email</button>
-  <p id="emailStatus" style="margin-top:8px;color:#333;font-weight:bold"></p>
-</section>
-
-</main>
-
 <script type="module">
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // Mets ici ton URL et ta clé d'API Supabase (remplace par les tiennes)
-
 const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -60,6 +15,7 @@ const uploadStatus = document.getElementById('uploadStatus')
 
 let uploadedPath = ''
 
+// === Upload image ===
 uploadBtn.addEventListener('click', async () => {
   const fileInput = form.elements['imagefile']
   const file = fileInput.files[0]
@@ -69,12 +25,9 @@ uploadBtn.addEventListener('click', async () => {
   }
 
   const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
-
   uploadStatus.innerText = 'Upload en cours...'
 
-  // Upload dans le bucket 'photos-recettes' (le nom doit correspondre au bucket créé dans Supabase Storage)
   const { data, error } = await supabase.storage.from('photos-recettes').upload(fileName, file)
-
   if (error) {
     console.error('Erreur upload :', error)
     uploadStatus.innerText = 'Erreur lors de l\'upload'
@@ -82,17 +35,14 @@ uploadBtn.addEventListener('click', async () => {
   }
 
   uploadedPath = data.path
-
-  // Récupérer l'URL publique de l'image uploadée
   const { data: publicUrlData } = supabase.storage.from('photos-recettes').getPublicUrl(uploadedPath)
   form.elements['photo_url'].value = publicUrlData.publicUrl
   uploadStatus.innerText = 'Upload réussi !'
 })
 
-// Charge et affiche la liste des recettes
+// === Charger liste des recettes ===
 async function loadList() {
   const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
-
   if (error) {
     console.error('Erreur chargement recettes:', error)
     listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'
@@ -113,7 +63,7 @@ async function loadList() {
     listDiv.appendChild(card)
   })
 
-  // Gestion suppression
+  // Suppression
   listDiv.querySelectorAll('.del').forEach(btn => {
     btn.addEventListener('click', async e => {
       if (!confirm('Supprimer cette recette ?')) return
@@ -128,7 +78,7 @@ async function loadList() {
     })
   })
 
-  // Gestion édition
+  // Édition
   listDiv.querySelectorAll('.edit').forEach(btn => {
     btn.addEventListener('click', async e => {
       const id = e.target.dataset.id
@@ -149,6 +99,7 @@ async function loadList() {
   })
 }
 
+// === Sauvegarde recette ===
 form.addEventListener('submit', async e => {
   e.preventDefault()
   const id = form.elements['id'].value || null
@@ -193,44 +144,41 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 })
 
 loadList()
-// === TEST ENVOI EMAIL ===
-const sendBtn = document.getElementById('sendTestEmail');
-const emailInput = document.getElementById('testEmail');
-const emailStatus = document.getElementById('emailStatus');
+
+// === TEST ENVOI EMAIL via supabase.functions.invoke ===
+const sendBtn = document.getElementById('sendTestEmail')
+const emailInput = document.getElementById('testEmail')
+const emailStatus = document.getElementById('emailStatus')
 
 sendBtn.addEventListener('click', async () => {
-  const recipient = emailInput.value.trim();
+  const recipient = emailInput.value.trim()
   if (!recipient) {
-    alert('Veuillez entrer une adresse email');
-    return;
+    alert('Veuillez entrer une adresse email')
+    return
   }
 
-  emailStatus.innerText = 'Envoi en cours...';
+  emailStatus.innerText = 'Envoi en cours...'
 
   try {
-    const res = await fetch('/functions/sendEmail', { // chemin vers ton Edge Function
+    const { data, error } = await supabase.functions.invoke('sendEmail', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         to: recipient,
         subject: 'Objet test',
         text: 'Test envoi email camijote'
       })
-    });
+    })
 
-    const data = await res.json();
-    if (res.ok) {
-      emailStatus.innerText = 'Email envoyé avec succès !';
+    if (error) {
+      emailStatus.innerText = 'Erreur : ' + error.message
+      console.error(error)
     } else {
-      emailStatus.innerText = 'Erreur : ' + (data.error || 'Impossible d\'envoyer l\'email');
-      console.error(data);
+      emailStatus.innerText = 'Email envoyé avec succès !'
+      console.log(data)
     }
   } catch (err) {
-    emailStatus.innerText = 'Erreur lors de la requête';
-    console.error(err);
+    emailStatus.innerText = 'Erreur lors de la requête'
+    console.error(err)
   }
-});
-
-
+})
 </script>
-</body></html>
