@@ -209,16 +209,13 @@ sendBtn.addEventListener('click', async () => {
 
   try {
     const { data, error } = await supabase.functions.invoke('sendEmail', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${supabaseKey}` // clé service Supabase
-      },
-      body: JSON.stringify({
-        to: recipient,
-        subject: 'Objet test',
-        text: 'Test envoi email camijote'
-      })
-    })
+  method: 'POST',
+  body: JSON.stringify({
+    to: recipient,
+    subject: 'Objet test',
+    text: 'Test envoi email camijote'
+  })
+})
 
     if (error) {
       emailStatus.innerText = 'Erreur : ' + error.message
