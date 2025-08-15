@@ -194,6 +194,9 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 loadList()
 // === TEST ENVOI EMAIL via supabase.functions.invoke ===
+const sendBtn = document.getElementById('sendTestEmail')
+const emailInput = document.getElementById('testEmail')
+const emailStatus = document.getElementById('emailStatus')
 
 sendBtn.addEventListener('click', async () => {
   const recipient = emailInput.value.trim()
