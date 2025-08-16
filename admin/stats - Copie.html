@@ -73,31 +73,20 @@ async function loadStats() {
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
   })
 
-// Visites totales par catégorie
-const visitesParCategorie = {}
-recettes.forEach(r => {
-  const cat = r.categorie || 'Autre'
-  visitesParCategorie[cat] = (visitesParCategorie[cat] || 0) + (r.nombre_visites || 0)
-})
-
-const ctxCat = document.getElementById('categorieChart').getContext('2d')
-new Chart(ctxCat, {
-  type: 'pie',
-  data: {
-    labels: Object.keys(visitesParCategorie),
-    datasets: [{
-      data: Object.values(visitesParCategorie),
-      backgroundColor: ['#b04a32','#2a4d69','#2a9d8f','#f39c12','#f4d03f']
-    }]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'right' },
-      tooltip: { callbacks: { label: context => `${context.label} : ${context.raw} visites` } }
+  // Catégorie
+  const categories = {}
+  recettes.forEach(r => {
+    const cat = r.categorie || 'Autre'
+    categories[cat] = (categories[cat] || 0) + 1
+  })
+  const ctxCat = document.getElementById('categorieChart').getContext('2d')
+  new Chart(ctxCat, {
+    type:'pie',
+    data:{
+      labels:Object.keys(categories),
+      datasets:[{data:Object.values(categories), backgroundColor:['#b04a32','#2a4d69','#2a9d8f','#f39c12','#f4d03f'] }]
     }
-  }
-})
-
+  })
 
   // Top recettes par note
   const topNotes = recettes.sort((a,b)=> (b.note_moyenne||0) - (a.note_moyenne||0)).slice(0,5)
