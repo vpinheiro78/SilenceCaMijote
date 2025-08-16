@@ -117,6 +117,7 @@
 <div class="container" id="recetteContainer">
   <a href="../index.html" class="button">← Retour aux recettes</a>
 <h1 id="titre" class="fade-in">Chargement...</h1>
+<p id="nombreVues" class="fade-in" style="color:#999; font-size:0.9em; margin-top:5px;"></p>
 
 <div class="recette-header fade-in">
   <div id="description"></div>
@@ -179,6 +180,17 @@
       document.getElementById('titre').innerText = "Erreur lors du chargement";
       return;
     }
+ // ---- INCREMENTATION DU NOMBRE DE VUES ----
+  const { error: updateError } = await supabase
+    .from('recettes')
+    .update({ nombre_visites: data.nombre_visites + 1 })
+    .eq('id', id);
+
+  if (updateError) console.error("Erreur mise à jour vues :", updateError);
+
+  // Affichage local immédiat
+  data.nombre_visites = data.nombre_visites + 1;
+  document.getElementById('nombreVues').innerText = `Vues : ${data.nombre_visites}`;
 
     afficherRecette(data);
   }
