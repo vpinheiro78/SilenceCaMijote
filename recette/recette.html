@@ -167,18 +167,6 @@
     document.getElementById('titre').innerText = "Recette non trouvée";
   } else { fetchRecette(recetteId); }
 
-  async function fetchRecette(id) {
-    const { data, error } = await supabase
-      .from('recettes')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error || !data) {
-      console.error(error);
-      document.getElementById('titre').innerText = "Erreur lors du chargement";
-      return;
-    }
 
 async function fetchRecette(id) {
   const { data, error } = await supabase
@@ -200,6 +188,9 @@ async function fetchRecette(id) {
     .eq('id', id);
 
   if (updateError) console.error("Erreur mise à jour vues :", updateError);
+
+  // Mettre à jour la valeur localement pour l'affichage
+  data.nombre_visites = data.nombre_visites + 1;
 
   afficherRecette(data);
 }
