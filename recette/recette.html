@@ -167,33 +167,18 @@
     document.getElementById('titre').innerText = "Recette non trouvée";
   } else { fetchRecette(recetteId); }
 
+  async function fetchRecette(id) {
+    const { data, error } = await supabase
+      .from('recettes')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-async function fetchRecette(id) {
-  const { data, error } = await supabase
-    .from('recettes')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error || !data) {
-    console.error(error);
-    document.getElementById('titre').innerText = "Erreur lors du chargement";
-    return;
-  }
-
-  // ---- INCREMENTATION DU NOMBRE DE VUES ----
-  const { error: updateError } = await supabase
-    .from('recettes')
-    .update({ nombre_visites: data.nombre_visites + 1 })
-    .eq('id', id);
-
-  if (updateError) console.error("Erreur mise à jour vues :", updateError);
-
-  // Mettre à jour la valeur localement pour l'affichage
-  data.nombre_visites = data.nombre_visites + 1;
-
-  afficherRecette(data);
-}
+    if (error || !data) {
+      console.error(error);
+      document.getElementById('titre').innerText = "Erreur lors du chargement";
+      return;
+    }
 
     afficherRecette(data);
   }
