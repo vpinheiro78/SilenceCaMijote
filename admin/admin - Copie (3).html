@@ -193,7 +193,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 })
 
 loadList()
-// === TEST ENVOI EMAIL via fonction Netlify ===
+// === TEST ENVOI EMAIL via supabase.functions.invoke ===
 const sendBtn = document.getElementById('sendTestEmail')
 const emailInput = document.getElementById('testEmail')
 const emailStatus = document.getElementById('emailStatus')
@@ -208,24 +208,21 @@ sendBtn.addEventListener('click', async () => {
   emailStatus.innerText = 'Envoi en cours...'
 
   try {
-    const response = await fetch('https://silencecamijote.netlify.app/.netlify/functions/sendEmail', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: recipient,
-        subject: 'Objet test',
-        text: 'Test envoi email camijote'
-      })
-    })
+    const { data, error } = await supabase.functions.invoke('sendEmail', {
+  method: 'POST',
+  body: JSON.stringify({
+    to: recipient,
+    subject: 'Objet test',
+    text: 'Test envoi email camijote'
+  })
+})
 
-    const data = await response.json()
-
-    if (response.ok) {
+    if (error) {
+      emailStatus.innerText = 'Erreur : ' + error.message
+      console.error(error)
+    } else {
       emailStatus.innerText = 'Email envoyé avec succès !'
       console.log(data)
-    } else {
-      emailStatus.innerText = 'Erreur : ' + (data.error || 'Problème inconnu')
-      console.error(data)
     }
   } catch (err) {
     emailStatus.innerText = 'Erreur lors de la requête'
