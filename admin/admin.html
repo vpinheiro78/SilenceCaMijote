@@ -220,18 +220,19 @@ sendBtn.addEventListener('click', async () => {
 
     const data = await response.json()
 
-    if (response.ok) {
+    if (!response.ok) {
+      emailStatus.innerText = 'Erreur : ' + (data.error || response.statusText)
+      console.error(data)
+    } else {
       emailStatus.innerText = 'Email envoyé avec succès !'
       console.log(data)
-    } else {
-      emailStatus.innerText = 'Erreur : ' + (data.error || 'Problème inconnu')
-      console.error(data)
     }
   } catch (err) {
     emailStatus.innerText = 'Erreur lors de la requête'
     console.error(err)
   }
 })
+
 
 
 </script>
