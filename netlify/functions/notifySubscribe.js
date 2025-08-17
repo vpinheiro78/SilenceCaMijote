@@ -1,41 +1,41 @@
-import fs from "fs";
-import path from "path";
-import sgMail from "@sendgrid/mail";
+const sgMail = require("@sendgrid/mail");
+const fs = require("fs");
+const path = require("path");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
   try {
     const { email } = JSON.parse(event.body);
 
-    // Lire le fichier welcome.html
-    const filePath = path.resolve("templates", "welcome.html");
-    let htmlTemplate = fs.readFileSync(filePath, "utf8");
+    // Lire le template HTML
+    const templatePath = path.resolve("templates", "welcome.html");
+    let htmlContent = fs.readFileSync(templatePath, "utf8");
 
     // Remplacer les variables dynamiques
-    htmlTemplate = htmlTemplate
+    htmlContent = htmlContent
       .replace("{{email}}", email)
       .replace("{{site_url}}", "https://silencecamijote.fr")
-      .replace("{{unsubscribe_url}}", "https://silencecamijote.fr/unsubscribe?email=" + encodeURIComponent(email));
+      .replace("{{unsubscribe_url}}", "https://silencecamijote.fr/unsubscribe");
 
     const msg = {
       to: email,
-      from: process.env.SENDGRID_FROM,
-      subject: "Bienvenue sur Silence, ça mijote !",
-      html: htmlTemplate,
+      from: process.env.SENDGRID_FROM, // Doit être validé sur SendGrid
+      subject: "Bienvenue sur Silence, ça mijote 🍲",
+      html: htmlContent, // <-- ton template HTML avec style
     };
 
     await sgMail.send(msg);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Email envoyé avec succès" }),
+      body: JSON.stringify({ message: "Email envoyé avec succès !" }),
     };
   } catch (error) {
-    console.error(error);
+    console.error("Erreur d’envoi:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Erreur envoi email" }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
