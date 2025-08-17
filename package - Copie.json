@@ -20,14 +20,4 @@
   "dependencies": {
     "@sendgrid/mail": "^8.1.5"
   }
-
-{
-  "name": "silencecamijote",
-  "private": true,
-  "version": "1.0.0",
-  "dependencies": {
-    "@sendgrid/mail": "^8.1.0",
-    "@supabase/supabase-js": "^2.44.0"
-  }
-}
 }

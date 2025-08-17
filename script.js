@@ -146,7 +146,19 @@ subscribeForm.addEventListener('submit', async (e) => {
     return
   }
 
-  subscribeMessage.style.color = 'green'
-  subscribeMessage.innerText = "Merci pour votre abonnement !"
+subscribeMessage.style.color = 'green'
+subscribeMessage.innerText = "Merci pour votre abonnement !"
+
+// déclenche l'envoi des 2 emails
+try {
+  await fetch('/.netlify/functions/notifySubscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+} catch (e) {
+  console.error('Erreur envoi emails (notifySubscribe):', e)
+}
+
   subscribeForm.reset()
 })
