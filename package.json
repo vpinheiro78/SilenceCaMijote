@@ -20,6 +20,7 @@
   "homepage": "https://github.com/vpinheiro78/SilenceCaMijote#readme",
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",
-    "@supabase/supabase-js": "^2.44.0"
+    "@supabase/supabase-js": "^2.44.0",
+    "node-fetch": "^2.7.0"
   }
 }
