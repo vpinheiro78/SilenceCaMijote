@@ -8,8 +8,8 @@ exports.handler = async (event) => {
   try {
     const { email } = JSON.parse(event.body);
 
-    // Lire le template HTML dans netlify/emails/
-    const templatePath = path.join(__dirname, "../emails/welcome.html");
+    // Lire le template HTML depuis le même dossier que la fonction
+    const templatePath = path.join(__dirname, "welcome.html");
     let htmlContent = fs.readFileSync(templatePath, "utf8");
 
     // Remplacer les variables dynamiques
@@ -20,9 +20,9 @@ exports.handler = async (event) => {
 
     const msg = {
       to: email,
-      from: process.env.SENDGRID_FROM, // doit être validé dans SendGrid
+      from: process.env.SENDGRID_FROM, // Doit être validé sur SendGrid
       subject: "Bienvenue sur Silence, ça mijote 🍲",
-      html: htmlContent,
+      html: htmlContent, // Ton template HTML avec style
     };
 
     await sgMail.send(msg);
