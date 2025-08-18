@@ -64,10 +64,11 @@ exports.handler = async (event, context) => {
 
           <tr>
             <td style="padding:16px 28px 24px;font-size:12px;color:#666;border-top:1px solid #eee">
-              <p style="margin:0 0 6px;">Vous ne souhaitez plus recevoir nos emails ?</p>
               <p style="margin:0">
-                <a href="https://silencecamijote.netlify.app/unsubscribe?email=${encodeURIComponent(recipient)}" style="color:#2a4d69">Se désabonner</a>
-              </p>
+  Pour ne plus recevoir nos recettes, envoyez simplement un email à 
+  <a href="mailto:contact.silencecamijote@gmail.com" style="color:#2a4d69">contact.silencecamijote@gmail.com</a> 
+  et nous retirerons votre adresse de notre liste.
+</p>
             </td>
           </tr>
         </table>
