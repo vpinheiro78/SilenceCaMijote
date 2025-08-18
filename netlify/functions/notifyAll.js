@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Ici, tu peux figer le mail destinataire pour test
-    const recipient = "testdestinataire@example.com";
+    const recipient = "victor.pinheiro@exovision.fr";
 
     // Tu peux aussi récupérer le titre, description etc. depuis le body si tu veux
     const { titre, description, photo_url, lien_youtube } = JSON.parse(event.body || "{}");
