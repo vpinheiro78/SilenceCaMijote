@@ -38,6 +38,10 @@ exports.handler = async (event) => {
       `
     }));
 
+console.log("Destinataires :", abonnés);
+console.log("Messages :", messages);
+
+
     // Envoi des mails (SendGrid autorise plusieurs envois via Promise.all)
     await Promise.all(messages.map(msg => sgMail.send(msg)));
 
