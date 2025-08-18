@@ -14,7 +14,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { recipient, titre, description, photo_url, lien_youtube } = JSON.parse(event.body || "{}");
+    // On prend email du front et on le renomme en recipient
+    const { email: recipient, titre, description, photo_url, lien_youtube } = JSON.parse(event.body || "{}");
 
     if (!recipient) {
       return { statusCode: 400, headers, body: "Aucun email fourni" };
