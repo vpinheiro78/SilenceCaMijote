@@ -1,48 +1,58 @@
 const sgMail = require("@sendgrid/mail");
-const { createClient } = require("@supabase/supabase-js");
 
+// Clé SendGrid à mettre dans les variables d'environnement
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// URL et clé Supabase (service role ou anonyme si lecture simple)
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 exports.handler = async (event) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // Gestion requête pré-vol OPTIONS
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+      body: ""
+    };
+  }
+
   try {
-    const { titre, description, photo_url, lien_youtube } = JSON.parse(event.body);
+    const { recetteId, titre, description, photo_url, lien_youtube } = JSON.parse(event.body);
 
-    // Récupérer tous les abonnés
-    const { data: abonnés, error } = await supabase.from("abonnés").select("email");
-    if (error) throw error;
+    // Ici tu peux définir un tableau fixe pour test, ou récupérer depuis Supabase
+    const abonnés = ["exemple1@mail.com", "exemple2@mail.com"]; // <- à remplacer par tes abonnés réels
 
-    if (!abonnés || abonnés.length === 0) {
-      return { statusCode: 200, body: JSON.stringify({ message: "Aucun abonné trouvé." }) };
-    }
+    const messages = abonnés.map(email => ({
+      to: email,
+      from: process.env.SENDGRID_FROM, // Doit être validé sur SendGrid
+      subject: `Nouvelle recette : ${titre}`,
+      html: `
+        <h2>${titre}</h2>
+        <p>${description}</p>
+        ${photo_url ? `<img src="${photo_url}" style="max-width:100%;height:auto;"/>` : ""}
+        ${lien_youtube ? `<p><a href="${lien_youtube}">Voir la vidéo</a></p>` : ""}
+        <p>Bonne dégustation ! 🍲</p>
+      `
+    }));
 
-    // Préparer le contenu HTML (simple exemple)
-    const htmlContent = `
-      <h2>Nouvelle recette : ${titre}</h2>
-      <p>${description}</p>
-      ${photo_url ? `<img src="${photo_url}" style="max-width:300px;"/>` : ""}
-      ${lien_youtube ? `<p>Regardez la vidéo : <a href="${lien_youtube}">Voir sur YouTube</a></p>` : ""}
-      <p><a href="https://silencecamijote.fr">Voir la recette sur le site</a></p>
-    `;
+    // Envoi des mails (SendGrid autorise plusieurs envois via Promise.all)
+    await Promise.all(messages.map(msg => sgMail.send(msg)));
 
-    // Envoyer l’email à chaque abonné
-    for (const abo of abonnés) {
-      const msg = {
-        to: abo.email,
-        from: process.env.SENDGRID_FROM,
-        subject: `Nouvelle recette : ${titre} 🍲`,
-        html: htmlContent,
-      };
-      await sgMail.send(msg);
-    }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ message: `Notification envoyée à ${abonnés.length} abonnés !` })
+    };
 
-    return { statusCode: 200, body: JSON.stringify({ message: "Notifications envoyées à tous les abonnés ✅" }) };
-  } catch (err) {
-    console.error("Erreur notifyAll:", err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  } catch (error) {
+    console.error("Erreur notifyAll:", error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
