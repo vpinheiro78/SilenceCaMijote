@@ -7,12 +7,13 @@ exports.handler = async (event, context) => {
   const headers = {
     "Access-Control-Allow-Origin": "*", // ou ton domaine
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json"
   };
 
   // Réponse aux requêtes OPTIONS (pré-vol)
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
+    return { statusCode: 200, headers, body: JSON.stringify({ message: "OK" }) };
   }
 
   try {
@@ -20,7 +21,7 @@ exports.handler = async (event, context) => {
     const { email, titre, description, photo_url, lien_youtube } = JSON.parse(event.body || "{}");
 
     if (!email) {
-      return { statusCode: 400, headers, body: "Aucun email fourni" };
+      return { statusCode: 400, headers, body: JSON.stringify({ error: "Aucun email fourni" }) };
     }
 
     const htmlContent = `
@@ -42,10 +43,18 @@ exports.handler = async (event, context) => {
 
     console.log("Email envoyé à :", email);
 
-    return { statusCode: 200, headers, body: JSON.stringify({ message: `Notification envoyée à ${email}` }) };
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ message: `Notification envoyée à ${email}` })
+    };
 
   } catch (error) {
     console.error("Erreur notifySingle:", error);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
