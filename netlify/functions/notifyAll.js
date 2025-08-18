@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 exports.handler = async (event, context) => {
   // Autoriser CORS
   const headers = {
-    "Access-Control-Allow-Origin": "*", 
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS"
   };
@@ -27,9 +27,9 @@ exports.handler = async (event, context) => {
 
     // Récupérer le premier email depuis la table "abonnés"
     const { data: subscribers, error } = await supabase
-      .from('abonnés') // nom exact de ta table
+      .from('abonnes') // nom exact de ta table
       .select('email')
-      .limit(1); // un seul pour l'instant
+      .limit(1);
 
     if (error) {
       console.error("Erreur Supabase:", error);
