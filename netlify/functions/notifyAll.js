@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
               <p>Une nouvelle recette vient d’être publiée sur « Silence, ça mijote » :</p>
               <h2 style="color:#b04a32">${titre}</h2>
               <p>${description || ""}</p>
-              ${photo_url ? `<img src="${photo_url}" style="width:50px;height:auto;border-radius:12px;margin-top:12px;" />` : ""}
+              ${photo_url ? `<img src="${photo_url}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;margin-top:12px;" />` : ""}
               ${lien_youtube ? `<p><a class="btn shadow" href="${lien_youtube}" style="background:#b04a32;color:#fff">Voir la vidéo</a></p>` : ""}
               <p style="margin:0">Votre email : <strong>${recipient}</strong></p>
             </td>
