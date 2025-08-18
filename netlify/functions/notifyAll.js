@@ -1,70 +1,68 @@
-// notifyAll.js
 const sgMail = require("@sendgrid/mail");
 const { createClient } = require("@supabase/supabase-js");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY // clé anonyme suffit pour lire les abonnés
-);
+// URL et clé anonyme Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY; 
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event) => {
-  // Gérer CORS preflight
+  // Gestion CORS
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-      },
-    };
+    return { statusCode: 200, headers };
   }
 
   try {
-    const { recetteId, titre, description, photo_url, lien_youtube } = JSON.parse(event.body);
+    const { recetteId } = JSON.parse(event.body);
 
-    // Récupérer tous les abonnés
-    const { data: abonnés, error } = await supabase.from("abonnés").select("email");
-    if (error) throw error;
+    // Récupérer la recette
+    const { data: recette, error: recetteErr } = await supabase
+      .from("recettes")
+      .select("*")
+      .eq("id", recetteId)
+      .single();
 
-    if (!abonnés || abonnés.length === 0) {
+    if (recetteErr || !recette) {
       return {
-        statusCode: 200,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ message: "Aucun abonné trouvé" }),
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({ error: "Recette introuvable" }),
       };
     }
 
-    // Construire l'email
-    const emails = abonnés.map(a => a.email);
-    const msg = {
-      to: emails, // SendGrid gère plusieurs destinataires
-      from: process.env.SENDGRID_FROM,
-      subject: `Nouvelle recette : ${titre} 🍲`,
-      html: `
-        <h2>${titre}</h2>
-        <p>${description}</p>
-        ${photo_url ? `<img src="${photo_url}" width="400" />` : ""}
-        ${lien_youtube ? `<p>Voir la vidéo : <a href="${lien_youtube}">${lien_youtube}</a></p>` : ""}
-        <p><a href="https://silencecamijote.fr/recette/${recetteId}">Voir la recette en ligne</a></p>
-      `,
-    };
+    // Récupérer les abonnés
+    const { data: abonnés, error: subErr } = await supabase.from("abonnés").select("email");
+    if (subErr) throw subErr;
 
-    await sgMail.send(msg);
+    // Envoyer l'email à chaque abonné
+    const sendPromises = abonnés.map((sub) => {
+      return sgMail.send({
+        to: sub.email,
+        from: process.env.SENDGRID_FROM,
+        subject: `Nouvelle recette : ${recette.titre}`,
+        html: `
+          <h1>${recette.titre}</h1>
+          <p>${recette.description}</p>
+          ${recette.photo_url ? `<img src="${recette.photo_url}" style="max-width:300px"/>` : ""}
+          ${recette.lien_youtube ? `<p>Regardez la vidéo : <a href="${recette.lien_youtube}">${recette.lien_youtube}</a></p>` : ""}
+          <p>Bonne dégustation ! 🍲</p>
+        `,
+      });
+    });
 
-    return {
-      statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ message: "Emails envoyés à tous les abonnés ✅" }),
-    };
+    await Promise.all(sendPromises);
+
+    return { statusCode: 200, headers, body: JSON.stringify({ message: "Notification envoyée à tous les abonnés ✅" }) };
   } catch (err) {
     console.error(err);
-    return {
-      statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: err.message }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
   }
 };
