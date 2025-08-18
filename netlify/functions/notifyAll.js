@@ -14,8 +14,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // On prend email du front et on le renomme en recipient
-    const { email: recipient, titre, description, photo_url, lien_youtube } = JSON.parse(event.body || "{}");
+    const { recipient, titre, description } = JSON.parse(event.body || "{}");
 
     if (!recipient) {
       return { statusCode: 400, headers, body: "Aucun email fourni" };
@@ -28,8 +27,8 @@ exports.handler = async (event, context) => {
   <meta charset="utf-8">
   <title>Nouvelle recette</title>
   <style>
-    .btn{display:inline-block;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700}
-    .shadow{box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    .btn {display:inline-block;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700}
+    .shadow {box-shadow:0 6px 18px rgba(0,0,0,0.12)}
   </style>
 </head>
 <body style="margin:0;background:#faf5f0;font-family:Arial,Helvetica,sans-serif;color:#222;">
@@ -45,25 +44,12 @@ exports.handler = async (event, context) => {
           </tr>
 
           <tr>
-            <td style="padding:16px 28px 6px;font-size:15px;line-height:1.6;color:#333">
+            <td style="padding:16px 28px 24px;font-size:15px;line-height:1.6;color:#333">
               <p>Bonjour 👋</p>
               <p>Une nouvelle recette vient d’être publiée sur « Silence, ça mijote » :</p>
               <h2 style="color:#b04a32">${titre}</h2>
               <p>${description || ""}</p>
-			  
-              ${photo_url ? `
-  <table role="presentation" style="margin-top:12px;">
-    <tr>
-      <td style="width:80px; height:80px; overflow:hidden; border-radius:12px;">
-        <img src="${photo_url}" width="80" height="80" style="display:block; width:80px; height:80px; object-fit:cover; border-radius:12px;" />
-      </td>
-    </tr>
-  </table>
-` : ""}
-			  
-			  
-              ${lien_youtube ? `<p><a class="btn shadow" href="${lien_youtube}" style="background:#b04a32;color:#fff">Voir la vidéo</a></p>` : ""}
-              <p style="margin:0">Votre email : <strong>${recipient}</strong></p>
+              <p>Votre email : <strong>${recipient}</strong></p>
             </td>
           </tr>
 
@@ -75,11 +61,7 @@ exports.handler = async (event, context) => {
 
           <tr>
             <td style="padding:16px 28px 24px;font-size:12px;color:#666;border-top:1px solid #eee">
-              <p style="margin:0">
-  Pour ne plus recevoir nos recettes, envoyez simplement un email à 
-  <a href="mailto:contact.silencecamijote@gmail.com" style="color:#2a4d69">contact.silencecamijote@gmail.com</a> 
-  et nous retirerons votre adresse de notre liste.
-</p>
+              <p style="margin:0 0 6px;">Pour vous désabonner de nos notifications, envoyez-nous un email à <a href="mailto:contact.silencecamijote@gmail.com" style="color:#2a4d69">contact.silencecamijote@gmail.com</a> et nous retirerons votre adresse définitivement.</p>
             </td>
           </tr>
         </table>
