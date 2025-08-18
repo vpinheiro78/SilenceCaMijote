@@ -1,58 +1,44 @@
 const sgMail = require("@sendgrid/mail");
-const { createClient } = require("@supabase/supabase-js");
+const { createClient } = require('@supabase/supabase-js');
 
-// Configurer SendGrid et Supabase via variables d'environnement
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   const headers = {
-    "Access-Control-Allow-Origin": "*", // ou ton domaine admin pour plus de sécurité
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS"
   };
 
-  // Répondre aux prévol OPTIONS
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers };
   }
 
   try {
-    const { recetteId } = JSON.parse(event.body);
+    const { recetteId, titre, description, photo_url, lien_youtube } = JSON.parse(event.body);
 
-    if (!recetteId) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "recetteId manquant" }) };
-    }
+    // Récupérer la liste des abonnés
+    const { data: abonnés, error: subError } = await supabase.from('abonnés').select('email');
+    if (subError) throw subError;
 
-    // Récupérer la recette dans Supabase
-    const { data: recette, error: recipeError } = await supabase
-      .from("recettes")
-      .select("*")
-      .eq("id", recetteId)
-      .single();
-
-    if (recipeError || !recette) {
-      return { statusCode: 404, headers, body: JSON.stringify({ error: "Recette introuvable" }) };
-    }
-
-    // Récupérer tous les abonnés
-    const { data: subscribers, error: subError } = await supabase
-      .from("abonnes")
-      .select("email");
-
-    if (subError) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: subError.message }) };
-    }
-
-    // Préparer les emails
-    const messages = subscribers.map(sub => ({
-      to: sub.email,
+    const msgList = abonnés.map(a => ({
+      to: a.email,
       from: process.env.SENDGRID_FROM,
-      subject: `Nouvelle recette : ${recette.titre} 🍲`,
-      html: `
-        <h2>${recette.titre}</h2>
-        <p>${recette.description}</p>
-        ${recette.photo_url ? `<img src="${recette.photo_url}
+      subject: `Nouvelle recette : ${titre}`,
+      html: `<h1>${titre}</h1>
+             <p>${description}</p>
+             ${photo_url ? `<img src="${photo_url}" width="300"/>` : ''}
+             ${lien_youtube ? `<p><a href="${lien_youtube}">Voir la vidéo</a></p>` : ''}`
+    }));
+
+    for (const msg of msgList) {
+      await sgMail.send(msg);
+    }
+
+    return { statusCode: 200, headers, body: JSON.stringify({ message: 'Notifications envoyées !' }) };
+  } catch (error) {
+    console.error(error);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+  }
+};
