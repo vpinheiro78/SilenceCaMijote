@@ -281,7 +281,7 @@ sendNotifBtn.addEventListener('click', async () => {
     return
   }
 
-  if (!confirm("Confirmez-vous l'envoi de la notification à tous les abonnés ?")) {
+  if (!confirm("Confirmez-vous l'envoi de la notification à l'abonné ?")) {
     return
   }
 
@@ -289,23 +289,40 @@ sendNotifBtn.addEventListener('click', async () => {
 
   try {
     // Récupérer les détails de la recette depuis Supabase
-    const { data: recette, error } = await supabase.from('recettes').select('*').eq('id', recetteId).single()
-    if (error || !recette) {
+    const { data: recette, error: recError } = await supabase
+      .from('recettes')
+      .select('*')
+      .eq('id', recetteId)
+      .single()
+    if (recError || !recette) {
       notifStatus.innerText = 'Erreur : recette introuvable'
-      console.error(error)
+      console.error(recError)
       return
     }
+
+    // Récupérer l'email de l'abonné depuis Supabase
+    const { data: abonnés, error: subError } = await supabase
+      .from('abonnes')
+      .select('email')
+      .limit(1)  // pour l'instant, il n'y a qu'un seul abonné
+    if (subError || !abonnés || abonnés.length === 0) {
+      notifStatus.innerText = 'Erreur : aucun abonné trouvé'
+      console.error(subError)
+      return
+    }
+
+    const recipient = abonnés[0].email
 
     // Envoyer les infos à la fonction Netlify
     const response = await fetch('https://silencecamijote.netlify.app/.netlify/functions/notifyAll', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        recetteId,
         titre: recette.titre,
         description: recette.description,
         photo_url: recette.photo_url,
-        lien_youtube: recette.lien_youtube
+        lien_youtube: recette.lien_youtube,
+        recipient // on envoie maintenant l'email récupéré
       })
     })
 
@@ -315,13 +332,15 @@ sendNotifBtn.addEventListener('click', async () => {
       notifStatus.innerText = 'Erreur : ' + (data.error || response.statusText)
       console.error(data)
     } else {
-      notifStatus.innerText = 'Notification envoyée à tous les abonnés ✅'
+      notifStatus.innerText = `Notification envoyée à ${recipient} ✅`
+      console.log('Email envoyé à :', recipient)
     }
   } catch (err) {
     notifStatus.innerText = 'Erreur lors de la requête'
     console.error(err)
   }
 })
+
 
 
 // Charger les options au démarrage
