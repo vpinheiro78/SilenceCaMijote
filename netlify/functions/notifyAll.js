@@ -1,74 +1,58 @@
 const sgMail = require("@sendgrid/mail");
 const { createClient } = require("@supabase/supabase-js");
 
+// Configurer SendGrid et Supabase via variables d'environnement
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Connexion Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*", // ou ton domaine admin pour plus de sécurité
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // Répondre aux prévol OPTIONS
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers };
+  }
+
   try {
-    const { recetteId } = JSON.parse(event.body); // ID de recette envoyé depuis admin
+    const { recetteId } = JSON.parse(event.body);
 
-    // 1. Récupérer la recette
-    const { data: recette, error: recetteError } = await supabase
-      .from("recette")
-      .select("id, titre, description, image_url")
+    if (!recetteId) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: "recetteId manquant" }) };
+    }
+
+    // Récupérer la recette dans Supabase
+    const { data: recette, error: recipeError } = await supabase
+      .from("recettes")
+      .select("*")
       .eq("id", recetteId)
       .single();
 
-    if (recetteError || !recette) {
-      throw new Error("Recette introuvable !");
+    if (recipeError || !recette) {
+      return { statusCode: 404, headers, body: JSON.stringify({ error: "Recette introuvable" }) };
     }
 
-    // 2. Récupérer tous les abonnés
-    const { data: abonnes, error: abonneError } = await supabase
-      .from("abonne")
+    // Récupérer tous les abonnés
+    const { data: subscribers, error: subError } = await supabase
+      .from("abonnes")
       .select("email");
 
-    if (abonneError || !abonnes) {
-      throw new Error("Impossible de récupérer les abonnés !");
+    if (subError) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: subError.message }) };
     }
 
-    // 3. Construire le mail
-    const htmlContent = `
-      <h2>${recette.titre}</h2>
-      <img src="${recette.image_url}" alt="${recette.titre}" style="max-width:100%;border-radius:8px"/>
-      <p>${recette.description}</p>
-      <p>
-        <a href="https://silencecamijote.fr/recette.html?id=${recette.id}">
-          👉 Découvrez la recette complète ici
-        </a>
-      </p>
-      <hr/>
-      <p style="font-size:12px;color:#888">
-        Vous ne souhaitez plus recevoir nos emails ?  
-        <a href="mailto:contact.silencecamijote@gmail.com">Envoyez-nous un email</a>
-      </p>
-    `;
-
-    // 4. Envoyer à tous les abonnés
-    const messages = abonnes.map((abonne) => ({
-      to: abonne.email,
-      from: process.env.SENDGRID_FROM, // Expéditeur validé dans SendGrid
-      subject: "Une nouvelle recette est en ligne 🍲",
-      html: htmlContent,
-    }));
-
-    await sgMail.send(messages, false);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Notification envoyée avec succès !" }),
-    };
-  } catch (error) {
-    console.error("Erreur d’envoi:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
-    };
-  }
-};
+    // Préparer les emails
+    const messages = subscribers.map(sub => ({
+      to: sub.email,
+      from: process.env.SENDGRID_FROM,
+      subject: `Nouvelle recette : ${recette.titre} 🍲`,
+      html: `
+        <h2>${recette.titre}</h2>
+        <p>${recette.description}</p>
+        ${recette.photo_url ? `<img src="${recette.photo_url}
