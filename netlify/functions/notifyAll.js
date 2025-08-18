@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
               <p>Une nouvelle recette vient d’être publiée sur « Silence, ça mijote » :</p>
               <h2 style="color:#b04a32">${titre}</h2>
               <p>${description || ""}</p>
-              <p style="margin:0">Votre email : <strong>${recipient}</strong></p>
+              
             </td>
           </tr>
 
