@@ -1,6 +1,5 @@
 import fs from "fs";
 import { createClient } from "@supabase/supabase-js";
-import "dotenv/config"; // si tu veux charger les variables .env en local
 
 console.log("🚀 Début du script sitemap");
 
