@@ -4,7 +4,8 @@
   "private": true,
   "main": "config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "node generate-sitemap.js",
+    "build": "echo \"Build terminé\""
   },
   "description": "",
   "repository": {
