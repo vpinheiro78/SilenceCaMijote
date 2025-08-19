@@ -48,7 +48,7 @@ async function generateSitemap() {
 
   sitemap += `</urlset>`;
 
-  fs.writeFileSync("sitemap.xml", sitemap);
+  fs.writeFileSync("public/sitemap.xml", sitemap);
   console.log("✅ sitemap.xml généré avec succès !");
 }
 
