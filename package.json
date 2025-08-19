@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "silencecamijote",
   "version": "1.0.0",
   "private": true,
@@ -21,6 +22,7 @@
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",
     "@supabase/supabase-js": "^2.44.0",
+    "googleapis": "^156.0.0",
     "node-fetch": "^2.7.0"
   }
 }
