@@ -4,8 +4,8 @@
   "private": true,
   "main": "config.js",
   "scripts": {
-    "prebuild": "node generate-sitemap.js",
-    "build": "echo \"Build terminé\""
+    "scripts": {
+  "build": "node generate-sitemap.js && echo \"Build terminé\""
   },
   "description": "",
   "repository": {
