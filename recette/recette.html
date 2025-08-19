@@ -381,14 +381,14 @@ if (recette.lien_youtube) {
     videoContainer.appendChild(iframeTop);
 
     // Mini-player flottant uniquement si l'élément existe
-    //const videoFloat = document.getElementById('videoFloat');
-    //if (videoFloat) {
-    //  videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-    //  videoFloat.style.display = 'none';
+    const videoFloat = document.getElementById('videoFloat');
+    if (videoFloat) {
+      videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+      videoFloat.style.display = 'none';
 
-    //  window.addEventListener('scroll', () => {
-    //    videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
-    //  });
+      window.addEventListener('scroll', () => {
+        videoFloat.style.display = window.scrollY > 300 ? 'block' : 'none';
+      });
     }
   } else {
     console.warn("⚠ Aucun ID YouTube valide trouvé pour ce lien !");
