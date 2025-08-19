@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin - Silence ça mijote</title>
+<link rel="stylesheet" href="../style.css"/>
+</head>
+<body>
+<header class="site-header">
+  <h1>Admin</h1>
+  <a href="stats.html" class="btn-liste-courses" style="margin-left:12px;">📊 Statistiques</a>
+  <a href="../index.html">Retour site</a>
+</header>
+
+<main style="max-width:1100px;margin:18px auto;padding:12px">
+
+  <!-- SECTION RECETTES -->
+  <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
+    <h2>Créer / Modifier une recette</h2>
+    <form id="recipeForm">
+      <input type="hidden" name="id" />
+      <label>Titre<br/><input name="titre" required style="width:100%;padding:12px;font-size:16px"/></label><br/><br/>
+      <label>Description<br/><textarea name="description" rows="3" style="width:100%;padding:12px;font-size:15px"></textarea></label><br/>
+      <label>Catégorie<br/>
+        <select name="categorie" style="padding:10px;font-size:15px">
+          <option value="dessert">dessert</option>
+          <option value="viande">viande</option>
+          <option value="poisson">poisson</option>
+          <option value="accompagnement">accompagnement</option>
+          <option value="autre">autre</option>
+        </select>
+      </label><br/><br/>
+      <label>Image (fichier)<br/><input type="file" name="imagefile" accept="image/*" /></label><br/>
+      <button type="button" id="uploadBtn">Uploader l'image</button> <span id="uploadStatus" style="margin-left:8px;color:#333"></span><br/><br/>
+      <label>Ou URL image<br/><input name="photo_url" style="width:100%;padding:10px;font-size:15px" placeholder="https://..."/></label><br/><br/>
+      <label>Vidéo YouTube (URL)<br/><input name="lien_youtube" style="width:100%;padding:10px;font-size:15px" placeholder="https://www.youtube.com/watch?v=..."/></label><br/><br/>
+      <label>Ingrédients (un par ligne)<br/><textarea name="ingredients" rows="4" style="width:100%;padding:12px;font-size:15px" placeholder="1 aubergine&#10;2 courgettes"></textarea></label><br/>
+      <label>Préparation / Étapes (une étape par ligne)<br/><textarea name="preparation" rows="6" style="width:100%;padding:12px;font-size:15px" placeholder="Étape 1&#10;Étape 2"></textarea></label><br/><br/>
+      <button type="submit">Enregistrer</button> 
+      <button type="button" id="resetBtn">Réinitialiser</button>
+    </form>
+  </section>
+
+  <section style="margin-top:18px">
+    <h2>Recettes existantes</h2>
+    <div id="list"></div>
+  </section>
+
+  <!-- SECTION TEST EMAIL -->
+  <section style="margin-top:30px; background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
+    <h2>Test Envoi Email</h2>
+    <label>Adresse email destinataire<br/>
+      <input type="email" id="testEmail" placeholder="exemple@domaine.com" style="width:100%;padding:10px;font-size:15px"/>
+    </label><br/><br/>
+    <button type="button" id="sendTestEmail">Envoyer Email</button>
+    <p id="emailStatus" style="margin-top:8px;color:#333;font-weight:bold"></p>
+  </section>
+
+  <!-- SECTION ENVOI NOTIFICATION -->
+  <section style="margin-top:30px; background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
+    <h2>Notifier un abonné</h2>
+    <label>Choisir une recette<br/>
+      <select id="recetteSelect" style="width:100%;padding:10px;font-size:15px">
+        <option value="">-- Sélectionnez une recette --</option>
+      </select>
+    </label><br/><br/>
+    <label>Choisir un abonné<br/>
+      <select id="abonneSelect" style="width:100%;padding:10px;font-size:15px">
+        <option value="">-- Sélectionnez un abonné --</option>
+      </select>
+    </label><br/><br/>
+    <button type="button" id="sendNotification">Envoyer notification</button>
+    <p id="notifStatus" style="margin-top:8px;color:#333;font-weight:bold"></p>
+  </section>
+
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const form = document.getElementById('recipeForm')
+const listDiv = document.getElementById('list')
+const uploadBtn = document.getElementById('uploadBtn')
+const uploadStatus = document.getElementById('uploadStatus')
+let uploadedPath = ''
+
+// --- Upload image ---
+uploadBtn.addEventListener('click', async () => {
+  const fileInput = form.elements['imagefile']
+  const file = fileInput.files[0]
+  if (!file) { alert('Choisissez d\'abord un fichier'); return }
+  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+  uploadStatus.innerText = 'Upload en cours...'
+  const { data, error } = await supabase.storage.from('photos-recettes').upload(fileName, file)
+  if (error) { uploadStatus.innerText = 'Erreur lors de l\'upload'; console.error(error); return }
+  uploadedPath = data.path
+  const { data: publicUrlData } = supabase.storage.from('photos-recettes').getPublicUrl(uploadedPath)
+  form.elements['photo_url'].value = publicUrlData.publicUrl
+  uploadStatus.innerText = 'Upload réussi !'
+})
+
+// --- Liste recettes ---
+async function loadList() {
+  const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
+  if (error) { listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'; console.error(error); return }
+
+  listDiv.innerHTML = ''
+  data.forEach(r => {
+    const card = document.createElement('div')
+    card.className = 'card'
+    card.style.padding = '12px'
+    card.style.marginBottom = '10px'
+    card.innerHTML = `
+      <strong>${r.titre}</strong> — ${r.categorie} <br/>
+      <button data-id="${r.id}" class="edit">Modifier</button>
+      <button data-id="${r.id}" class="del">Supprimer</button>
+    `
+    listDiv.appendChild(card)
+  })
+
+  // Suppression
+  listDiv.querySelectorAll('.del').forEach(btn => btn.addEventListener('click', async e => {
+    if (!confirm('Supprimer cette recette ?')) return
+    const id = e.target.dataset.id
+    const { error } = await supabase.from('recettes').delete().eq('id', id)
+    if (error) alert('Erreur lors de la suppression'); else loadList()
+  }))
+
+  // Edition
+  listDiv.querySelectorAll('.edit').forEach(btn => btn.addEventListener('click', async e => {
+    const id = e.target.dataset.id
+    const { data, error } = await supabase.from('recettes').select('*').eq('id', id).single()
+    if (error || !data) { alert('Recette introuvable'); return }
+    form.elements['id'].value = data.id
+    form.elements['titre'].value = data.titre || ''
+    form.elements['description'].value = data.description || ''
+    form.elements['categorie'].value = data.categorie || 'dessert'
+    form.elements['photo_url'].value = data.photo_url || ''
+    form.elements['lien_youtube'].value = data.lien_youtube || ''
+    form.elements['ingredients'].value = (data.ingredients || []).join('\n')
+    form.elements['preparation'].value = (data.preparation || []).join('\n')
+  }))
+}
+
+// --- Soumission recette ---
+form.addEventListener('submit', async e => {
+  e.preventDefault()
+  const id = form.elements['id'].value || null
+  const recette = {
+    titre: form.elements['titre'].value,
+    description: form.elements['description'].value,
+    categorie: form.elements['categorie'].value,
+    photo_url: form.elements['photo_url'].value || null,
+    lien_youtube: form.elements['lien_youtube'].value || null,
+    ingredients: form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean),
+    preparation: form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
+  }
+  const response = id 
+    ? await supabase.from('recettes').update(recette).eq('id', id)
+    : await supabase.from('recettes').insert(recette)
+
+  if (response.error) { alert('Erreur lors de la sauvegarde'); console.error(response.error); return }
+
+  alert(id ? 'Recette mise à jour' : 'Recette créée')
+  form.reset(); uploadedPath = ''; uploadStatus.innerText = ''
+  loadList()
+})
+
+document.getElementById('resetBtn').addEventListener('click', () => { form.reset(); uploadedPath=''; uploadStatus.innerText='' })
+loadList()
+
+// --- TEST EMAIL ---
+const sendBtn = document.getElementById('sendTestEmail')
+const emailInput = document.getElementById('testEmail')
+const emailStatus = document.getElementById('emailStatus')
+sendBtn.addEventListener('click', async () => {
+  const recipient = emailInput.value.trim()
+  if (!recipient) { alert('Veuillez entrer une adresse email'); return }
+  emailStatus.innerText = 'Envoi en cours...'
+  try {
+    const response = await fetch('https://silencecamijote.netlify.app/.netlify/functions/sendEmail', {
+      method:'POST', headers:{'Content-Type':'application/json'}, 
+      body:JSON.stringify({to:recipient,subject:'Objet test',text:'Test envoi email camijote'})
+    })
+    const data = await response.json()
+    emailStatus.innerText = response.ok ? 'Email envoyé avec succès !' : 'Erreur : '+(data.error||response.statusText)
+    console.log(data)
+  } catch(err) { emailStatus.innerText='Erreur lors de la requête'; console.error(err) }
+})
+
+// --- NOTIFICATIONS ---
+const recetteSelect = document.getElementById('recetteSelect')
+const abonneSelect = document.getElementById('abonneSelect')
+const sendNotifBtn = document.getElementById('sendNotification')
+const notifStatus = document.getElementById('notifStatus')
+
+// Charger recettes
+async function loadRecetteOptions() {
+  const { data, error } = await supabase.from('recettes').select('id,titre').order('created_at',{ascending:false})
+  if (error) { console.error(error); return }
+  recetteSelect.innerHTML='<option value="">-- Sélectionnez une recette --</option>'
+  data.forEach(r => { const opt=document.createElement('option'); opt.value=r.id; opt.textContent=r.titre; recetteSelect.appendChild(opt) })
+}
+
+// Charger abonnés
+async function loadAbonneOptions() {
+  const { data, error } = await supabase.from('abonnes').select('id,email').order('created_at',{ascending:true})
+  if (error) { console.error(error); return }
+  abonneSelect.innerHTML='<option value="">-- Sélectionnez un abonné --</option>'
+  data.forEach(a => { const opt=document.createElement('option'); opt.value=a.email; opt.textContent=a.email; abonneSelect.appendChild(opt) })
+}
+
+sendNotifBtn.addEventListener('click', async () => {
+  const recetteId = recetteSelect.value
+  const recipient = abonneSelect.value
+  if (!recetteId) { alert('Veuillez sélectionner une recette'); return }
+  if (!recipient) { alert('Veuillez sélectionner un abonné'); return }
+  if (!confirm(`Confirmez-vous l'envoi de la notification à ${recipient} ?`)) return
+  notifStatus.innerText='Envoi en cours...'
+
+  try {
+    const { data: recette, error: recError } = await supabase.from('recettes').select('*').eq('id',recetteId).single()
+    if (recError || !recette) { notifStatus.innerText='Erreur : recette introuvable'; console.error(recError); return }
+
+    const response = await fetch('https://silencecamijote.netlify.app/.netlify/functions/notifyAll',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({titre:recette.titre, description:recette.description, photo_url:recette.photo_url, lien_youtube:recette.lien_youtube, email:recipient})
+    })
+    const data = await response.json()
+    notifStatus.innerText = response.ok ? `Notification envoyée à ${recipient} ✅` : 'Erreur : '+(data.error||response.statusText)
+    console.log('Email envoyé à :', recipient)
+  } catch(err){ notifStatus.innerText='Erreur lors de la requête'; console.error(err) }
+})
+
+// Charger options au démarrage
+loadRecetteOptions()
+loadAbonneOptions()
+
+</script>
+</body>
+</html>
