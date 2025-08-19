@@ -1,3 +1,5 @@
+console.log("📁 Création du fichier sitemap.xml dans public/");
+
 import fs from "fs";
 import { createClient } from "@supabase/supabase-js";
 
