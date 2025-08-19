@@ -14,41 +14,56 @@
 </header>
 
 <main style="max-width:1100px;margin:20px auto;padding:12px">
-
   <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
     <h2>Vue quotidienne (7 derniers jours)</h2>
     <canvas id="googleChart" height="200"></canvas>
   </section>
-
 </main>
 
 <script type="module">
-import { google } from 'https://cdn.jsdelivr.net/npm/googleapis/build/src/index.js' // Placeholder, ne fonctionne pas directement en navigateur
+const ctx = document.getElementById('googleChart').getContext('2d');
 
-// --- Pour usage réel : il faut passer par ton serveur Node.js ou une Netlify Function ---
-// Ici exemple statique/mock pour le front-end
-const mockData = [
-  {date:'2025-08-12', clicks:12, impressions:120},
-  {date:'2025-08-13', clicks:18, impressions:150},
-  {date:'2025-08-14', clicks:22, impressions:170},
-  {date:'2025-08-15', clicks:15, impressions:130},
-  {date:'2025-08-16', clicks:25, impressions:190},
-  {date:'2025-08-17', clicks:20, impressions:180},
-  {date:'2025-08-18', clicks:30, impressions:210},
-]
+async function loadGoogleStats() {
+  try {
+    const res = await fetch('/.netlify/functions/googleStats');
+    if (!res.ok) throw new Error('Erreur récupération stats Google');
+    const data = await res.json();
 
-const ctx = document.getElementById('googleChart').getContext('2d')
-new Chart(ctx,{
-  type:'line',
-  data:{
-    labels: mockData.map(d=>d.date),
-    datasets:[
-      {label:'Clics', data: mockData.map(d=>d.clicks), borderColor:'#4285F4', backgroundColor:'#4285F4', fill:false},
-      {label:'Impressions', data: mockData.map(d=>d.impressions), borderColor:'#34A853', backgroundColor:'#34A853', fill:false}
-    ]
-  },
-  options:{responsive:true, scales:{y:{beginAtZero:true}}}
-})
+    // Préparer les labels et datasets
+    const labels = data.map(d => d.keys[0]); // date
+    const clicks = data.map(d => d.clicks || 0);
+    const impressions = data.map(d => d.impressions || 0);
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Clics', data: clicks, borderColor: '#4285F4', backgroundColor: '#4285F4', fill: false },
+          { label: 'Impressions', data: impressions, borderColor: '#34A853', backgroundColor: '#34A853', fill: false }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: context => `${context.dataset.label} : ${context.raw}`
+            }
+          }
+        },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    ctx.font = "16px Arial";
+    ctx.fillText("Impossible de charger les stats Google", 10, 50);
+  }
+}
+
+loadGoogleStats();
 </script>
 </body>
 </html>
