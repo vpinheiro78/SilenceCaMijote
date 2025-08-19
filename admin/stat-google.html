@@ -6,63 +6,80 @@
 <title>Stats Google - Silence ça mijote</title>
 <link rel="stylesheet" href="../style.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .chart-container {
+    background:#fff;
+    padding:14px;
+    border-radius:10px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.04);
+    margin-bottom:20px;
+  }
+</style>
 </head>
 <body>
 <header class="site-header">
   <h1>Stats Google Search Console</h1>
-  <a href="stats.html" class="btn-liste-courses">Retour Statistiques</a>
+  <a href="stats.html" class="btn-liste-courses">← Retour Statistiques</a>
 </header>
 
 <main style="max-width:1100px;margin:20px auto;padding:12px">
-  <section style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.04)">
-    <h2>Vue quotidienne (7 derniers jours)</h2>
-    <canvas id="googleChart" height="200"></canvas>
+
+  <section class="chart-container">
+    <h2>Clics et impressions (7 derniers jours)</h2>
+    <canvas id="googleChart" height="250"></canvas>
+    <p id="googleChartError" style="color:red;margin-top:10px;"></p>
   </section>
+
 </main>
 
 <script type="module">
-const ctx = document.getElementById('googleChart').getContext('2d');
-
+// --- Fonction pour récupérer les stats via Netlify Function ---
 async function loadGoogleStats() {
   try {
     const res = await fetch('/.netlify/functions/googleStats');
     if (!res.ok) throw new Error('Erreur récupération stats Google');
     const data = await res.json();
 
-    // Préparer les labels et datasets
-    const labels = data.map(d => d.keys[0]); // date
-    const clicks = data.map(d => d.clicks || 0);
-    const impressions = data.map(d => d.impressions || 0);
+    if (!Array.isArray(data) || data.length === 0) {
+      document.getElementById('googleChartError').innerText = 'Aucune donnée disponible';
+      return;
+    }
 
+    // Format pour Chart.js
+    const chartData = data.map(d => ({
+      date: d.keys[0],      // format YYYY-MM-DD
+      clicks: d.clicks,
+      impressions: d.impressions
+    }));
+
+    const ctx = document.getElementById('googleChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels,
+        labels: chartData.map(d => d.date),
         datasets: [
-          { label: 'Clics', data: clicks, borderColor: '#4285F4', backgroundColor: '#4285F4', fill: false },
-          { label: 'Impressions', data: impressions, borderColor: '#34A853', backgroundColor: '#34A853', fill: false }
+          { label: 'Clics', data: chartData.map(d => d.clicks), borderColor: '#4285F4', backgroundColor:'#4285F4', fill:false, tension:0.2 },
+          { label: 'Impressions', data: chartData.map(d => d.impressions), borderColor: '#34A853', backgroundColor:'#34A853', fill:false, tension:0.2 }
         ]
       },
       options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'top' },
-          tooltip: {
-            callbacks: {
-              label: context => `${context.dataset.label} : ${context.raw}`
-            }
-          }
+        responsive:true,
+        plugins:{
+          legend:{position:'top'},
+          tooltip:{mode:'index', intersect:false}
         },
-        scales: { y: { beginAtZero: true } }
+        interaction:{mode:'nearest', axis:'x', intersect:false},
+        scales:{y:{beginAtZero:true}}
       }
     });
-  } catch (err) {
+
+  } catch(err) {
     console.error(err);
-    ctx.font = "16px Arial";
-    ctx.fillText("Impossible de charger les stats Google", 10, 50);
+    document.getElementById('googleChartError').innerText = 'Impossible de récupérer les stats Google';
   }
 }
 
+// --- Charger les stats au chargement ---
 loadGoogleStats();
 </script>
 </body>
