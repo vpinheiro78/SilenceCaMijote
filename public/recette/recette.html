@@ -381,7 +381,7 @@ if (recette.lien_youtube) {
     videoContainer.appendChild(iframeTop);
 
     // Mini-player flottant uniquement si l'élément existe  retirer /* et */ si envie de remettre la video flottante
-/*
+
     const videoFloat = document.getElementById('videoFloat');
     if (videoFloat) {
       videoFloat.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
@@ -396,7 +396,7 @@ if (recette.lien_youtube) {
   }
 }
 
-*/
+
     // Animations fade-in
     container.classList.add('show');
     fadeElems.forEach((el, i) => setTimeout(() => el.classList.add('show'), i*150));
