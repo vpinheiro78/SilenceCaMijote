@@ -1,4 +1,4 @@
-# Rediriger les bots vers Prerender.io
-/*  https://service.prerender.io/  200!
+# Rediriger uniquement les bots vers Prerender.io
+/*  https://service.prerender.io/:splat  200!
   User-Agent=googlebot|bingbot|yahoo|yandex|baiduspider
-  X-Prerender-Token=:PRERENDER_TOKEN
+  X-Prerender-Token=T08cC31aYCHjYJvk6B57
