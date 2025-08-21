@@ -1,4 +1,4 @@
-const recipeTranslations = {
+export const recipeTranslations = {
   fr: {
     back: "Retour aux recettes",
     ingredients: "Ingrédients",
