@@ -211,25 +211,25 @@ for (let i = 1; i <= 5; i++) {
   star.dataset.value = i;
 
   star.addEventListener('mouseover', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.toggle('hover', s.dataset.value <= i)
-    );
+    document.querySelectorAll('#starsContainer .star').forEach(s => {
+      if (parseInt(s.dataset.value) <= i) s.classList.add('hover');
+      else s.classList.remove('hover');
+    });
   });
 
   star.addEventListener('mouseleave', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.remove('hover')
-    );
+    document.querySelectorAll('#starsContainer .star').forEach(s => s.classList.remove('hover'));
   });
 
   star.addEventListener('click', async () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.toggle('selected', s.dataset.value <= i)
-    );
+    document.querySelectorAll('#starsContainer .star').forEach(s => {
+      if (parseInt(s.dataset.value) <= i) s.classList.add('selected');
+      else s.classList.remove('selected');
+    });
 
     ratingMessage.textContent = `${recipeTranslations[savedLang].yourRating} ${i} ${i > 1 ? recipeTranslations[savedLang].stars : recipeTranslations[savedLang].star}`;
 
-    const { error } = await supabase.from('notes').insert([{ recette_id: recette.id, note: i }]);
+    const { error } = await supabase.from('notes').insert([{ recette_id: recette.id || recette.recette_id, note: i }]);
     if (error) {
       console.error('Erreur note :', error);
       ratingMessage.textContent = recipeTranslations[savedLang].ratingError;
@@ -240,6 +240,7 @@ for (let i = 1; i <= 5; i++) {
 
   starsContainer.appendChild(star);
 }
+
 
 </script>
 </body>
