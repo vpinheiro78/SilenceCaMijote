@@ -22,17 +22,51 @@
 
 <!-- Google Translate (caché) -->
 <div id="google_translate_element" style="position:absolute; left:-9999px;"></div>
+
+
 </header>
 
 <main class="container">
-  <!-- ... ton contenu reste inchangé ... -->
+  <div class="blurb" id="site-blurb">Recettes préparées avec amour : des plats savoureux et gourmands pour régaler vos proches à chaque repas.</div>
+
+  <div class="search-row">
+    <input id="search" type="search" placeholder="Rechercher une recette, un ingrédient..." />
+  </div>
+
+  <div class="categories" id="categories">
+    <button data-cat="all" class="cat-btn">Toutes</button>
+    <button data-cat="dessert" class="cat-btn cat-dessert">Dessert</button>
+    <button data-cat="viande" class="cat-btn cat-viande">Viande</button>
+    <button data-cat="poisson" class="cat-btn cat-poisson">Poisson</button>
+    <button data-cat="accompagnement" class="cat-btn cat-accompagnement">Accompagnement</button>
+    <button data-cat="autre" class="cat-btn cat-autre">Autre</button>
+  </div>
+  
+<div class="newsletter">
+  <h3>Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !</h3>
+  <form id="subscribeForm">
+    <input type="email" name="email" placeholder="Votre email" required style="padding:10px; width:250px; border-radius:6px; border:1px solid #ccc"/>
+    <button type="submit" class="btn-liste-courses">S'abonner</button>
+  </form>
+  <p id="subscribeMessage" style="margin-top:6px;color:green;"></p>
+</div>
+
+  <section id="recipes" class="grid" aria-live="polite"></section>
 </main>
 
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
 <script type="module" src="script.js"></script>
 
-<!-- ✅ Fonctions Google Translate corrigées -->
+<script type="text/javascript">
+
+</script>
+
+<script type="text/javascript" 
+  src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
+  async defer>
+</script>
+
 <script type="text/javascript">
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
@@ -41,13 +75,14 @@ function googleTranslateElementInit() {
         layout: google.translate.TranslateElement.InlineLayout.SIMPLE
     }, 'google_translate_element');
 
-    // Applique la langue sauvegardée après 1,5s
+    // Applique la langue sauvegardée après 1,5s (le temps que Google injecte le <select>)
     var savedLang = localStorage.getItem('preferredLang');
     if (savedLang) {
         setTimeout(function() { changeLanguage(savedLang); }, 1500);
     }
 }
 
+// Fonction pour changer la langue via les drapeaux
 function changeLanguage(lang) {
     var interval = setInterval(function() {
         var select = document.querySelector('#google_translate_element select');
@@ -61,10 +96,10 @@ function changeLanguage(lang) {
 }
 </script>
 
-<!-- ✅ Une seule inclusion du script Google Translate -->
 <script type="text/javascript" 
   src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
   async defer></script>
+
 
 </body>
 </html>
