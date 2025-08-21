@@ -191,6 +191,16 @@ form.addEventListener('submit', async e => {
     const descTrad = await translateText(recette.description, lang);
     const ingrTrad = await translateText(recette.ingredients.join('\n'), lang);
     const prepTrad = await translateText(recette.preparation.join('\n'), lang);
+	
+	 // --- Ajoute ce log ici ---
+  console.log({
+    recette_id: recetteId,
+    langue: lang,
+    titre: titreTrad,
+    description: descTrad,
+    ingredients: ingrTrad,
+    preparation: prepTrad
+  });
 
     // Insert ou update dans la table traductions
 
