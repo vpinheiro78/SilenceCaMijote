@@ -283,3 +283,5 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   }
 }
 
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body { top: 0 !important; }
