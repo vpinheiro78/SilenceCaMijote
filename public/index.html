@@ -9,6 +9,15 @@
 <body>
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
+  <!-- Drapeaux personnalisés -->
+<div id="flags-wrapper" style="position:absolute; top:60px; right:10px; z-index:1000;">
+  <img src="assets/flags/fr.svg" onclick="GTranslate('fr')" style="width:30px; margin:2px; cursor:pointer;">
+  <img src="assets/flags/en.svg" onclick="GTranslate('en')" style="width:30px; margin:2px; cursor:pointer;">
+  <img src="assets/flags/es.svg" onclick="GTranslate('es')" style="width:30px; margin:2px; cursor:pointer;">
+  <img src="assets/flags/it.svg" onclick="GTranslate('it')" style="width:30px; margin:2px; cursor:pointer;">
+  <img src="assets/flags/pt.svg" onclick="GTranslate('pt')" style="width:30px; margin:2px; cursor:pointer;">
+  <img src="assets/flags/de.svg" onclick="GTranslate('de')" style="width:30px; margin:2px; cursor:pointer;">
+</div>
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
 </header>
 
@@ -43,5 +52,18 @@
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
 <script type="module" src="script.js"></script>
+
+<!-- Script GTranslate -->
+<script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
+<script>
+function GTranslate(lang) {
+  var select = document.querySelector(".goog-te-combo");
+  if (!select) return;
+  select.value = lang;
+  select.dispatchEvent(new Event('change'));
+}
+</script>
+
+
 </body>
 </html>
