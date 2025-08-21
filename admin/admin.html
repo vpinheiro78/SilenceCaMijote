@@ -193,14 +193,23 @@ form.addEventListener('submit', async e => {
     const prepTrad = await translateText(recette.preparation.join('\n'), lang);
 
     // Insert ou update dans la table traductions
-    await supabase.from('recettes_traductions').upsert({
-      recette_id: recetteId,
-      langue: lang,
-      titre: titreTrad,
-      description: descTrad,
-      ingredients: ingrTrad,
-      preparation: prepTrad
-    }, { onConflict: ['recette_id','langue'] });
+
+const { data, error } = await supabase.from('recettes_traductions').upsert({
+  recette_id: recetteId,
+  langue: lang,
+  titre: titreTrad,
+  description: descTrad,
+  ingredients: ingrTrad,
+  preparation: prepTrad
+}, { onConflict: ['recette_id','langue'] });
+
+if (error) {
+  console.error('Erreur traduction', lang, error);
+} else {
+  console.log('Traduction insérée ou mise à jour', lang, data);
+}
+
+
   }
 
   alert(id ? 'Recette mise à jour (avec traductions)' : 'Recette créée (avec traductions)');
