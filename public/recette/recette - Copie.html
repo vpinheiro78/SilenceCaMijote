@@ -127,17 +127,17 @@
   <!-- Vidéo YouTube intégrée -->
   <div id="videoContainer" class="fade-in"></div>
 
-  <h2 id="ingredientsTitle" class="fade-in">Ingrédients</h2>
+  <h2 class="fade-in">Ingrédients</h2>
   <div id="ingredients" class="fade-in"></div>
   
   <button id="createShoppingList" class="button fade-in">Créer ma liste de courses</button>
   <div id="shoppingListContainer" style="margin-top:15px;"></div>
 
-  <h2 id="preparationTitle" class="fade-in">Préparation</h2>
+  <h2 class="fade-in">Préparation</h2>
   <div id="instructions" class="fade-in"></div>
    
    <!-- Bloc notation -->
-  <h2 id="ratingTitle" class="fade-in">Votre note</h2>
+  <h2 class="fade-in">Votre note</h2>
   <div id="ratingSection" class="fade-in">
     <div id="starsContainer">
       <!-- étoiles dynamiques -->
@@ -151,24 +151,8 @@
 <iframe id="videoFloat"></iframe>
 
 <script type="module">
-  import { recipeTranslations } from './translations_recette.js'; // chemin vers ton fichier
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-  
-  const savedLang = localStorage.getItem('siteLang') || 'fr';
-  
-  function applyRecipeTranslation(lang) {
-  if (!recipeTranslations[lang]) lang = 'fr';
 
-  document.querySelector('a.button').innerText = recipeTranslations[lang].back;
-  document.getElementById('ingredientsTitle').innerText = recipeTranslations[lang].ingredients;
-  document.getElementById('preparationTitle').innerText = recipeTranslations[lang].preparation;
-  document.getElementById('ratingTitle').innerText = recipeTranslations[lang].rating;
-}
-
-// Appliquer la traduction immédiatement
-applyRecipeTranslation(savedLang);
-
-  
   const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY';
   const supabase = createClient(supabaseUrl, supabaseKey);
