@@ -67,17 +67,14 @@
       layout: google.translate.TranslateElement.InlineLayout.SIMPLE
     }, 'google_translate_element');
 
-    // ✅ Charger la langue sauvegardée
-    var savedLang = localStorage.getItem("preferredLang");
-    if (savedLang) {
-      setTimeout(function() {
-        var select = document.querySelector("#google_translate_element select");
-        if (select) {
-          select.value = savedLang;
-          select.dispatchEvent(new Event("change"));
-        }
-      }, 1000);
-    }
+// Charger la langue sauvegardée
+var savedLang = localStorage.getItem("preferredLang");
+if (savedLang) {
+    setTimeout(function() {
+        changeLanguage(savedLang); // <-- utilise ta fonction qui attend le <select>
+    }, 1000);
+}
+
 
     // ✅ Sauvegarder le choix utilisateur
     document.addEventListener("change", function(e) {
@@ -95,14 +92,19 @@
 
 <script>
 function changeLanguage(lang) {
-    // Vérifie toutes les 100ms si Google Translate a créé le <select>
-    var interval = setInterval(function() {
+    // On attend que le <select> Google Translate existe
+    var checkExist = setInterval(function() {
         var select = document.querySelector("#google_translate_element select");
         if (select) {
-            select.value = lang;                        // Change la langue
-            select.dispatchEvent(new Event("change"));  // Déclenche le changement
-            localStorage.setItem("preferredLang", lang);// Sauvegarde la préférence
-            clearInterval(interval);                     // Arrête le check
+            // Force le changement de langue
+            select.value = lang;
+            select.dispatchEvent(new Event('change'));
+
+            // Sauvegarde la langue choisie
+            localStorage.setItem('preferredLang', lang);
+
+            // Stop l'intervalle
+            clearInterval(checkExist);
         }
     }, 100);
 }
