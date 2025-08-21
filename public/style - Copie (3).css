@@ -295,20 +295,9 @@ body { top: 0 !important; }
   z-index: 1000;
 }
 
-/* Langues : drapeaux responsive */
-.lang-selector {
-  position: static;       /* plus absolute pour éviter chevauchement sur mobile */
-  display: flex;
-  flex-wrap: wrap;        /* permet aux drapeaux de passer à la ligne */
-  justify-content: center;/* centre horizontalement */
-  gap: 8px;               /* espace entre les drapeaux */
-  margin: 10px 0;         /* espace vertical */
-  z-index: 1000;
-}
-
 .lang-selector img {
-  width: 36px;            /* taille par défaut */
-  height: auto;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   border-radius: 50%;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -319,16 +308,3 @@ body { top: 0 !important; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* Ajustement pour tablette */
-@media screen and (max-width: 700px) {
-  .lang-selector img {
-    width: 32px;
-  }
-}
-
-/* Ajustement pour mobile */
-@media screen and (max-width: 480px) {
-  .lang-selector img {
-    width: 28px;
-  }
-}
