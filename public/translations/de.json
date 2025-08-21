@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Rezepte mit Liebe zubereitet: leckere und herzhafte Gerichte, um Ihre Lieben bei jeder Mahlzeit zu verwöhnen."
+  },
+  "search": {
+    "placeholder": "Suche nach einem Rezept oder einer Zutat..."
+  },
+  "newsletter": {
+    "title": "Abonnieren Sie, um benachrichtigt zu werden, sobald ein neues Rezept veröffentlicht wird!",
+    "email_placeholder": "Ihre E-Mail",
+    "subscribe_button": "Abonnieren"
+  },
+  "categories": {
+    "all": "Alle",
+    "dessert": "Dessert",
+    "viande": "Fleisch",
+    "poisson": "Fisch",
+    "accompagnement": "Beilage",
+    "autre": "Andere"
+  }
+}

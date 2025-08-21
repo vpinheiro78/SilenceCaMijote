@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Recipes made with love: delicious and hearty dishes to delight your loved ones at every meal."
+  },
+  "search": {
+    "placeholder": "Search for a recipe or an ingredient..."
+  },
+  "newsletter": {
+    "title": "Subscribe to be notified as soon as a new recipe is published!",
+    "email_placeholder": "Your email",
+    "subscribe_button": "Subscribe"
+  },
+  "categories": {
+    "all": "All",
+    "dessert": "Dessert",
+    "viande": "Meat",
+    "poisson": "Fish",
+    "accompagnement": "Side dish",
+    "autre": "Other"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Recettes préparées avec amour : des plats savoureux et gourmands pour régaler vos proches à chaque repas."
+  },
+  "search": {
+    "placeholder": "Rechercher une recette, un ingrédient..."
+  },
+  "newsletter": {
+    "title": "Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !",
+    "email_placeholder": "Votre email",
+    "subscribe_button": "S'abonner"
+  },
+  "categories": {
+    "all": "Toutes",
+    "dessert": "Dessert",
+    "viande": "Viande",
+    "poisson": "Poisson",
+    "accompagnement": "Accompagnement",
+    "autre": "Autre"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Recetas hechas con amor: platos sabrosos y generosos para deleitar a tus seres queridos en cada comida."
+  },
+  "search": {
+    "placeholder": "Buscar una receta o un ingrediente..."
+  },
+  "newsletter": {
+    "title": "¡Suscríbete para recibir una notificación cuando se publique una nueva receta!",
+    "email_placeholder": "Tu correo electrónico",
+    "subscribe_button": "Suscribirse"
+  },
+  "categories": {
+    "all": "Todas",
+    "dessert": "Postre",
+    "viande": "Carne",
+    "poisson": "Pescado",
+    "accompagnement": "Guarnición",
+    "autre": "Otro"
+  }
+}

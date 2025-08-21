@@ -9,16 +9,6 @@
 <body>
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
-  <div id="langSelector" class="lang-selector">
-  <img src="assets/flags/fr.svg" alt="FR" data-lang="fr">
-  <img src="assets/flags/en.svg" alt="EN" data-lang="en">
-  <img src="assets/flags/es.svg" alt="ES" data-lang="es">
-  <img src="assets/flags/de.svg" alt="DE" data-lang="de">
-  <img src="assets/flags/it.svg" alt="IT" data-lang="it">
-  <img src="assets/flags/pt.svg" alt="PT" data-lang="pt">
-</div>
-</div>
-
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
 </header>
 
@@ -53,32 +43,5 @@
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
 <script type="module" src="script.js"></script>
-
-<script>
-const availableLangs = ['fr','en','es','de','it','pt'];
-const defaultLang = 'fr';
-
-function changeLanguage(lang) {
-  if (!availableLangs.includes(lang)) lang = defaultLang;
-  localStorage.setItem('siteLang', lang);
-
-  fetch(`translations/${lang}.json`)
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('site-blurb').innerText = data.blurb.main;
-      document.getElementById('search').placeholder = data.search.placeholder;
-
-      document.querySelector('#subscribeForm h3').innerText = data.newsletter.title;
-      document.querySelector('#subscribeForm input[name="email"]').setAttribute('placeholder', data.newsletter.email_placeholder);
-      document.querySelector('#subscribeForm button').innerText = data.newsletter.subscribe_button;
-
-      const categories = data.categories;
-      document.querySelector('button[data-cat="all"]').innerText = categories.all;
-      document.querySelector('button[data-cat="dessert"]').innerText = categories.dessert;
-      document.querySelector('button[data-cat="viande"]').innerText = categories.viande;
-      document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
-      document.querySelector('button[data-cat="accompagnement"]').inne
-
-
 </body>
 </html>

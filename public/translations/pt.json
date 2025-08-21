@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Receitas preparadas com amor: pratos saborosos e generosos para encantar seus entes queridos a cada refeição."
+  },
+  "search": {
+    "placeholder": "Procure uma receita ou ingrediente..."
+  },
+  "newsletter": {
+    "title": "Assine para ser notificado assim que uma nova receita for publicada!",
+    "email_placeholder": "Seu email",
+    "subscribe_button": "Assinar"
+  },
+  "categories": {
+    "all": "Todas",
+    "dessert": "Sobremesa",
+    "viande": "Carne",
+    "poisson": "Peixe",
+    "accompagnement": "Acompanhamento",
+    "autre": "Outro"
+  }
+}

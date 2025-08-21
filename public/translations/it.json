@@ -1,0 +1,21 @@
+{
+  "blurb": {
+    "main": "Ricette preparate con amore: piatti gustosi e generosi per deliziare i tuoi cari a ogni pasto."
+  },
+  "search": {
+    "placeholder": "Cerca una ricetta o un ingrediente..."
+  },
+  "newsletter": {
+    "title": "Iscriviti per essere notificato non appena viene pubblicata una nuova ricetta!",
+    "email_placeholder": "La tua email",
+    "subscribe_button": "Iscriviti"
+  },
+  "categories": {
+    "all": "Tutte",
+    "dessert": "Dessert",
+    "viande": "Carne",
+    "poisson": "Pesce",
+    "accompagnement": "Contorno",
+    "autre": "Altro"
+  }
+}
