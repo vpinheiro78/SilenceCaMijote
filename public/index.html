@@ -5,21 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Silence, ça mijote</title>
 <link rel="stylesheet" href="style.css"/>
-<script type='text/javascript' src='https://www.microsoft.com/translator/embed/v1/translator.js'></script>
 </head>
 <body>
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
-  <div id="languageSelector" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
-  <img src="assets/flags/fr.svg" alt="Français" onclick="translatePage('fr')" style="cursor:pointer; width:30px; margin:2px;">
-  <img src="assets/flags/en.svg" alt="English" onclick="translatePage('en')" style="cursor:pointer; width:30px; margin:2px;">
-  <img src="assets/flags/es.svg" alt="Español" onclick="translatePage('es')" style="cursor:pointer; width:30px; margin:2px;">
-  <img src="assets/flags/it.svg" alt="Italiano" onclick="translatePage('it')" style="cursor:pointer; width:30px; margin:2px;">
-  <img src="assets/flags/pt.svg" alt="Português" onclick="translatePage('pt')" style="cursor:pointer; width:30px; margin:2px;">
-  <img src="assets/flags/de.svg" alt="Deutsch" onclick="translatePage('de')" style="cursor:pointer; width:30px; margin:2px;">
-</div>
-
 </header>
 
 <main class="container">
@@ -53,23 +43,5 @@
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
 <script type="module" src="script.js"></script>
-
-<script type="text/javascript">
-function translatePage(lang) {
-    if (typeof Microsoft !== "undefined" && Microsoft.Translator && Microsoft.Translator.Widget) {
-        Microsoft.Translator.Widget.Translate('auto', lang, onProgress, onError, onComplete, onRestoreOriginal);
-    } else {
-        alert("Le traducteur n'est pas encore chargé. Réessayez dans quelques secondes.");
-    }
-}
-
-function onProgress(value) { console.log('Progress: ' + value); }
-function onError(error) { console.error('Erreur traduction: ' + error); }
-function onComplete() { console.log('Traduction terminée'); }
-function onRestoreOriginal() { console.log('Page originale restaurée'); }
-</script>
-
-
-
 </body>
 </html>
