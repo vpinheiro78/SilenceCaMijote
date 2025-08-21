@@ -5,34 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Silence, ça mijote</title>
 <link rel="stylesheet" href="style.css"/>
-
-<!-- Masquer le widget flottant par défaut -->
-<style>
-.goog-te-banner-frame.skiptranslate { display: none !important; }
-body { top: 0 !important; }
-</style>
 </head>
 <body>
-
-<header class="site-header" style="position:relative;">
+<header class="site-header">
   <h1>Silence, ça mijote</h1>
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
-
-  <!-- Drapeaux personnalisés -->
-  <div id="flags-wrapper" style="position:absolute; top:60px; right:10px; z-index:1000;">
-    <img src="assets/flags/fr.svg" onclick="GTranslate('fr')" style="width:30px; margin:2px; cursor:pointer;">
-    <img src="assets/flags/en.svg" onclick="GTranslate('en')" style="width:30px; margin:2px; cursor:pointer;">
-    <img src="assets/flags/es.svg" onclick="GTranslate('es')" style="width:30px; margin:2px; cursor:pointer;">
-    <img src="assets/flags/it.svg" onclick="GTranslate('it')" style="width:30px; margin:2px; cursor:pointer;">
-    <img src="assets/flags/pt.svg" onclick="GTranslate('pt')" style="width:30px; margin:2px; cursor:pointer;">
-    <img src="assets/flags/de.svg" onclick="GTranslate('de')" style="width:30px; margin:2px; cursor:pointer;">
-  </div>
 </header>
 
 <main class="container">
-  <div class="blurb" id="site-blurb">
-    Recettes préparées avec amour : des plats savoureux et gourmands pour régaler vos proches à chaque repas.
-  </div>
+  <div class="blurb" id="site-blurb">Recettes préparées avec amour : des plats savoureux et gourmands pour régaler vos proches à chaque repas.</div>
 
   <div class="search-row">
     <input id="search" type="search" placeholder="Rechercher une recette, un ingrédient..." />
@@ -46,35 +27,21 @@ body { top: 0 !important; }
     <button data-cat="accompagnement" class="cat-btn cat-accompagnement">Accompagnement</button>
     <button data-cat="autre" class="cat-btn cat-autre">Autre</button>
   </div>
-
-  <div class="newsletter">
-    <h3>Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !</h3>
-    <form id="subscribeForm">
-      <input type="email" name="email" placeholder="Votre email" required
-             style="padding:10px; width:250px; border-radius:6px; border:1px solid #ccc"/>
-      <button type="submit" class="btn-liste-courses">S'abonner</button>
-    </form>
-    <p id="subscribeMessage" style="margin-top:6px;color:green;"></p>
-  </div>
+  
+<div class="newsletter">
+  <h3>Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !</h3>
+  <form id="subscribeForm">
+    <input type="email" name="email" placeholder="Votre email" required style="padding:10px; width:250px; border-radius:6px; border:1px solid #ccc"/>
+    <button type="submit" class="btn-liste-courses">S'abonner</button>
+  </form>
+  <p id="subscribeMessage" style="margin-top:6px;color:green;"></p>
+</div>
 
   <section id="recipes" class="grid" aria-live="polite"></section>
 </main>
 
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
-<!-- Script principal -->
 <script type="module" src="script.js"></script>
-
-<!-- Script GTranslate -->
-<script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
-<script>
-function GTranslate(lang) {
-  var select = document.querySelector(".goog-te-combo");
-  if (!select) return;
-  select.value = lang;
-  select.dispatchEvent(new Event('change'));
-}
-</script>
-
 </body>
 </html>
