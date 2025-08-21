@@ -199,48 +199,29 @@ function afficherRecette(recette){
     }
   }
 
- // Étoiles interactives
-const starsContainer = document.getElementById('starsContainer');
-const ratingMessage = document.getElementById('ratingMessage');
-starsContainer.innerHTML = '';
+  // Étoiles interactives
+  const starsContainer=document.getElementById('starsContainer');
+  const ratingMessage=document.getElementById('ratingMessage');
+  starsContainer.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const star=document.createElement('span');
+    star.classList.add('star'); star.innerHTML='☆'; star.dataset.value=i;
+    star.addEventListener('mouseover',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('hover',s.dataset.value<=i));});
+    star.addEventListener('mouseleave',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.remove('hover'));});
+    star.addEventListener('click',async()=>{
+      document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('selected',s.dataset.value<=i));
+      ratingMessage.textContent=`Vous avez noté ${i} étoile${i>1?'s':''}`;
+      const {error}=await supabase.from('notes').insert([{recette_id:recette.id,note:i}]);
+      if(error){console.error('Erreur note:',error); ratingMessage.textContent="Erreur lors de l'envoi de la note.";}
+      else {ratingMessage.textContent+=" ✅ Merci pour votre avis !";}
+    });
+    starsContainer.appendChild(star);
+  }
 
-for (let i = 1; i <= 5; i++) {
-  const star = document.createElement('span');
-  star.classList.add('star');
-  star.innerHTML = '☆';
-  star.dataset.value = i;
-
-  star.addEventListener('mouseover', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.toggle('hover', s.dataset.value <= i)
-    );
-  });
-
-  star.addEventListener('mouseleave', () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.remove('hover')
-    );
-  });
-
-  star.addEventListener('click', async () => {
-    document.querySelectorAll('#starsContainer .star').forEach(s =>
-      s.classList.toggle('selected', s.dataset.value <= i)
-    );
-
-    ratingMessage.textContent = `${recipeTranslations[savedLang].yourRating} ${i} ${i > 1 ? recipeTranslations[savedLang].stars : recipeTranslations[savedLang].star}`;
-
-    const { error } = await supabase.from('notes').insert([{ recette_id: recette.id, note: i }]);
-    if (error) {
-      console.error('Erreur note :', error);
-      ratingMessage.textContent = recipeTranslations[savedLang].ratingError;
-    } else {
-      ratingMessage.textContent += ` ✅ ${recipeTranslations[savedLang].thankYou}`;
-    }
-  });
-
-  starsContainer.appendChild(star);
+  container.classList.add('show');
+  fadeElems.forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*150));
+  document.querySelectorAll('.etape-card').forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*200));
 }
-
 </script>
 </body>
 </html>

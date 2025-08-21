@@ -9,12 +9,7 @@ export const recipeTranslations = {
     selectAlert: "Veuillez sélectionner au moins un ingrédient !",
     myListTitle: "Ma liste de courses",
     downloadList: "Télécharger la liste",
-    shareWhatsapp: "Partager sur WhatsApp",
-    yourRating: "Vous avez noté",
-    star: "étoile",
-    stars: "étoiles",
-    ratingError: "Erreur lors de l'envoi de la note.",
-    thankYou: "Merci pour votre avis !"
+    shareWhatsapp: "Partager sur WhatsApp"
   },
   en: {
     back: "Back to recipes",
@@ -26,12 +21,7 @@ export const recipeTranslations = {
     selectAlert: "Please select at least one ingredient!",
     myListTitle: "My shopping list",
     downloadList: "Download the list",
-    shareWhatsapp: "Share on WhatsApp",
-    yourRating: "You rated",
-    star: "star",
-    stars: "stars",
-    ratingError: "Error sending your rating.",
-    thankYou: "Thank you for your feedback!"
+    shareWhatsapp: "Share on WhatsApp"
   },
   es: {
     back: "Volver a recetas",
@@ -43,12 +33,7 @@ export const recipeTranslations = {
     selectAlert: "¡Seleccione al menos un ingrediente!",
     myListTitle: "Mi lista de compras",
     downloadList: "Descargar la lista",
-    shareWhatsapp: "Compartir en WhatsApp",
-    yourRating: "Has valorado",
-    star: "estrella",
-    stars: "estrellas",
-    ratingError: "Error al enviar la valoración.",
-    thankYou: "¡Gracias por tu opinión!"
+    shareWhatsapp: "Compartir en WhatsApp"
   },
   de: {
     back: "Zurück zu den Rezepten",
@@ -60,12 +45,7 @@ export const recipeTranslations = {
     selectAlert: "Bitte wählen Sie mindestens eine Zutat aus!",
     myListTitle: "Meine Einkaufsliste",
     downloadList: "Liste herunterladen",
-    shareWhatsapp: "Auf WhatsApp teilen",
-    yourRating: "Sie haben bewertet",
-    star: "Stern",
-    stars: "Sterne",
-    ratingError: "Fehler beim Senden der Bewertung.",
-    thankYou: "Danke für Ihre Rückmeldung!"
+    shareWhatsapp: "Auf WhatsApp teilen"
   },
   it: {
     back: "Torna alle ricette",
@@ -77,12 +57,7 @@ export const recipeTranslations = {
     selectAlert: "Seleziona almeno un ingrediente!",
     myListTitle: "La mia lista della spesa",
     downloadList: "Scarica lista",
-    shareWhatsapp: "Condividi su WhatsApp",
-    yourRating: "Hai valutato",
-    star: "stella",
-    stars: "stelle",
-    ratingError: "Errore durante l'invio della valutazione.",
-    thankYou: "Grazie per il tuo feedback!"
+    shareWhatsapp: "Condividi su WhatsApp"
   },
   pt: {
     back: "Voltar às receitas",
@@ -94,11 +69,6 @@ export const recipeTranslations = {
     selectAlert: "Por favor, selecione pelo menos um ingrediente!",
     myListTitle: "Minha lista de compras",
     downloadList: "Baixar lista",
-    shareWhatsapp: "Compartilhar no WhatsApp",
-    yourRating: "Você avaliou",
-    star: "estrela",
-    stars: "estrelas",
-    ratingError: "Erro ao enviar a avaliação.",
-    thankYou: "Obrigado pelo seu feedback!"
+    shareWhatsapp: "Compartilhar no WhatsApp"
   }
 };
