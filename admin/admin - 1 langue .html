@@ -149,22 +149,9 @@ async function loadList() {
 }
 
 // --- Soumission recette ---
-// --- Fonction traduction via Netlify ---
-async function translateText(text, targetLang) {
-  const res = await fetch("/.netlify/functions/translate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, targetLang })
-  });
-  const data = await res.json();
-  return data.translations[0].text;
-}
-
-// --- Soumission recette avec traduction ---
 form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const id = form.elements['id'].value || null;
-
+  e.preventDefault()
+  const id = form.elements['id'].value || null
   const recette = {
     titre: form.elements['titre'].value,
     description: form.elements['description'].value,
@@ -174,42 +161,16 @@ form.addEventListener('submit', async e => {
     ingredients: form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean),
     preparation: form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
   }
-
-  // --- Sauvegarde principale en français ---
   const response = id 
     ? await supabase.from('recettes').update(recette).eq('id', id)
-    : await supabase.from('recettes').insert(recette).select().single()
+    : await supabase.from('recettes').insert(recette)
 
   if (response.error) { alert('Erreur lors de la sauvegarde'); console.error(response.error); return }
 
-  const recetteId = id || response.data.id;
-
-  // --- Traduction dans les autres langues ---
-  const langues = ['en','es','it','pt'];
-  for (const lang of langues) {
-    const titreTrad = await translateText(recette.titre, lang);
-    const descTrad = await translateText(recette.description, lang);
-    const ingrTrad = await translateText(recette.ingredients.join('\n'), lang);
-    const prepTrad = await translateText(recette.preparation.join('\n'), lang);
-
-    // Insert ou update dans la table traductions
-    await supabase.from('recettes_traductions').upsert({
-      recette_id: recetteId,
-      langue: lang,
-      titre: titreTrad,
-      description: descTrad,
-      ingredients: ingrTrad,
-      preparation: prepTrad
-    }, { onConflict: ['recette_id','langue'] });
-  }
-
-  alert(id ? 'Recette mise à jour (avec traductions)' : 'Recette créée (avec traductions)');
-  form.reset(); uploadedPath=''; uploadStatus.innerText='';
-  loadList();
-});
-
-
-
+  alert(id ? 'Recette mise à jour' : 'Recette créée')
+  form.reset(); uploadedPath = ''; uploadStatus.innerText = ''
+  loadList()
+})
 
 document.getElementById('resetBtn').addEventListener('click', () => { form.reset(); uploadedPath=''; uploadStatus.innerText='' })
 loadList()
