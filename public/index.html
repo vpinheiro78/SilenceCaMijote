@@ -56,7 +56,11 @@
 
 <script type="text/javascript">
 function translatePage(lang) {
-    Microsoft.Translator.Widget.Translate('auto', lang, onProgress, onError, onComplete, onRestoreOriginal);
+    if (typeof Microsoft !== "undefined" && Microsoft.Translator && Microsoft.Translator.Widget) {
+        Microsoft.Translator.Widget.Translate('auto', lang, onProgress, onError, onComplete, onRestoreOriginal);
+    } else {
+        alert("Le traducteur n'est pas encore chargé. Réessayez dans quelques secondes.");
+    }
 }
 
 function onProgress(value) { console.log('Progress: ' + value); }
@@ -64,6 +68,7 @@ function onError(error) { console.error('Erreur traduction: ' + error); }
 function onComplete() { console.log('Traduction terminée'); }
 function onRestoreOriginal() { console.log('Page originale restaurée'); }
 </script>
+
 
 
 </body>
