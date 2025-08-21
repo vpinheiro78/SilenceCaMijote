@@ -21,7 +21,7 @@
 </div>
 
 <!-- Google Translate (caché) -->
-<div id="google_translate_element" style="display:none;"></div>
+<div id="google_translate_element" style="position:absolute; left:-9999px;"></div>
 
 
 </header>
@@ -95,14 +95,19 @@
 
 <script>
 function changeLanguage(lang) {
-  var select = document.querySelector("#google_translate_element select");
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event("change"));
-    // 🔒 Sauvegarder le choix utilisateur
-    localStorage.setItem("preferredLang", lang);
-  }
+    // Vérifie toutes les 100ms si Google Translate a créé le <select>
+    var interval = setInterval(function() {
+        var select = document.querySelector("#google_translate_element select");
+        if (select) {
+            select.value = lang;                        // Change la langue
+            select.dispatchEvent(new Event("change"));  // Déclenche le changement
+            localStorage.setItem("preferredLang", lang);// Sauvegarde la préférence
+            clearInterval(interval);                     // Arrête le check
+        }
+    }, 100);
 }
+
+
 </script>
 
 </body>
