@@ -151,7 +151,7 @@
 <iframe id="videoFloat"></iframe>
 
 <script type="module">
-  import { recipeTranslations } from './translations_recette.js'; // chemin vers ton fichier
+  import { recipeTranslations } from '../translations/translations_recette.js'; // chemin vers ton fichier
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   
   const savedLang = localStorage.getItem('siteLang') || 'fr';
