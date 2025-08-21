@@ -1,0 +1,38 @@
+const recipeTranslations = {
+  fr: {
+    back: "Retour aux recettes",
+    ingredients: "Ingrédients",
+    preparation: "Préparation",
+    rating: "Votre note"
+  },
+  en: {
+    back: "Back to recipes",
+    ingredients: "Ingredients",
+    preparation: "Preparation",
+    rating: "Your rating"
+  },
+  es: {
+    back: "Volver a recetas",
+    ingredients: "Ingredientes",
+    preparation: "Preparación",
+    rating: "Tu valoración"
+  },
+  de: {
+    back: "Zurück zu den Rezepten",
+    ingredients: "Zutaten",
+    preparation: "Zubereitung",
+    rating: "Ihre Bewertung"
+  },
+  it: {
+    back: "Torna alle ricette",
+    ingredients: "Ingredienti",
+    preparation: "Preparazione",
+    rating: "La tua valutazione"
+  },
+  pt: {
+    back: "Voltar às receitas",
+    ingredients: "Ingredientes",
+    preparation: "Preparação",
+    rating: "Sua avaliação"
+  }
+};
