@@ -234,3 +234,51 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   transform: scale(1.2);
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
+
+/* 🌍 Sélecteur de langues responsive et fluide */
+.lang-switcher {
+  display: flex;
+  flex-wrap: wrap;        /* les drapeaux passent à la ligne si besoin */
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lang-switcher img {
+  width: 36px;            /* taille par défaut */
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.lang-switcher img:hover {
+  transform: scale(1.2);  /* effet zoom au survol */
+}
+
+/* 🌐 Responsive fluide */
+@media screen and (max-width: 900px) {
+  .lang-switcher img {
+    width: 34px;
+    height: 22px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .site-header {
+    flex-direction: column; /* titre au-dessus, drapeaux en dessous */
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lang-switcher img {
+    width: 32px;
+    height: 20px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .lang-switcher img {
+    width: 28px;
+    height: 18px;
+  }
+}
