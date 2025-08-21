@@ -10,6 +10,20 @@
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
+ <!-- 🌍 Sélecteur de langue avec drapeaux -->
+<div class="lang-switcher">
+  <img src="assets/flags/fr.png" alt="Français" onclick="changeLanguage('fr')">
+  <img src="assets/flags/en.png" alt="English" onclick="changeLanguage('en')">
+  <img src="assets/flags/es.png" alt="Español" onclick="changeLanguage('es')">
+  <img src="assets/flags/pt.png" alt="Português" onclick="changeLanguage('pt')">
+  <img src="assets/flags/it.png" alt="Italiano" onclick="changeLanguage('it')">
+  <img src="assets/flags/de.png" alt="Deutsch" onclick="changeLanguage('de')">
+</div>
+
+<!-- Google Translate (caché) -->
+<div id="google_translate_element" style="display:none;"></div>
+
+
 </header>
 
 <main class="container">
@@ -43,5 +57,53 @@
 <footer class="site-footer">© 2025 Silence, ça mijote</footer>
 
 <script type="module" src="script.js"></script>
+
+<!-- 🌍 Script Google Translate -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'fr',
+      includedLanguages: 'en,es,pt,it,de', // 👈 ajoute ou retire les langues
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+
+    // ✅ Charger la langue sauvegardée
+    var savedLang = localStorage.getItem("preferredLang");
+    if (savedLang) {
+      setTimeout(function() {
+        var select = document.querySelector("#google_translate_element select");
+        if (select) {
+          select.value = savedLang;
+          select.dispatchEvent(new Event("change"));
+        }
+      }, 1000);
+    }
+
+    // ✅ Sauvegarder le choix utilisateur
+    document.addEventListener("change", function(e) {
+      if (e.target && e.target.parentNode && e.target.parentNode.id === "google_translate_element") {
+        localStorage.setItem("preferredLang", e.target.value);
+      }
+    });
+  }
+</script>
+
+<script type="text/javascript" 
+  src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
+  async defer>
+</script>
+
+<script>
+function changeLanguage(lang) {
+  var select = document.querySelector("#google_translate_element select");
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event("change"));
+    // 🔒 Sauvegarder le choix utilisateur
+    localStorage.setItem("preferredLang", lang);
+  }
+}
+</script>
+
 </body>
 </html>

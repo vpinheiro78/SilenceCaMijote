@@ -215,22 +215,3 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);margin:0;
   background: #943a27;
 }
 
-/* 🌍 Langues : drapeaux */
-.lang-switcher {
-  display: flex;
-  gap: 8px; /* espace entre les drapeaux */
-  align-items: center;
-}
-
-.lang-switcher img {
-  width: 28px;       /* largeur des drapeaux */
-  height: 20px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.lang-switcher img:hover {
-  transform: scale(1.2);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
