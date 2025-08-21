@@ -17,7 +17,6 @@
   <img src="assets/flags/it.svg" alt="IT" data-lang="it">
   <img src="assets/flags/pt.svg" alt="PT" data-lang="pt">
 </div>
-</div>
 
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
 </header>
@@ -77,7 +76,21 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="dessert"]').innerText = categories.dessert;
       document.querySelector('button[data-cat="viande"]').innerText = categories.viande;
       document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
-      document.querySelector('button[data-cat="accompagnement"]').inne
+      document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
+      document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
+    });
+}
+
+// Appliquer la langue sauvegardée ou langue par défaut au chargement
+const savedLang = localStorage.getItem('siteLang') || defaultLang;
+changeLanguage(savedLang);
+
+// Ajouter les événements sur les drapeaux
+document.querySelectorAll('#langSelector img').forEach(img => {
+  img.addEventListener('click', () => changeLanguage(img.dataset.lang));
+});
+</script>
+
 
 
 </body>
