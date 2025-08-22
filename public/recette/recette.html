@@ -93,16 +93,56 @@ if(!recetteId){
 }
 
 async function fetchRecette(id){
-  const {data,error}=await supabase.from('recettes').select('*').eq('id',id).single();
-  if(error||!data){console.error(error);document.getElementById('titre').innerText="Erreur lors du chargement"; return;}
+  // 1️⃣ Récupération recette principale (FR)
+  const { data: recetteFR, error: errorFR } = await supabase
+    .from('recettes')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  const { error:updateError }=await supabase.from('recettes').update({nombre_visites:data.nombre_visites+1}).eq('id',id);
-  if(updateError) console.error("Erreur mise à jour vues :",updateError);
+  if (errorFR || !recetteFR) {
+    console.error(errorFR);
+    document.getElementById('titre').innerText = "Erreur lors du chargement";
+    return;
+  }
 
-  data.nombre_visites++;
-  document.getElementById('nombreVues').innerText=`${recipeTranslations[savedLang].views} ${data.nombre_visites}`;
+  let recette = { ...recetteFR };
 
-  afficherRecette(data);
+  // 2️⃣ Si langue ≠ fr → chercher traduction
+  if (savedLang !== 'fr') {
+    const { data: trad, error: tradError } = await supabase
+      .from('recettes_traductions')
+      .select('*')
+      .eq('recette_id', id)
+      .eq('langue', savedLang)
+      .single();
+
+    if (!tradError && trad) {
+      recette.titre = trad.titre || recette.titre;
+      recette.description = trad.description || recette.description;
+      recette.ingredients = trad.ingredients
+        ? trad.ingredients.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+        : recette.ingredients;
+      recette.preparation = trad.preparation
+        ? trad.preparation.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+        : recette.preparation;
+    }
+  }
+
+  // 3️⃣ Mise à jour des vues UNIQUEMENT dans recettes
+  const { error: updateError } = await supabase
+    .from('recettes')
+    .update({ nombre_visites: (recetteFR.nombre_visites || 0) + 1 })
+    .eq('id', id);
+
+  if (updateError) console.error("Erreur mise à jour vues :", updateError);
+
+  recette.nombre_visites = (recetteFR.nombre_visites || 0) + 1;
+  document.getElementById('nombreVues').innerText =
+    `${recipeTranslations[savedLang].views} ${recette.nombre_visites}`;
+
+  // 4️⃣ Affichage
+  afficherRecette(recette);
 }
 
 function afficherRecette(recette){
