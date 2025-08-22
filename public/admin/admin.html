@@ -108,6 +108,8 @@ uploadBtn.addEventListener('click', async () => {
 // --- Liste recettes ---
 async function loadList() {
   const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
+  console.log('data reçue:', data, 'error:', error)  // <-- ça va afficher ce que Supabase renvoie
+
   if (error) { listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'; console.error(error); return }
 
   listDiv.innerHTML = ''
@@ -225,6 +227,7 @@ form.addEventListener('submit', async e => {
   alert(id ? 'Recette mise à jour avec traductions' : 'Recette créée avec traductions')
   form.reset(); uploadedPath = ''; uploadStatus.innerText = ''
   loadList()
+  
 })
 
 
