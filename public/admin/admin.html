@@ -193,7 +193,7 @@ form.addEventListener('submit', async e => {
   console.log("Recette FR sauvegardée :", recetteId)
 
   // --- 2️⃣ Traductions via DeepL ---
-  const langues = ['en','es','it','pt','de']
+  const langues = ['en','es','it','pt']
   for (const lang of langues) {
     try {
       const titreTrad = await translateText(recette.titre, lang)
