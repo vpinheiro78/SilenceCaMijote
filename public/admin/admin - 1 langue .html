@@ -108,8 +108,6 @@ uploadBtn.addEventListener('click', async () => {
 // --- Liste recettes ---
 async function loadList() {
   const { data, error } = await supabase.from('recettes').select('*').order('created_at', { ascending: false })
-  console.log('data reçue:', data, 'error:', error)  // <-- ça va afficher ce que Supabase renvoie
-
   if (error) { listDiv.innerHTML = '<p>Erreur de chargement des recettes.</p>'; console.error(error); return }
 
   listDiv.innerHTML = ''
@@ -150,26 +148,10 @@ async function loadList() {
   }))
 }
 
-// --- Fonction pour appeler l'API DeepL via Netlify ---
-async function translateText(text, targetLang) {
-  const res = await fetch("/.netlify/functions/translateText", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, targetLang })
-  });
-  if (!res.ok) {
-    console.error("Erreur DeepL", await res.text());
-    return text; // fallback si erreur
-  }
-  const data = await res.json();
-  return data.translations[0].text;
-}
-
-// --- Soumission recette + traductions ---
+// --- Soumission recette ---
 form.addEventListener('submit', async e => {
   e.preventDefault()
   const id = form.elements['id'].value || null
-
   const recette = {
     titre: form.elements['titre'].value,
     description: form.elements['description'].value,
@@ -179,57 +161,19 @@ form.addEventListener('submit', async e => {
     ingredients: form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean),
     preparation: form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
   }
+  const response = id 
+    ? await supabase.from('recettes').update(recette).eq('id', id)
+    : await supabase.from('recettes').insert(recette)
 
-  // --- 1️⃣ Sauvegarde recette FR ---
-  let response = id 
-    ? await supabase.from('recettes').update(recette).eq('id', id).select().single()
-    : await supabase.from('recettes').insert(recette).select().single()
+  if (response.error) { alert('Erreur lors de la sauvegarde'); console.error(response.error); return }
 
-  if (response.error) { 
-    alert('Erreur lors de la sauvegarde'); 
-    console.error(response.error); 
-    return 
-  }
-
-  const recetteId = response.data.id
-  console.log("Recette FR sauvegardée :", recetteId)
-
-  // --- 2️⃣ Traductions via DeepL ---
-  const langues = ['en','es','it','pt','de']
-  for (const lang of langues) {
-    try {
-      const titreTrad = await translateText(recette.titre, lang)
-      const descTrad = await translateText(recette.description, lang)
-      const ingrTrad = await translateText(recette.ingredients.join('\n'), lang)
-      const prepTrad = await translateText(recette.preparation.join('\n'), lang)
-
-      console.log(`Traduction [${lang}]`, { titreTrad, descTrad, ingrTrad, prepTrad })
-
-      // --- 3️⃣ Upsert dans table traductions ---
-      const { error: tradError } = await supabase
-        .from('recettes_traductions')
-        .upsert({
-          recette_id: recetteId,
-          langue: lang,
-          titre: titreTrad,
-          description: descTrad,
-          ingredients: ingrTrad,
-          preparation: prepTrad
-        }, { onConflict: ['recette_id','langue'] })
-
-      if (tradError) console.error(`Erreur traduction [${lang}]`, tradError)
-      else console.log(`✅ Traduction [${lang}] enregistrée`)
-    } catch (err) {
-      console.error(`Erreur DeepL [${lang}]`, err)
-    }
-  }
-
-  alert(id ? 'Recette mise à jour avec traductions' : 'Recette créée avec traductions')
+  alert(id ? 'Recette mise à jour' : 'Recette créée')
   form.reset(); uploadedPath = ''; uploadStatus.innerText = ''
   loadList()
-  
 })
 
+document.getElementById('resetBtn').addEventListener('click', () => { form.reset(); uploadedPath=''; uploadStatus.innerText='' })
+loadList()
 
 // --- TEST EMAIL ---
 const sendBtn = document.getElementById('sendTestEmail')
@@ -297,7 +241,6 @@ sendNotifBtn.addEventListener('click', async () => {
 // Charger options au démarrage
 loadRecetteOptions()
 loadAbonneOptions()
-loadList()
 
 </script>
 </body>
