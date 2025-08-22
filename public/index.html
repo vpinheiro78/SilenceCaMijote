@@ -56,7 +56,7 @@
 const availableLangs = ['fr','en','es','de','it','pt'];
 const defaultLang = 'fr';
 
-function changeLanguage(lang) {
+function changeLanguageStatic(lang) {
   if (!availableLangs.includes(lang)) lang = defaultLang;
   localStorage.setItem('siteLang', lang);
 
@@ -77,25 +77,18 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
       document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
       document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
-    })
-    .finally(() => {
-      // 🔥 Recharge les recettes dans la langue choisie
-      if (typeof loadRecipes === 'function') {
-        loadRecipes();
-      }
     });
 }
 
-
-// Appliquer la langue sauvegardée ou langue par défaut au chargement
 const savedLang = localStorage.getItem('siteLang') || defaultLang;
-changeLanguage(savedLang);
+changeLanguageStatic(savedLang);
 
-// Ajouter les événements sur les drapeaux
 document.querySelectorAll('#langSelector img').forEach(img => {
-  img.addEventListener('click', () => changeLanguage(img.dataset.lang));
+  img.addEventListener('click', () => changeLanguageStatic(img.dataset.lang));
 });
 </script>
+
+
 
 </body>
 </html>
