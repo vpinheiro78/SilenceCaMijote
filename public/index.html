@@ -78,13 +78,14 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
       document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
     })
-	.finally(() => {
+    .finally(() => {
       // 🔥 Recharge les recettes dans la langue choisie
       if (typeof loadRecipes === 'function') {
         loadRecipes();
       }
     });
 }
+
 
 // Appliquer la langue sauvegardée ou langue par défaut au chargement
 const savedLang = localStorage.getItem('siteLang') || defaultLang;

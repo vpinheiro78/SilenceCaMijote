@@ -6,6 +6,9 @@ const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+// 🔥 Langue actuelle
+let currentLang = localStorage.getItem('siteLang') || 'fr'
+
 // Sélecteurs HTML
 const recipesContainer = document.getElementById('recipes')
 const searchInput = document.getElementById('search')                                                                                         
@@ -71,45 +74,35 @@ if (currentSearch.trim() !== '') {
   displayRecipes(filtered)
 }
 
-// Chargement depuis Supabase
-async function loadRecipes() {
-  // 🔥 on récupère la langue choisie (ou fr par défaut)
-  const currentLang = localStorage.getItem('siteLang') || 'fr';
+function changeLanguage(lang) {
+  if (!availableLangs.includes(lang)) lang = defaultLang;
+  localStorage.setItem('siteLang', lang);
 
-  const { data, error } = await supabase
-    .from('recettes')
-    .select(`
-      id,
-      titre,
-      description,
-      categorie,
-      photo_url,
-      ingredients,
-      note_moyenne,
-      lien_youtube,
-      nombre_votes,
-      traductions:recettes_traductions(langue, titre, description)
-    `)
-    .order('id', { ascending: false });
+  currentLang = lang; // 🔥 MAJ de la variable globale
 
-  if (error) {
-    console.error('Erreur chargement recettes:', error);
-    recipesContainer.innerHTML = `<p>Erreur de chargement des recettes.</p>`;
-    return;
-  }
+  fetch(`translations/${lang}.json`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('site-blurb').innerText = data.blurb.main;
+      document.getElementById('search').placeholder = data.search.placeholder;
 
-  // On applique la traduction si dispo
-  allRecipes = data.map(r => {
-    const trad = r.traductions?.find(t => t.langue === currentLang);
-    return {
-      ...r,
-      titre: trad?.titre || r.titre,
-      description: trad?.description || r.description
-    };
-  });
+      document.querySelector('#subscribeForm h3').innerText = data.newsletter.title;
+      document.querySelector('#subscribeForm input[name="email"]').setAttribute('placeholder', data.newsletter.email_placeholder);
+      document.querySelector('#subscribeForm button').innerText = data.newsletter.subscribe_button;
 
-  filterRecipes();
+      const categories = data.categories;
+      document.querySelector('button[data-cat="all"]').innerText = categories.all;
+      document.querySelector('button[data-cat="dessert"]').innerText = categories.dessert;
+      document.querySelector('button[data-cat="viande"]').innerText = categories.viande;
+      document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
+      document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
+      document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
+    })
+    .finally(() => {
+      loadRecipes(); // 🔥 maintenant loadRecipes prendra la bonne langue
+    });
 }
+
 
 // Lancement
 loadRecipes()
