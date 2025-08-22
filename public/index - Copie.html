@@ -10,14 +10,13 @@
 <header class="site-header">
   <h1>Silence, ça mijote</h1>
   <div id="langSelector" class="lang-selector">
-  <img src="assets/flags/fr.svg" alt="FR" data-lang="fr">
-  <img src="assets/flags/en.svg" alt="EN" data-lang="en">
-  <img src="assets/flags/es.svg" alt="ES" data-lang="es">
-  <img src="assets/flags/de.svg" alt="DE" data-lang="de">
-  <img src="assets/flags/it.svg" alt="IT" data-lang="it">
-  <img src="assets/flags/pt.svg" alt="PT" data-lang="pt">
-</div>
-
+    <img src="assets/flags/fr.svg" alt="FR" data-lang="fr">
+    <img src="assets/flags/en.svg" alt="EN" data-lang="en">
+    <img src="assets/flags/es.svg" alt="ES" data-lang="es">
+    <img src="assets/flags/de.svg" alt="DE" data-lang="de">
+    <img src="assets/flags/it.svg" alt="IT" data-lang="it">
+    <img src="assets/flags/pt.svg" alt="PT" data-lang="pt">
+  </div>
   <a class="admin-link" href="admin/login.html" title="Admin"><img src="assets/logo.png" alt="Logo" /></a>
 </header>
 
@@ -37,14 +36,14 @@
     <button data-cat="autre" class="cat-btn cat-autre">Autre</button>
   </div>
   
-<div class="newsletter">
-  <h3>Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !</h3>
-  <form id="subscribeForm">
-    <input type="email" name="email" placeholder="Votre email" required style="padding:10px; width:250px; border-radius:6px; border:1px solid #ccc"/>
-    <button type="submit" class="btn-liste-courses">S'abonner</button>
-  </form>
-  <p id="subscribeMessage" style="margin-top:6px;color:green;"></p>
-</div>
+  <div class="newsletter">
+    <form id="subscribeForm">
+      <h3>Abonnez-vous pour être notifié dès qu’une nouvelle recette est publiée !</h3>
+      <input type="email" name="email" placeholder="Votre email" required style="padding:10px; width:250px; border-radius:6px; border:1px solid #ccc"/>
+      <button type="submit" class="btn-liste-courses">S'abonner</button>
+    </form>
+    <p id="subscribeMessage" style="margin-top:6px;color:green;"></p>
+  </div>
 
   <section id="recipes" class="grid" aria-live="polite"></section>
 </main>
@@ -90,8 +89,6 @@ document.querySelectorAll('#langSelector img').forEach(img => {
   img.addEventListener('click', () => changeLanguage(img.dataset.lang));
 });
 </script>
-
-
 
 </body>
 </html>

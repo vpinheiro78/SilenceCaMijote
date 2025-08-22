@@ -77,6 +77,12 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
       document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
       document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
+    })
+	.finally(() => {
+      // 🔥 Recharge les recettes dans la langue choisie
+      if (typeof loadRecipes === 'function') {
+        loadRecipes();
+      }
     });
 }
 

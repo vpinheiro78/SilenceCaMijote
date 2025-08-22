@@ -73,20 +73,47 @@ if (currentSearch.trim() !== '') {
 
 // Chargement depuis Supabase
 async function loadRecipes() {
+  // 🔥 on récupère la langue choisie (ou fr par défaut)
+  const currentLang = localStorage.getItem('siteLang') || 'fr';
+
   const { data, error } = await supabase
-    .from('recettes') // 📌 nom exact de ta table
-    .select('id, titre, description, categorie, photo_url,ingredients,note_moyenne,lien_youtube,nombre_votes')
-    .order('id', { ascending: false })
+    .from('recettes')
+    .select(`
+      id,
+      titre,
+      description,
+      categorie,
+      photo_url,
+      ingredients,
+      note_moyenne,
+      lien_youtube,
+      nombre_votes,
+      traductions:recettes_traductions(langue, titre, description)
+    `)
+    .order('id', { ascending: false });
 
   if (error) {
-    console.error('Erreur chargement recettes:', error)
-    recipesContainer.innerHTML = `<p>Erreur de chargement des recettes.</p>`
-    return
+    console.error('Erreur chargement recettes:', error);
+    recipesContainer.innerHTML = `<p>Erreur de chargement des recettes.</p>`;
+    return;
   }
 
-  allRecipes = data
-  filterRecipes()
+  // On applique la traduction si dispo
+  allRecipes = data.map(r => {
+    const trad = r.traductions?.find(t => t.langue === currentLang);
+    return {
+      ...r,
+      titre: trad?.titre || r.titre,
+      description: trad?.description || r.description
+    };
+  });
+
+  filterRecipes();
 }
+
+// Lancement
+loadRecipes()
+
 
 //génération étoile
 function generateStars(rating) {
