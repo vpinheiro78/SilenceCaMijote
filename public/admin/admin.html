@@ -166,6 +166,20 @@ async function translateText(text, targetLang) {
 }
 
 // --- Soumission recette + traductions ---
+
+// --- Génération du slug ---
+function generateSlug(title) {
+  const slugBase = title.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // retirer accents
+    .replace(/\s+/g, "-") // remplacer espaces par des tirets
+    .replace(/[^a-z0-9\-]/g, "") // retirer caractères spéciaux
+    .replace(/\-+/g, "-") // supprimer doubles tirets
+    .replace(/^-+|-+$/g, ""); // retirer tirets début/fin
+  const randomId = Date.now().toString(36) // suffixe unique
+  return `${slugBase}-${randomId}`
+}
+
+
 form.addEventListener('submit', async e => {
   e.preventDefault()
   const id = form.elements['id'].value || null
@@ -177,7 +191,8 @@ form.addEventListener('submit', async e => {
     photo_url: form.elements['photo_url'].value || null,
     lien_youtube: form.elements['lien_youtube'].value || null,
     ingredients: form.elements['ingredients'].value.split('\n').map(i => i.trim()).filter(Boolean),
-    preparation: form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean)
+    preparation: form.elements['preparation'].value.split('\n').map(s => s.trim()).filter(Boolean),
+	slug: id ? undefined : generateSlug(form.elements['titre'].value) // seulement pour nouvelle recette
   }
 
   // --- 1️⃣ Sauvegarde recette FR ---
