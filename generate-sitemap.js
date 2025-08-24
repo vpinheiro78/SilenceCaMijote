@@ -38,7 +38,7 @@ async function generateSitemap() {
   recettes.forEach((recette) => {
     const lastmod = recette.created_at ? recette.created_at.split("T")[0] : today;
     sitemap += `  <url>
-    <loc>${baseUrl}/recette/recette.html?id=${recette.id}</loc>
+    <loc>${baseUrl}/recette/recette.html?slug=${recette.slug}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -56,3 +56,4 @@ async function generateSitemap() {
 }
 
 generateSitemap();
+
