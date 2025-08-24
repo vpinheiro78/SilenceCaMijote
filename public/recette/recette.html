@@ -84,8 +84,8 @@ const container = document.getElementById('recetteContainer');
 const fadeElems = document.querySelectorAll('.fade-in');
 
 // Récupère le slug depuis le chemin de l'URL
-const pathParts = window.location.pathname.split('/');
-const recetteSlug = pathParts[pathParts.length - 1]; // ex: "moqueca-63967f5efd3b"
+const params = new URLSearchParams(window.location.search);
+const recetteSlug = params.get('slug');
 
 if(!recetteSlug){
   document.getElementById('titre').innerText="Recette non trouvée";
