@@ -52,43 +52,5 @@
 
 <script type="module" src="script.js"></script>
 
-<script>
-const availableLangs = ['fr','en','es','de','it','pt'];
-const defaultLang = 'fr';
-
-function changeLanguage(lang) {
-  if (!availableLangs.includes(lang)) lang = defaultLang;
-  localStorage.setItem('siteLang', lang);
-
-  fetch(`translations/${lang}.json`)
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('site-blurb').innerText = data.blurb.main;
-      document.getElementById('search').placeholder = data.search.placeholder;
-
-      document.querySelector('#subscribeForm h3').innerText = data.newsletter.title;
-      document.querySelector('#subscribeForm input[name="email"]').setAttribute('placeholder', data.newsletter.email_placeholder);
-      document.querySelector('#subscribeForm button').innerText = data.newsletter.subscribe_button;
-
-      const categories = data.categories;
-      document.querySelector('button[data-cat="all"]').innerText = categories.all;
-      document.querySelector('button[data-cat="dessert"]').innerText = categories.dessert;
-      document.querySelector('button[data-cat="viande"]').innerText = categories.viande;
-      document.querySelector('button[data-cat="poisson"]').innerText = categories.poisson;
-      document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement;
-      document.querySelector('button[data-cat="autre"]').innerText = categories.autre;
-    });
-}
-
-// Appliquer la langue sauvegardée ou langue par défaut au chargement
-const savedLang = localStorage.getItem('siteLang') || defaultLang;
-changeLanguage(savedLang);
-
-// Ajouter les événements sur les drapeaux
-document.querySelectorAll('#langSelector img').forEach(img => {
-  img.addEventListener('click', () => changeLanguage(img.dataset.lang));
-});
-</script>
-
 </body>
 </html>

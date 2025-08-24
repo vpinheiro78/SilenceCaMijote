@@ -32,7 +32,7 @@ function displayRecipes(recipes) {
   }
 
   recipesContainer.innerHTML = recipes.map(r => `
-    <a href="recette/${r.slug}" class="recipe-card">
+    <a href="recette/recette.html?id=${r.id}" class="recipe-card">
       <div class="recipe-img-wrapper">
         <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
         ${r.lien_youtube ? `
@@ -92,7 +92,6 @@ async function loadRecipes() {
     .from('recettes')
     .select(`
       id,
-	  slug,
       titre,
       description,
       categorie,

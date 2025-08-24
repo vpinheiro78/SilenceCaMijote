@@ -80,27 +80,25 @@ const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const urlParams = new URLSearchParams(window.location.search);
+const recetteId = urlParams.get('id');
+
 const container = document.getElementById('recetteContainer');
 const fadeElems = document.querySelectorAll('.fade-in');
 
-// Récupère le slug depuis le chemin de l'URL
-const pathParts = window.location.pathname.split('/');
-const recetteSlug = pathParts[pathParts.length - 1]; // ex: "moqueca-63967f5efd3b"
-
-if(!recetteSlug){
+if(!recetteId){
   document.getElementById('titre').innerText="Recette non trouvée";
 }else{
-  fetchRecette(recetteSlug);
+  fetchRecette(recetteId);
 }
-
 
 async function fetchRecette(id){
   // 1️⃣ Récupération recette principale (FR)
-const { data: recetteFR, error: errorFR } = await supabase
-  .from('recettes')
-  .select('*')
-  .eq('slug', recetteSlug)
-  .single();
+  const { data: recetteFR, error: errorFR } = await supabase
+    .from('recettes')
+    .select('*')
+    .eq('id', id)
+    .single();
 
   if (errorFR || !recetteFR) {
     console.error(errorFR);
@@ -115,7 +113,7 @@ const { data: recetteFR, error: errorFR } = await supabase
     const { data: trad, error: tradError } = await supabase
       .from('recettes_traductions')
       .select('*')
-      .eq('recette_id', recetteFR.id)
+      .eq('recette_id', id)
       .eq('langue', savedLang)
       .single();
 
@@ -135,7 +133,7 @@ const { data: recetteFR, error: errorFR } = await supabase
   const { error: updateError } = await supabase
     .from('recettes')
     .update({ nombre_visites: (recetteFR.nombre_visites || 0) + 1 })
-    .eq('id', recetteFR.id);
+    .eq('id', id);
 
   if (updateError) console.error("Erreur mise à jour vues :", updateError);
 
