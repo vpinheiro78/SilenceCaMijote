@@ -14,7 +14,7 @@ async function generateSitemap() {
 
   const { data: recettes, error } = await supabase
     .from("recettes")
-    .select("id, created_at");
+    .select("id, slug, created_at");
 
   if (error) {
     console.error("❌ Erreur Supabase :", error);
