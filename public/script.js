@@ -32,7 +32,7 @@ function displayRecipes(recipes) {
   }
 
   recipesContainer.innerHTML = recipes.map(r => `
-    <a href="recette/recette/${r.slug}" class="recipe-card">
+    <a href="recette/recette.html?slug=${r.slug}" class="recipe-card">
       <div class="recipe-img-wrapper">
         <img src="${r.photo_url}" alt="Photo de ${r.titre}" class="recipe-img"/>
         ${r.lien_youtube ? `
