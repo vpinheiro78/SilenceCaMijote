@@ -72,61 +72,6 @@ function filterRecipes() {
   displayRecipes(filtered)
 }
 
-// ----------------- CARTE MONDE ----------------- //
-
-function displayMap(recipes) {
-  const svg = document.getElementById("world-map")
-  if (!svg) return;
-
-  // Supprime les anciens drapeaux
-  svg.querySelectorAll(".recipe-flag").forEach(el => el.remove());
-
-  recipes.forEach(r => {
-    if (!r.show_on_map || r.map_x == null || r.map_y == null) return;
-
-    const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-    img.setAttribute("href", r.traductions?.find(t => t.langue === currentLang)?.langue ? `/assets/flags/${r.traductions.find(t => t.langue === currentLang).langue}.svg` : `/assets/flags/fr.svg`);
-    img.setAttribute("x", r.map_x);
-    img.setAttribute("y", r.map_y);
-    img.setAttribute("width", 30);
-    img.setAttribute("height", 20);
-    img.classList.add("recipe-flag");
-    img.dataset.id = r.id;
-    svg.appendChild(img);
-  });
-
-  attachMapPopups(recipes);
-}
-
-function attachMapPopups(recipes) {
-  const popup = document.getElementById("popup");
-  if (!popup) return;
-  let currentRecipe = null;
-
-  document.querySelectorAll(".recipe-flag").forEach(flag => {
-    flag.addEventListener("click", () => {
-      currentRecipe = recipes.find(r => r.id == flag.dataset.id);
-      const rect = flag.getBoundingClientRect();
-      popup.style.left = rect.x + "px";
-      popup.style.top = (rect.y - 50) + "px";
-      const trad = currentRecipe.traductions?.find(t => t.langue === currentLang);
-      popup.querySelector("#popup-title").textContent = trad?.titre || currentRecipe.titre;
-      popup.style.display = "block";
-    });
-  });
-
-  document.getElementById("view-recipe").addEventListener("click", () => {
-    if (currentRecipe) window.location.href = `/recette/recette.html?slug=${currentRecipe.slug}`;
-  });
-
-  document.addEventListener("click", e => {
-    if (!e.target.classList.contains("recipe-flag") && !popup.contains(e.target)) {
-      popup.style.display = "none";
-    }
-  });
-}
-
-
 // Génération étoiles
 function generateStars(rating) {
   const maxStars = 5
@@ -156,9 +101,6 @@ async function loadRecipes() {
       note_moyenne,
       lien_youtube,
       nombre_votes,
-	  map_x,
-	  map_y,
-	  show_on_map,
       traductions:recettes_traductions(langue, titre, description)
     `)
     .order('id', { ascending: false })
@@ -179,7 +121,6 @@ async function loadRecipes() {
   })
 
   filterRecipes()
-  displayMap(allRecipes) // 🔥 Affiche les drapeaux sur la carte
 }
 
 // Changer langue
@@ -206,7 +147,7 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="autre"]').innerText = categories.autre
     })
     .finally(() => {
-      loadRecipes();
+      loadRecipes() // 🔥 fonctionne maintenant
     })
 }
 
