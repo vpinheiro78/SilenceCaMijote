@@ -332,3 +332,42 @@ body { top: 0 !important; }
     width: 28px;
   }
 }
+
+.map-section {
+  margin: 40px 0;
+  text-align: center;
+}
+
+#world-map {
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.map-popup {
+  position: absolute;
+  background: #fff8f0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e67e22;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 100;
+}
+
+.map-popup button {
+  margin-top: 6px;
+  background-color: #e67e22;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.map-popup button:hover {
+  background-color: #d35400;
+}
