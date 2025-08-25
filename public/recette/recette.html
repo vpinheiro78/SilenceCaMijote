@@ -1,269 +1,317 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recette</title>
-<style>
-/* ... garde tout ton CSS précédent ... */
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:20px; background:linear-gradient(120deg,#fff8f0,#ffe6d1); color:#333;}
-.container {max-width:900px;margin:auto;background:#fff;padding:25px;border-radius:15px;box-shadow:0 6px 20px rgba(0,0,0,0.1);opacity:0;transform:translateY(30px);transition:all 0.8s ease;}
-.container.show {opacity:1;transform:translateY(0);}
-img {width:50%;max-width:200px;display:block;margin:0 auto 20px auto;border-radius:15px;transition: transform 0.5s ease;}
-img:hover {transform: scale(1.03);}
-h1 {color:#d35400;font-size:2.5em;margin-bottom:15px;}
-h2 {color:#e67e22;margin-top:25px;margin-bottom:12px;}
-p {line-height:1.6;margin-bottom:12px;}
-a.button {display:inline-block;margin-top:15px;padding:10px 18px;background-color:#e67e22;color:white;text-decoration:none;border-radius:8px;transition:background 0.3s ease;}
-a.button:hover {background-color:#d35400;}
-.fade-in {opacity:0;transform:translateY(20px);transition:all 0.6s ease;}
-.fade-in.show {opacity:1;transform:translateY(0);}
-iframe {width:100%;height:500px;border-radius:15px;margin:20px 0;}
-#videoFloat {position:fixed;bottom:20px;right:20px;width:320px;height:180px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.2);z-index:1000;display:none;}
-.ingredient-card {display:inline-block;background:#ffe6d1;padding:8px 12px;margin:5px;border-radius:10px;font-weight:bold;font-size:0.95em;transition:transform 0.3s ease;}
-.ingredient-card:hover {transform:scale(1.05);background:#ffd1a4;}
-.etape-card {background:#fff3e0;border-radius:12px;margin-bottom:15px;padding:15px;box-shadow:0 4px 12px rgba(0,0,0,0.08);opacity:0;transform:translateY(20px);transition:all 0.6s ease;}
-.etape-card.show {opacity:1;transform:translateY(0);}
-.etape-num {display:inline-block;background:#e67e22;color:white;font-weight:bold;border-radius:50%;width:30px;height:30px;line-height:30px;text-align:center;margin-right:10px;}
-.star {font-size:1.8em;cursor:pointer;color:#ccc;transition:color 0.3s;}
-.star.hover, .star.selected {color:#e67e22;}
-</style>
-</head>
-<body>
+	<!DOCTYPE html>
+	<html lang="fr">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="container" id="recetteContainer">
-  <a href="../index.html" class="button" id="backButton">← Retour aux recettes</a>
-  <h1 id="titre" class="fade-in">Chargement...</h1>
-  <p id="nombreVues" class="fade-in" style="color:#999;font-size:0.9em;margin-top:5px;"></p>
+	<!-- Script JSON-LD vide, qu’on remplira en JS -->
+	  <script id="recipe-jsonld" type="application/ld+json"></script>
 
-  <div class="recette-header fade-in">
-    <div id="description"></div>
-    <img id="imageRecette" class="recipe-img" src="" alt="Recette">
-  </div>
+	<style>
+	/* ... garde tout ton CSS précédent ... */
+	body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:20px; background:linear-gradient(120deg,#fff8f0,#ffe6d1); color:#333;}
+	.container {max-width:900px;margin:auto;background:#fff;padding:25px;border-radius:15px;box-shadow:0 6px 20px rgba(0,0,0,0.1);opacity:0;transform:translateY(30px);transition:all 0.8s ease;}
+	.container.show {opacity:1;transform:translateY(0);}
+	img {width:50%;max-width:200px;display:block;margin:0 auto 20px auto;border-radius:15px;transition: transform 0.5s ease;}
+	img:hover {transform: scale(1.03);}
+	h1 {color:#d35400;font-size:2.5em;margin-bottom:15px;}
+	h2 {color:#e67e22;margin-top:25px;margin-bottom:12px;}
+	p {line-height:1.6;margin-bottom:12px;}
+	a.button {display:inline-block;margin-top:15px;padding:10px 18px;background-color:#e67e22;color:white;text-decoration:none;border-radius:8px;transition:background 0.3s ease;}
+	a.button:hover {background-color:#d35400;}
+	.fade-in {opacity:0;transform:translateY(20px);transition:all 0.6s ease;}
+	.fade-in.show {opacity:1;transform:translateY(0);}
+	iframe {width:100%;height:500px;border-radius:15px;margin:20px 0;}
+	#videoFloat {position:fixed;bottom:20px;right:20px;width:320px;height:180px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.2);z-index:1000;display:none;}
+	.ingredient-card {display:inline-block;background:#ffe6d1;padding:8px 12px;margin:5px;border-radius:10px;font-weight:bold;font-size:0.95em;transition:transform 0.3s ease;}
+	.ingredient-card:hover {transform:scale(1.05);background:#ffd1a4;}
+	.etape-card {background:#fff3e0;border-radius:12px;margin-bottom:15px;padding:15px;box-shadow:0 4px 12px rgba(0,0,0,0.08);opacity:0;transform:translateY(20px);transition:all 0.6s ease;}
+	.etape-card.show {opacity:1;transform:translateY(0);}
+	.etape-num {display:inline-block;background:#e67e22;color:white;font-weight:bold;border-radius:50%;width:30px;height:30px;line-height:30px;text-align:center;margin-right:10px;}
+	.star {font-size:1.8em;cursor:pointer;color:#ccc;transition:color 0.3s;}
+	.star.hover, .star.selected {color:#e67e22;}
+	</style>
+	</head>
+	<body>
 
-  <div id="videoContainer" class="fade-in"></div>
+	<div class="container" id="recetteContainer">
+	  <a href="../index.html" class="button" id="backButton">← Retour aux recettes</a>
+	  <h1 id="titre" class="fade-in">Chargement...</h1>
+	  <p id="nombreVues" class="fade-in" style="color:#999;font-size:0.9em;margin-top:5px;"></p>
 
-  <h2 id="ingredientsTitle" class="fade-in">Ingrédients</h2>
-  <div id="ingredients" class="fade-in"></div>
+	  <div class="recette-header fade-in">
+		<div id="description"></div>
+		<img id="imageRecette" class="recipe-img" src="" alt="Recette">
+	  </div>
 
-  <button id="createShoppingList" class="button fade-in">Créer ma liste de courses</button>
-  <div id="shoppingListContainer" style="margin-top:15px"></div>
+	  <div id="videoContainer" class="fade-in"></div>
 
-  <h2 id="preparationTitle" class="fade-in">Préparation</h2>
-  <div id="instructions" class="fade-in"></div>
+	  <h2 id="ingredientsTitle" class="fade-in">Ingrédients</h2>
+	  <div id="ingredients" class="fade-in"></div>
 
-  <h2 id="ratingTitle" class="fade-in">Votre note</h2>
-  <div id="ratingSection" class="fade-in">
-    <div id="starsContainer"></div>
-    <p id="ratingMessage" style="margin-top:8px;color:#e67e22;font-weight:bold;"></p>
-  </div>
-</div>
+	  <button id="createShoppingList" class="button fade-in">Créer ma liste de courses</button>
+	  <div id="shoppingListContainer" style="margin-top:15px"></div>
 
-<iframe id="videoFloat"></iframe>
+	  <h2 id="preparationTitle" class="fade-in">Préparation</h2>
+	  <div id="instructions" class="fade-in"></div>
 
-<script type="module">
-import { recipeTranslations } from '../translations/translations_recette.js';
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+	  <h2 id="ratingTitle" class="fade-in">Votre note</h2>
+	  <div id="ratingSection" class="fade-in">
+		<div id="starsContainer"></div>
+		<p id="ratingMessage" style="margin-top:8px;color:#e67e22;font-weight:bold;"></p>
+	  </div>
+	</div>
 
-const savedLang = localStorage.getItem('siteLang') || 'fr';
-function applyRecipeTranslation(lang){
-  if(!recipeTranslations[lang]) lang='fr';
-  document.getElementById('backButton').innerText = recipeTranslations[lang].back;
-  document.getElementById('ingredientsTitle').innerText = recipeTranslations[lang].ingredients;
-  document.getElementById('preparationTitle').innerText = recipeTranslations[lang].preparation;
-  document.getElementById('ratingTitle').innerText = recipeTranslations[lang].rating;
-  document.getElementById('createShoppingList').innerText = recipeTranslations[lang].createList;
-}
-applyRecipeTranslation(savedLang);
+	<iframe id="videoFloat"></iframe>
 
-const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+	<script type="module">
+	import { recipeTranslations } from '../translations/translations_recette.js';
+	import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const container = document.getElementById('recetteContainer');
-const fadeElems = document.querySelectorAll('.fade-in');
+	const savedLang = localStorage.getItem('siteLang') || 'fr';
+	function applyRecipeTranslation(lang){
+	  if(!recipeTranslations[lang]) lang='fr';
+	  document.getElementById('backButton').innerText = recipeTranslations[lang].back;
+	  document.getElementById('ingredientsTitle').innerText = recipeTranslations[lang].ingredients;
+	  document.getElementById('preparationTitle').innerText = recipeTranslations[lang].preparation;
+	  document.getElementById('ratingTitle').innerText = recipeTranslations[lang].rating;
+	  document.getElementById('createShoppingList').innerText = recipeTranslations[lang].createList;
+	}
+	applyRecipeTranslation(savedLang);
 
-// Récupère le slug depuis le chemin de l'URL
-const params = new URLSearchParams(window.location.search);
-const recetteSlug = params.get('slug');
+	const supabaseUrl = 'https://ttkgzzamsfnittbqqvft.supabase.co';
+	const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a2d6emFtc2ZuaXR0YnFxdmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mjg4MTEsImV4cCI6MjA3MDQwNDgxMX0.aE5GxrKrNJoqr1g8ASVG9Vdf7k_OLuyCOe2vZAp0-wY';
+	const supabase = createClient(supabaseUrl, supabaseKey);
 
-if(!recetteSlug){
-  document.getElementById('titre').innerText="Recette non trouvée";
-}else{
-  fetchRecette(recetteSlug);
-}
+	const container = document.getElementById('recetteContainer');
+	const fadeElems = document.querySelectorAll('.fade-in');
+
+	// Récupère le slug depuis le chemin de l'URL
+	const params = new URLSearchParams(window.location.search);
+	const recetteSlug = params.get('slug');
+
+	if(!recetteSlug){
+	  document.getElementById('titre').innerText="Recette non trouvée";
+	}else{
+	  fetchRecette(recetteSlug);
+	}
 
 
-async function fetchRecette(id){
-  // 1️⃣ Récupération recette principale (FR)
-const { data: recetteFR, error: errorFR } = await supabase
-  .from('recettes')
-  .select('*')
-  .eq('slug', recetteSlug)
-  .single();
+	async function fetchRecette(id){
+	  // 1️⃣ Récupération recette principale (FR)
+	const { data: recetteFR, error: errorFR } = await supabase
+	  .from('recettes')
+	  .select('*')
+	  .eq('slug', recetteSlug)
+	  .single();
 
-  if (errorFR || !recetteFR) {
-    console.error(errorFR);
-    document.getElementById('titre').innerText = "Erreur lors du chargement";
-    return;
-  }
+	  if (errorFR || !recetteFR) {
+		console.error(errorFR);
+		document.getElementById('titre').innerText = "Erreur lors du chargement";
+		return;
+	  }
 
-  let recette = { ...recetteFR };
+	  let recette = { ...recetteFR };
 
-  // 2️⃣ Si langue ≠ fr → chercher traduction
-  if (savedLang !== 'fr') {
-    const { data: trad, error: tradError } = await supabase
-      .from('recettes_traductions')
-      .select('*')
-      .eq('recette_id', recetteFR.id)
-      .eq('langue', savedLang)
-      .single();
+	  // 2️⃣ Si langue ≠ fr → chercher traduction
+	  if (savedLang !== 'fr') {
+		const { data: trad, error: tradError } = await supabase
+		  .from('recettes_traductions')
+		  .select('*')
+		  .eq('recette_id', recetteFR.id)
+		  .eq('langue', savedLang)
+		  .single();
 
-    if (!tradError && trad) {
-      recette.titre = trad.titre || recette.titre;
-      recette.description = trad.description || recette.description;
-      recette.ingredients = trad.ingredients
-        ? trad.ingredients.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-        : recette.ingredients;
-      recette.preparation = trad.preparation
-        ? trad.preparation.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-        : recette.preparation;
-    }
-  }
+		if (!tradError && trad) {
+		  recette.titre = trad.titre || recette.titre;
+		  recette.description = trad.description || recette.description;
+		  recette.ingredients = trad.ingredients
+			? trad.ingredients.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+			: recette.ingredients;
+		  recette.preparation = trad.preparation
+			? trad.preparation.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+			: recette.preparation;
+		}
+	  }
 
-  // 3️⃣ Mise à jour des vues UNIQUEMENT dans recettes
-  const { error: updateError } = await supabase
-    .from('recettes')
-    .update({ nombre_visites: (recetteFR.nombre_visites || 0) + 1 })
-    .eq('id', recetteFR.id);
+	  // 3️⃣ Mise à jour des vues UNIQUEMENT dans recettes
+	  const { error: updateError } = await supabase
+		.from('recettes')
+		.update({ nombre_visites: (recetteFR.nombre_visites || 0) + 1 })
+		.eq('id', recetteFR.id);
 
-  if (updateError) console.error("Erreur mise à jour vues :", updateError);
+	  if (updateError) console.error("Erreur mise à jour vues :", updateError);
 
-  recette.nombre_visites = (recetteFR.nombre_visites || 0) + 1;
-  document.getElementById('nombreVues').innerText =
-    `${recipeTranslations[savedLang].views} ${recette.nombre_visites}`;
+	  recette.nombre_visites = (recetteFR.nombre_visites || 0) + 1;
+	  document.getElementById('nombreVues').innerText =
+		`${recipeTranslations[savedLang].views} ${recette.nombre_visites}`;
 
-  // 4️⃣ Affichage
-  afficherRecette(recette);
-}
+	  // 4️⃣ Affichage
+	  afficherRecette(recette);
+	}
 
-function afficherRecette(recette){
-  document.getElementById('titre').innerText=recette.titre;
-  document.getElementById('imageRecette').src=recette.photo_url||'';
-  document.getElementById('imageRecette').alt=recette.nom;
-  document.getElementById('description').innerText=recette.description||'';
+	function injectJSONLD(recette) {
+	  const jsonld = {
+		"@context": "https://schema.org",
+		"@type": "Recipe",
+		"name": recette.titre,
+		"description": recette.description,
+		"image": recette.photo_url || "",
+		"author": {
+		  "@type": "Person",
+		  "name": "Silence, ça mijote"
+		},
+		"recipeIngredient": Array.isArray(recette.ingredients) ? recette.ingredients : [recette.ingredients],
+		"recipeInstructions": Array.isArray(recette.preparation) 
+		  ? recette.preparation.map(step => ({"@type": "HowToStep", "text": step}))
+		  : [],
+		// 👉 Optionnel si tu as les infos en base :
+	   
+		  "aggregateRating": recette.note_moyenne 
+		  ? {
+			  "@type": "AggregateRating",
+			  "ratingValue": recette.note_moyenne,
+			  "ratingCount": recette.nombre_votes || 1
+			}
+		  : undefined
+	  };
 
-  // Ingrédients
-  const ingredientsContainer=document.getElementById('ingredients');
-  ingredientsContainer.innerHTML='';
-  if(Array.isArray(recette.ingredients)){
-    recette.ingredients.forEach(i=>{
-      const card=document.createElement('span');
-      card.className='ingredient-card';
-      card.innerText=i;
-      card.dataset.selected='false';
-      card.addEventListener('click',()=>{card.dataset.selected=card.dataset.selected==='true'?'false':'true'; card.style.background=card.dataset.selected==='true'?'#ffd1a4':'#ffe6d1';});
-      ingredientsContainer.appendChild(card);
-    });
-  } else {ingredientsContainer.innerText=recette.ingredients;}
+	  document.getElementById("recipe-jsonld").textContent = JSON.stringify(jsonld, null, 2);
+	}
 
-  // Liste de courses
-  const createBtn=document.getElementById('createShoppingList');
-  const shoppingListContainer=document.getElementById('shoppingListContainer');
-  createBtn.addEventListener('click',()=>{
-    const selectedIngredients=Array.from(ingredientsContainer.children).filter(c=>c.dataset.selected==='true').map(c=>c.innerText);
-    if(selectedIngredients.length===0){alert(recipeTranslations[savedLang].selectAlert); return;}
-    shoppingListContainer.innerHTML='';
-    const listDiv=document.createElement('div');
-    listDiv.style.padding='20px';
-    listDiv.style.background='#fff8f0';
-    listDiv.style.borderRadius='15px';
-    listDiv.style.fontFamily="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-    listDiv.style.width='300px';
-    listDiv.style.textAlign='center';
-    listDiv.innerHTML=`<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">
-                       <h3>${recipeTranslations[savedLang].myListTitle}</h3>
-                       <ul style="text-align:left;">${selectedIngredients.map(i=>`<li>${i}</li>`).join('')}</ul>`;
-    shoppingListContainer.appendChild(listDiv);
-    if(!window.html2canvas){
-      const script=document.createElement('script');
-      script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      script.onload=()=>captureList(listDiv,selectedIngredients);
-      document.body.appendChild(script);
-    } else {captureList(listDiv,selectedIngredients);}
-  });
 
-  function captureList(element,selectedIngredients){
-    html2canvas(element).then(canvas=>{
-      const img=canvas.toDataURL('image/png');
-      const downloadLink=document.createElement('a');
-      downloadLink.href=img;
-      downloadLink.download='liste_courses.png';
-      downloadLink.textContent=recipeTranslations[savedLang].downloadList;
-      downloadLink.className='button';
-      downloadLink.style.marginRight='8px';
-      const whatsappLink=document.createElement('a');
-      whatsappLink.href=`https://api.whatsapp.com/send?text=${encodeURIComponent(recipeTranslations[savedLang].myListTitle+' :\n')+encodeURIComponent(selectedIngredients.join('\n'))}`;
-      whatsappLink.target='_blank';
-      whatsappLink.textContent=recipeTranslations[savedLang].shareWhatsapp;
-      whatsappLink.className='button';
-      shoppingListContainer.appendChild(downloadLink);
-      shoppingListContainer.appendChild(whatsappLink);
-    });
-  }
+	function afficherRecette(recette){
+	  document.title = recette.titre + " | Silence, ça mijote";
+	  
+	  // ✅ Met à jour la meta description pour Google
+	  let metaDesc = document.querySelector('meta[name="description"]');
+	  if (!metaDesc) {
+		metaDesc = document.createElement('meta');
+		metaDesc.name = "description";
+		document.head.appendChild(metaDesc);
+	  }
+	  metaDesc.content = recette.description || "Découvrez une recette gourmande sur Silence, ça mijote.";
 
-  // Instructions
-  const instructionsContainer=document.getElementById('instructions');
-  instructionsContainer.innerHTML='';
-  const etapes=Array.isArray(recette.preparation)?recette.preparation:(recette.preparation||'').split(/\r?\n|;/).map(s=>s.trim()).filter(Boolean);
-  etapes.forEach((etape,index)=>{
-    const div=document.createElement('div');
-    div.className='etape-card';
-    div.innerHTML=`<span class="etape-num">${index+1}</span> <p>${etape}</p>`;
-    instructionsContainer.appendChild(div);
-  });
+	  
+	  document.getElementById('titre').innerText=recette.titre;
+	  document.getElementById('imageRecette').src=recette.photo_url||'';
+	  document.getElementById('imageRecette').alt=recette.nom;
+	  document.getElementById('description').innerText=recette.description||'';
 
-  // Vidéo YouTube
-  const videoContainer=document.getElementById('videoContainer');
-  videoContainer.innerHTML='';
-  if(recette.lien_youtube){
-    const regex=/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match=recette.lien_youtube.match(regex);
-    const videoId=match?match[1]:null;
-    if(videoId){
-      const iframeTop=document.createElement('iframe');
-      iframeTop.src=`https://www.youtube.com/embed/${videoId}?rel=0`;
-      iframeTop.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      iframeTop.allowFullscreen=true;
-      iframeTop.width="100%";
-      iframeTop.height="315";
-      videoContainer.appendChild(iframeTop);
-    }
-  }
+	  // Ingrédients
+	  const ingredientsContainer=document.getElementById('ingredients');
+	  ingredientsContainer.innerHTML='';
+	  if(Array.isArray(recette.ingredients)){
+		recette.ingredients.forEach(i=>{
+		  const card=document.createElement('span');
+		  card.className='ingredient-card';
+		  card.innerText=i;
+		  card.dataset.selected='false';
+		  card.addEventListener('click',()=>{card.dataset.selected=card.dataset.selected==='true'?'false':'true'; card.style.background=card.dataset.selected==='true'?'#ffd1a4':'#ffe6d1';});
+		  ingredientsContainer.appendChild(card);
+		});
+	  } else {ingredientsContainer.innerText=recette.ingredients;}
 
-  // Étoiles interactives
-  const starsContainer=document.getElementById('starsContainer');
-  const ratingMessage=document.getElementById('ratingMessage');
-  starsContainer.innerHTML='';
-  for(let i=1;i<=5;i++){
-    const star=document.createElement('span');
-    star.classList.add('star'); star.innerHTML='☆'; star.dataset.value=i;
-    star.addEventListener('mouseover',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('hover',s.dataset.value<=i));});
-    star.addEventListener('mouseleave',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.remove('hover'));});
-    star.addEventListener('click',async()=>{
-      document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('selected',s.dataset.value<=i));
-      ratingMessage.textContent=`Vous avez noté ${i} étoile${i>1?'s':''}`;
-      const {error}=await supabase.from('notes').insert([{recette_id:recette.id,note:i}]);
-      if(error){console.error('Erreur note:',error); ratingMessage.textContent="Erreur lors de l'envoi de la note.";}
-      else {ratingMessage.textContent+=" ✅ Merci pour votre avis !";}
-    });
-    starsContainer.appendChild(star);
-  }
+	  // Liste de courses
+	  const createBtn=document.getElementById('createShoppingList');
+	  const shoppingListContainer=document.getElementById('shoppingListContainer');
+	  createBtn.addEventListener('click',()=>{
+		const selectedIngredients=Array.from(ingredientsContainer.children).filter(c=>c.dataset.selected==='true').map(c=>c.innerText);
+		if(selectedIngredients.length===0){alert(recipeTranslations[savedLang].selectAlert); return;}
+		shoppingListContainer.innerHTML='';
+		const listDiv=document.createElement('div');
+		listDiv.style.padding='20px';
+		listDiv.style.background='#fff8f0';
+		listDiv.style.borderRadius='15px';
+		listDiv.style.fontFamily="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+		listDiv.style.width='300px';
+		listDiv.style.textAlign='center';
+		listDiv.innerHTML=`<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">
+						   <h3>${recipeTranslations[savedLang].myListTitle}</h3>
+						   <ul style="text-align:left;">${selectedIngredients.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+		shoppingListContainer.appendChild(listDiv);
+		if(!window.html2canvas){
+		  const script=document.createElement('script');
+		  script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+		  script.onload=()=>captureList(listDiv,selectedIngredients);
+		  document.body.appendChild(script);
+		} else {captureList(listDiv,selectedIngredients);}
+	  });
 
-  container.classList.add('show');
-  fadeElems.forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*150));
-  document.querySelectorAll('.etape-card').forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*200));
-}
-</script>
-</body>
-</html>
+	  function captureList(element,selectedIngredients){
+		html2canvas(element).then(canvas=>{
+		  const img=canvas.toDataURL('image/png');
+		  const downloadLink=document.createElement('a');
+		  downloadLink.href=img;
+		  downloadLink.download='liste_courses.png';
+		  downloadLink.textContent=recipeTranslations[savedLang].downloadList;
+		  downloadLink.className='button';
+		  downloadLink.style.marginRight='8px';
+		  const whatsappLink=document.createElement('a');
+		  whatsappLink.href=`https://api.whatsapp.com/send?text=${encodeURIComponent(recipeTranslations[savedLang].myListTitle+' :\n')+encodeURIComponent(selectedIngredients.join('\n'))}`;
+		  whatsappLink.target='_blank';
+		  whatsappLink.textContent=recipeTranslations[savedLang].shareWhatsapp;
+		  whatsappLink.className='button';
+		  shoppingListContainer.appendChild(downloadLink);
+		  shoppingListContainer.appendChild(whatsappLink);
+		});
+	  }
+
+	  // Instructions
+	  const instructionsContainer=document.getElementById('instructions');
+	  instructionsContainer.innerHTML='';
+	  const etapes=Array.isArray(recette.preparation)?recette.preparation:(recette.preparation||'').split(/\r?\n|;/).map(s=>s.trim()).filter(Boolean);
+	  etapes.forEach((etape,index)=>{
+		const div=document.createElement('div');
+		div.className='etape-card';
+		div.innerHTML=`<span class="etape-num">${index+1}</span> <p>${etape}</p>`;
+		instructionsContainer.appendChild(div);
+	  });
+
+	  // Vidéo YouTube
+	  const videoContainer=document.getElementById('videoContainer');
+	  videoContainer.innerHTML='';
+	  if(recette.lien_youtube){
+		const regex=/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+		const match=recette.lien_youtube.match(regex);
+		const videoId=match?match[1]:null;
+		if(videoId){
+		  const iframeTop=document.createElement('iframe');
+		  iframeTop.src=`https://www.youtube.com/embed/${videoId}?rel=0`;
+		  iframeTop.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+		  iframeTop.allowFullscreen=true;
+		  iframeTop.width="100%";
+		  iframeTop.height="315";
+		  videoContainer.appendChild(iframeTop);
+		}
+	  }
+
+	  // Étoiles interactives
+	  const starsContainer=document.getElementById('starsContainer');
+	  const ratingMessage=document.getElementById('ratingMessage');
+	  starsContainer.innerHTML='';
+	  for(let i=1;i<=5;i++){
+		const star=document.createElement('span');
+		star.classList.add('star'); star.innerHTML='☆'; star.dataset.value=i;
+		star.addEventListener('mouseover',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('hover',s.dataset.value<=i));});
+		star.addEventListener('mouseleave',()=>{document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.remove('hover'));});
+		star.addEventListener('click',async()=>{
+		  document.querySelectorAll('#starsContainer .star').forEach(s=>s.classList.toggle('selected',s.dataset.value<=i));
+		  ratingMessage.textContent=`Vous avez noté ${i} étoile${i>1?'s':''}`;
+		  const {error}=await supabase.from('notes').insert([{recette_id:recette.id,note:i}]);
+		  if(error){console.error('Erreur note:',error); ratingMessage.textContent="Erreur lors de l'envoi de la note.";}
+		  else {ratingMessage.textContent+=" ✅ Merci pour votre avis !";}
+		});
+		starsContainer.appendChild(star);
+	  }
+
+	  container.classList.add('show');
+	  fadeElems.forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*150));
+	  document.querySelectorAll('.etape-card').forEach((el,i)=>setTimeout(()=>el.classList.add('show'),i*200));
+
+	 injectJSONLD(recette);  
+	  
+	}
+	</script>
+	</body>
+	</html>
