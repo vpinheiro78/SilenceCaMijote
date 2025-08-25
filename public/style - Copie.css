@@ -333,25 +333,41 @@ body { top: 0 !important; }
   }
 }
 
-/* === Carte === */
-.map-section{ margin:32px auto; max-width:1100px; padding:0 16px; }
-.map-title{ font-size:clamp(22px,3.2vw,36px); margin:0 0 12px; }
-.map-wrapper{
-  position:relative; background:#fff; border-radius:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08); padding:16px;
+.map-section {
+  margin: 40px 0;
+  text-align: center;
 }
-#world-map{ width:100%; height:auto; display:block; }
-.recipe-flag{ cursor:pointer; filter:drop-shadow(0 1px 1px rgba(0,0,0,.2)); }
 
-/* Popup */
-.map-popup{
-  position:absolute; z-index:5; background:#fff; border-radius:12px;
-  padding:10px 12px; box-shadow:0 8px 24px rgba(0,0,0,.18);
-  transform:translate(-50%,-120%);
-  min-width:200px;
+#world-map {
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.popup-title{ font-weight:600; margin-bottom:6px; }
-.popup-btn{
-  background:#e06a2c; color:#fff; border:none; padding:6px 10px;
-  border-radius:8px; cursor:pointer;
+
+.map-popup {
+  position: absolute;
+  background: #fff8f0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e67e22;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 100;
+}
+
+.map-popup button {
+  margin-top: 6px;
+  background-color: #e67e22;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.map-popup button:hover {
+  background-color: #d35400;
 }
