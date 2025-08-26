@@ -1,111 +1,86 @@
-// --- Gestion de la langue ---
+// Langue héritée automatiquement
 let currentLang = localStorage.getItem('siteLang') || 'fr';
 
 const texts = {
   fr: {
-    title: "Assistant des Saveurs",
-    greeting: "Bonjour, je suis votre chef virtuel ! Comment puis-je vous aider ?",
+    greeting: "Bonjour 👋, je suis votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
     options: [
-      "Créer une recette avec des ingrédients de votre choix",
-      "Créer une recette selon vos envies",
-      "Surprenez-moi avec une recette de saison"
+      "🍅 Créer une recette avec mes ingrédients",
+      "🍰 Créer une recette selon mes envies",
+      "🎁 Surprenez-moi avec une recette de saison"
     ],
-    askIngredients: "Quels ingrédients voulez-vous inclure ?",
-    askType: "Préférez-vous un dessert ou un plat ?",
-    askDessert: "Quel est l’ingrédient principal ?",
-    askPlat: "Viande ou poisson ?",
-    surprise: "Voici une recette de saison pour vous !"
+    askIngredients: "Dites-moi les ingrédients principaux 🥕🍗🍫 :",
+    askType: "Vous avez envie d’un dessert 🍰 ou d’un plat 🍽️ ?",
+    askDessert: "Parfait 😍 ! Quel est l’ingrédient vedette (chocolat, fruit…) ?",
+    askPlat: "Super ! Vous préférez à base de viande 🥩 ou de poisson 🐟 ?",
+    surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…"
   },
   en: {
-    title: "Flavor Assistant",
-    greeting: "Hello, I am your virtual chef! How can I help you?",
+    greeting: "Hello 👋, I’m your Virtual Chef! How can I delight you today? 😋",
     options: [
-      "Create a recipe with ingredients of your choice",
-      "Create a recipe based on your cravings",
-      "Surprise me with a seasonal recipe"
+      "🍅 Create a recipe with my ingredients",
+      "🍰 Create a recipe based on my cravings",
+      "🎁 Surprise me with a seasonal recipe"
     ],
-    askIngredients: "Which ingredients do you want to include?",
-    askType: "Do you prefer a dessert or a main dish?",
-    askDessert: "What is the main ingredient?",
-    askPlat: "Meat or fish?",
-    surprise: "Here’s a seasonal recipe for you!"
+    askIngredients: "Tell me your main ingredients 🥕🍗🍫 :",
+    askType: "Do you feel like a dessert 🍰 or a main dish 🍽️?",
+    askDessert: "Perfect 😍! What’s the star ingredient (chocolate, fruit…)?",
+    askPlat: "Great! Do you prefer meat 🥩 or fish 🐟?",
+    surprise: "✨ Voilà! A seasonal recipe just for you…"
   }
-  // Ajoute les autres langues de la même manière
 };
 
-function updateLanguage(lang){
-  currentLang = lang;
-  localStorage.setItem('siteLang', lang);
-  document.getElementById('assistant-title').innerText = texts[lang].title || texts['fr'].title;
-}
+// Sélection du bon jeu de textes
+const t = texts[currentLang] || texts['fr'];
 
-document.querySelectorAll('#langSelector img').forEach(img=>{
-  img.addEventListener('click', ()=> updateLanguage(img.dataset.lang));
-});
+const chat = document.getElementById('chat');
+const container = document.getElementById('assistantContainer');
 
-updateLanguage(currentLang);
-
-// --- Gestion du chat ---
-const chat = document.getElementById('chat-container');
-
-function addMessage(content, type='bot'){
-  const msg = document.createElement('div');
-  msg.className = `message ${type}`;
-  msg.innerText = content;
-  chat.appendChild(msg);
+function addMessage(text, type='bot'){
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  div.innerText = text;
+  chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-// --- Choix interactifs ---
 function addChoices(options){
-  const container = document.createElement('div');
-  container.className = 'choices';
+  const div = document.createElement('div');
+  div.className = 'choices';
   options.forEach(opt=>{
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.innerText = opt;
     btn.onclick = ()=> handleChoice(opt);
-    container.appendChild(btn);
+    div.appendChild(btn);
   });
-  chat.appendChild(container);
+  chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-let step = 0;
-
-function startAssistant(){
-  addMessage(texts[currentLang].greeting);
-  addChoices(texts[currentLang].options);
+function start(){
+  addMessage(t.greeting);
+  addChoices(t.options);
+  container.classList.add('show');
 }
 
 function handleChoice(choice){
-  addMessage(choice, 'user');
-  
-  // supprimer les anciens boutons
-  document.querySelectorAll('.choices').forEach(c => c.remove());
+  addMessage(choice,'user');
+  document.querySelectorAll('.choices').forEach(c=>c.remove());
 
-  const t = texts[currentLang];
-  
-  if(choice === t.options[0]){ // ingrédients
-    step = 1;
+  if(choice.includes("🍅") || choice.includes("ingredients")){
     addMessage(t.askIngredients);
-    // ici tu peux ajouter un input pour que l'utilisateur tape les ingrédients
-  } else if(choice === t.options[1]){ // selon envies
-    step = 2;
+  } else if(choice.includes("🍰") || choice.includes("cravings")){
     addMessage(t.askType);
-    addChoices(["Dessert", "Plat"]);
-  } else if(choice === t.options[2]){ // surprise
-    step = 3;
+    addChoices(["🍰 Dessert","🍽️ Plat"]);
+  } else if(choice.includes("🎁") || choice.includes("Surprise")){
     addMessage(t.surprise);
-    // ici tu peux afficher directement une recette de saison depuis Supabase
-  } else if(choice === "Dessert"){
-    step = 4;
+  } else if(choice.includes("Dessert")){
     addMessage(t.askDessert);
-  } else if(choice === "Plat"){
-    step = 5;
+  } else if(choice.includes("Plat")){
     addMessage(t.askPlat);
   }
 }
 
 // démarrage
-startAssistant();
+start();
