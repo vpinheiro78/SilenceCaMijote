@@ -1,85 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chef Virtuel | Silence, ça mijote</title>
-<style>
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin:0; padding:20px;
-  background:linear-gradient(120deg,#fff8f0,#ffe6d1);
-  color:#333;
-}
-.container {
-  max-width:900px; margin:auto;
-  background:#fff; padding:25px;
-  border-radius:15px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
-  opacity:0; transform:translateY(30px);
-  transition:all 0.8s ease;
-}
-.container.show {opacity:1;transform:translateY(0);}
-h1 {color:#d35400;font-size:2.2em;margin-bottom:10px;text-align:center;}
-p.subtitle {text-align:center;color:#555;margin-bottom:25px;}
-
-#chat {
-  display:flex; flex-direction:column; gap:12px;
-  max-height:60vh; overflow-y:auto;
-  padding:10px; border-radius:12px;
-  background:#fff8f0;
-}
-
-.message {
-  max-width:70%;
-  padding:12px 18px;
-  border-radius:18px;
-  font-size:1em;
-  line-height:1.4;
-  animation: fadeIn 0.5s ease forwards;
-}
-.message.bot {
-  background:#ffe6d1; align-self:flex-start;
-  border-bottom-left-radius:5px;
-}
-.message.user {
-  background:#e67e22; color:#fff;
-  align-self:flex-end;
-  border-bottom-right-radius:5px;
-}
-
-.choices {
-  display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;
-}
-.choice-btn {
-  background:#e67e22; color:white;
-  border:none; padding:10px 15px;
-  border-radius:20px; cursor:pointer;
-  transition:0.2s; font-size:0.9em;
-}
-.choice-btn:hover {background:#d35400;}
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
-}
-
-/* Responsive */
-@media(max-width:600px){
-  .message {max-width:85%; font-size:0.95em;}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Votre Chef Virtuel - Silence, ça mijote</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fffdf9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .assistant-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .assistant-intro {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .choice-btn {
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #ffefd5;
+      transition: all 0.3s ease;
+    }
+    .choice-btn:hover {
+      background: #ffd699;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
-<div class="container" id="assistantContainer">
-  <h1 id="title">👨‍🍳 Votre Chef Virtuel</h1>
-  <p class="subtitle" id="subtitle">
-    Je suis là pour imaginer avec vous des recettes uniques et personnalisées.  
-    Entrez dans l’univers gourmand 2.0 où <b>vous êtes l’acteur</b> ! ✨
-  </p>
-  <div id="chat"></div>
-</div>
+  <div class="assistant-container">
+    <h1 id="assistant-title"></h1>
+    <p id="assistant-intro" class="assistant-intro"></p>
 
-<script type="module" src="assistant.js"></script>
+    <div class="choices">
+      <button class="choice-btn" id="choice1"></button>
+      <button class="choice-btn" id="choice2"></button>
+      <button class="choice-btn" id="choice3"></button>
+    </div>
+  </div>
+
+  <script>
+    // récupérer la langue stockée (ex: dans localStorage)
+    const lang = localStorage.getItem("lang") || "fr";
+
+    // Dictionnaire multilingue
+    const translations = {
+      fr: {
+        title: "👨‍🍳 Votre Chef Hugo",
+        intro: "Bonjour, je suis Hugo, votre Chef Virtuel ! Je suis là pour imaginer avec vous des recettes uniques et personnalisées. Entrez dans l’univers gourmand 2.0 où vous êtes l’acteur ! ✨",
+        choice1: "Créer une recette avec vos ingrédients",
+        choice2: "Créer une recette selon vos envies",
+        choice3: "Surprenez-moi avec une recette de saison"
+      },
+      en: {
+        title: "👨‍🍳 Your Chef Hugo",
+        intro: "Hello, I’m Hugo, your Virtual Chef! I’m here to create unique, personalized recipes with you. Step into the gourmet 2.0 universe where you are the star! ✨",
+        choice1: "Create a recipe with your ingredients",
+        choice2: "Create a recipe based on your cravings",
+        choice3: "Surprise me with a seasonal recipe"
+      },
+      es: {
+        title: "👨‍🍳 Su Chef Hugo",
+        intro: "¡Hola! Soy Hugo, su Chef Virtual. Estoy aquí para imaginar con usted recetas únicas y personalizadas. ¡Entre en el universo gourmet 2.0 donde usted es el protagonista! ✨",
+        choice1: "Crear una receta con sus ingredientes",
+        choice2: "Crear una receta según sus antojos",
+        choice3: "Sorpréndame con una receta de temporada"
+      },
+      de: {
+        title: "👨‍🍳 Ihr Chef Hugo",
+        intro: "Hallo, ich bin Hugo, Ihr virtueller Chef! Ich bin hier, um mit Ihnen einzigartige und personalisierte Rezepte zu kreieren. Willkommen im Gourmet-Universum 2.0, wo Sie im Mittelpunkt stehen! ✨",
+        choice1: "Ein Rezept mit Ihren Zutaten erstellen",
+        choice2: "Ein Rezept nach Ihren Wünschen erstellen",
+        choice3: "Überraschen Sie mich mit einem saisonalen Rezept"
+      },
+      it: {
+        title: "👨‍🍳 Il Vostro Chef Hugo",
+        intro: "Ciao, sono Hugo, il vostro Chef Virtuale! Sono qui per creare con voi ricette uniche e personalizzate. Entrate nell’universo gourmet 2.0 dove voi siete i protagonisti! ✨",
+        choice1: "Creare una ricetta con i vostri ingredienti",
+        choice2: "Creare una ricetta secondo i vostri desideri",
+        choice3: "Sorprendetemi con una ricetta di stagione"
+      },
+      pt: {
+        title: "👨‍🍳 O Seu Chef Hugo",
+        intro: "Olá, eu sou Hugo, o seu Chef Virtual! Estou aqui para criar consigo receitas únicas e personalizadas. Entre no universo gourmet 2.0 onde você é a estrela! ✨",
+        choice1: "Criar uma receita com os seus ingredientes",
+        choice2: "Criar uma receita de acordo com os seus desejos",
+        choice3: "Surpreenda-me com uma receita da estação"
+      }
+    };
+
+    // Appliquer la traduction
+    document.getElementById("assistant-title").textContent = translations[lang].title;
+    document.getElementById("assistant-intro").textContent = translations[lang].intro;
+    document.getElementById("choice1").textContent = translations[lang].choice1;
+    document.getElementById("choice2").textContent = translations[lang].choice2;
+    document.getElementById("choice3").textContent = translations[lang].choice3;
+  </script>
 </body>
 </html>
