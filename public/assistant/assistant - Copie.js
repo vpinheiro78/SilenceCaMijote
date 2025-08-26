@@ -1,11 +1,9 @@
-// assistant.js
-
 // Langue héritée automatiquement
 let currentLang = localStorage.getItem('siteLang') || 'fr';
 
 const texts = {
   fr: {
-    greeting: "Bonjour 👋, je suis Hugo, votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
+    greeting: "Bonjour 👋, je suis votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
     options: [
       "🍅 Créer une recette avec mes ingrédients",
       "🍰 Créer une recette selon mes envies",
@@ -15,12 +13,10 @@ const texts = {
     askType: "Vous avez envie d’un dessert 🍰 ou d’un plat 🍽️ ?",
     askDessert: "Parfait 😍 ! Quel est l’ingrédient vedette (chocolat, fruit…) ?",
     askPlat: "Super ! Vous préférez à base de viande 🥩 ou de poisson 🐟 ?",
-    surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…",
-    dessertBtn: "🍰 Dessert",
-    platBtn: "🍽️ Plat"
+    surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…"
   },
   en: {
-    greeting: "Hello 👋, I’m Hugo, your Virtual Chef! How can I delight you today? 😋",
+    greeting: "Hello 👋, I’m your Virtual Chef! How can I delight you today? 😋",
     options: [
       "🍅 Create a recipe with my ingredients",
       "🍰 Create a recipe based on my cravings",
@@ -30,9 +26,7 @@ const texts = {
     askType: "Do you feel like a dessert 🍰 or a main dish 🍽️?",
     askDessert: "Perfect 😍! What’s the star ingredient (chocolate, fruit…)?",
     askPlat: "Great! Do you prefer meat 🥩 or fish 🐟?",
-    surprise: "✨ Voilà! A seasonal recipe just for you…",
-    dessertBtn: "🍰 Dessert",
-    platBtn: "🍽️ Main Dish"
+    surprise: "✨ Voilà! A seasonal recipe just for you…"
   }
 };
 
@@ -76,18 +70,14 @@ function handleChoice(choice){
 
   if(choice.includes("🍅") || choice.includes("ingredients")){
     addMessage(t.askIngredients);
-
   } else if(choice.includes("🍰") || choice.includes("cravings")){
     addMessage(t.askType);
-    addChoices([t.dessertBtn, t.platBtn]);
-
+    addChoices(["🍰 Dessert","🍽️ Plat"]);
   } else if(choice.includes("🎁") || choice.includes("Surprise")){
     addMessage(t.surprise);
-
   } else if(choice.includes("Dessert")){
     addMessage(t.askDessert);
-
-  } else if(choice.includes("Plat") || choice.includes("Main Dish")){
+  } else if(choice.includes("Plat")){
     addMessage(t.askPlat);
   }
 }
