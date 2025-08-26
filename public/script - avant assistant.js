@@ -18,16 +18,6 @@ const categoryButtons = document.querySelectorAll('.cat-btn')
 const subscribeForm = document.getElementById('subscribeForm')
 const subscribeMessage = document.getElementById('subscribeMessage')
 
-const assistantTranslations = {
-  fr: "Tentez l'expérience avec Votre Chef Virtuel : préparez une recette unique rien que pour vous !",
-  en: "Try the experience with Your Virtual Chef: create a unique recipe just for you!",
-  es: "¡Pruebe la experiencia con su Chef Virtual: prepare una receta única para usted!",
-  de: "Probieren Sie das Erlebnis mit Ihrem Virtuellen Koch: Kreieren Sie ein einzigartiges Rezept nur für Sie!",
-  it: "Prova l'esperienza con il tuo Chef Virtuale: prepara una ricetta unica per te!",
-  pt: "Experimente com o seu Chef Virtual: prepare uma receita única só para você!"
-};
-
-
 let allRecipes = []
 let currentCategory = 'all'
 let currentSearch = ''
@@ -156,21 +146,10 @@ function changeLanguage(lang) {
       document.querySelector('button[data-cat="accompagnement"]').innerText = categories.accompagnement
       document.querySelector('button[data-cat="autre"]').innerText = categories.autre
     })
-
     .finally(() => {
       loadRecipes() // 🔥 fonctionne maintenant
-	  updateAssistantButton(lang) // 🔥 met à jour le texte du bouton
     })
 }
-
-// ----------------- Assistant des Saveurs ----------------- //
-function updateAssistantButton(lang) {
-  const btnText = document.querySelector(".assistant-text");
-  if (btnText && assistantTranslations[lang]) {
-    btnText.textContent = assistantTranslations[lang];
-  }
-}
-
 
 // ----------------- ÉVÉNEMENTS ----------------- //
 
