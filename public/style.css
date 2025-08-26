@@ -372,16 +372,24 @@ body { top: 0 !important; }
   background-color: #d35400;
 }
 
+.assistant-button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
 .assistant-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: #e07b39;
   color: white;
-  padding: 15px 30px;
-  text-decoration: none;
+  padding: 15px 25px;
   border-radius: 12px;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  text-decoration: none;
   transition: all 0.3s ease;
-  display: inline-block;
+  min-width: 350px;
 }
 
 .assistant-button:hover {
@@ -389,3 +397,11 @@ body { top: 0 !important; }
   transform: scale(1.05);
 }
 
+.assistant-text {
+  margin-right: 15px;
+  text-align: left;
+}
+
+.assistant-icon {
+  font-size: 1.5rem;
+}
