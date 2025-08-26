@@ -1,58 +1,105 @@
-// Langue héritée
+// assistant.js
+
+// Langue héritée automatiquement depuis index.html
 let currentLang = localStorage.getItem('siteLang') || 'fr';
 
 const texts = {
   fr: {
     title: "👨‍🍳 Votre Chef Virtuel",
-    subtitle: "Entrez dans l’univers gourmand 2.0 où vous êtes l’acteur ! ✨",
-    greeting: "Bonjour 👋, je suis Hugo, votre Chef Virtuel !",
-    options: ["🍅 Ingrédients sous la main", "🍰 Selon vos envies", "🎁 Surprise de saison"],
+    subtitle: "Je suis là pour imaginer avec vous des recettes uniques et personnalisées. Entrez dans l’univers gourmand 2.0 où vous êtes l’acteur ! ✨",
+    greeting: "Bonjour 👋, je suis Hugo, votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
+    options: [
+      "🍅 Créer une recette avec ce que j’ai sous la main",
+      "🍰 Créer une recette selon mes envies",
+      "🎁 Surprenez-moi avec une recette de saison"
+    ],
     askIngredients: "Dites-moi ce que vous avez sous la main 🥕🍗🍫 :",
     askEnvie: "Parlez-moi de vos envies (ex: un dessert au chocolat, un plat épicé…) 😋 :",
-    askPersons: "Pour combien de personnes ? 👨‍👩‍👧‍👦",
-    confirmIngredients: "🥕 Super, j’ai noté vos ingrédients et combien vous serez à table !",
+    askPersons: "Pour combien de personnes voulez-vous préparer ce plat ? 👨‍👩‍👧‍👦",
     confirmEnvie: "🍽️ Super, j’ai noté vos envies et le nombre d’invités !",
+    confirmIngredients: "🥕 Super, j’ai noté vos ingrédients et combien vous serez à table !",
     surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…",
-    invalidNumber: "⚠️ Merci d’indiquer un nombre valide de personnes.",
+    invalidNumber: "⚠️ Merci d’indiquer un nombre valide de personnes (ex: 2, 4, 6).",
     invalidInput: "🤔 Ça ne ressemble pas à une envie culinaire… essayons encore !"
   },
   en: {
     title: "👨‍🍳 Your Virtual Chef",
-    subtitle: "Step into the gourmet 2.0 universe where YOU are the star! ✨",
-    greeting: "Hello 👋, I’m Hugo, your Virtual Chef!",
-    options: ["🍅 What I have", "🍰 My cravings", "🎁 Seasonal surprise"],
+    subtitle: "I’m here to imagine unique and personalized recipes with you. Step into the gourmet 2.0 universe where YOU are the star! ✨",
+    greeting: "Hello 👋, I’m Hugo, your Virtual Chef! How can I delight you today? 😋",
+    options: [
+      "🍅 Create a recipe with what I have",
+      "🍰 Create a recipe based on my cravings",
+      "🎁 Surprise me with a seasonal recipe"
+    ],
     askIngredients: "Tell me what you have at home 🥕🍗🍫 :",
-    askEnvie: "Tell me about your cravings (ex: chocolate dessert, spicy dish…) 😋 :",
-    askPersons: "For how many people? 👨‍👩‍👧‍👦",
-    confirmIngredients: "🥕 Perfect, noted your ingredients and the number of guests!",
-    confirmEnvie: "🍽️ Great, noted your cravings and number of guests!",
+    askEnvie: "Tell me about your cravings (ex: a chocolate dessert, a spicy dish…) 😋 :",
+    askPersons: "For how many people do you want to prepare this dish? 👨‍👩‍👧‍👦",
+    confirmEnvie: "🍽️ Great, I’ve noted your cravings and the number of guests!",
+    confirmIngredients: "🥕 Perfect, I’ve noted your ingredients and how many people you’ll serve!",
     surprise: "✨ Voilà! A seasonal recipe just for you…",
-    invalidNumber: "⚠️ Please enter a valid number of people.",
-    invalidInput: "🤔 That doesn’t sound like a food craving… try again!"
-  }
-  // ajouter es, it, pt, de ici si besoin
+    invalidNumber: "⚠️ Please enter a valid number of people (e.g., 2, 4, 6).",
+    invalidInput: "🤔 That doesn’t sound like a food craving… let’s try again!"
+  },
+  // (ajouter es, it, pt, de comme avant si besoin)
 };
 
+// Sélection du bon jeu de textes
 const t = texts[currentLang] || texts['fr'];
+
 const chat = document.getElementById('chat');
 const container = document.getElementById('assistantContainer');
 
-let userIngredients = "", userEnvie = "", userPersons = 0;
+let userIngredients = "";
+let userEnvie = "";
+let userPersons = "";
 
-// Start assistant
-function start() {
+// Liste simple de mots-clés culinaires pour filtrer
+const foodKeywords = ["poulet","poisson","chocolat","tomate","pâtes","riz","légume","salade","gâteau","pizza","soupe","fromage","beurre","pain","steak","cake","fruit","épice","poivre","sel"];
+
+function updateHeader() {
   document.getElementById('title').innerText = t.title;
   document.getElementById('subtitle').innerText = t.subtitle;
-  addMessage(t.greeting);
-  addChoices(t.options);
-  container.classList.add('show');
 }
 
-function addMessage(text, type='bot') {
+function addMessage(text, type='bot'){
   const div = document.createElement('div');
   div.className = `message ${type}`;
   div.innerText = text;
   chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Champ de saisie style "chat"
+function addInputField(placeholder, callback){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'input-wrapper';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'chat-input';
+  input.placeholder = placeholder;
+
+  const btn = document.createElement('button');
+  btn.innerText = "➤";
+  btn.className = 'send-btn';
+
+  btn.onclick = ()=>{
+    if(input.value.trim() !== ""){
+      callback(input.value.trim());
+      wrapper.remove();
+    }
+  };
+
+  input.addEventListener("keypress", (e)=>{
+    if(e.key === "Enter" && input.value.trim() !== ""){
+      callback(input.value.trim());
+      wrapper.remove();
+    }
+  });
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(btn);
+  chat.appendChild(wrapper);
   chat.scrollTop = chat.scrollHeight;
 }
 
@@ -70,119 +117,63 @@ function addChoices(options){
   chat.scrollTop = chat.scrollHeight;
 }
 
-// Champ style chat amélioré fun
-function addInputField(placeholder, callback){
-  const wrapper = document.createElement('div');
-  wrapper.className = 'input-wrapper';
-
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'chat-input';
-  input.placeholder = placeholder;
-
-  const btn = document.createElement('button');
-  btn.innerText = "➤";
-  btn.className = 'send-btn';
-
-  const sendValue = ()=>{
-    if(input.value.trim() === "") return;
-    callback(input.value.trim());
-    wrapper.remove();
-  };
-
-  btn.onclick = sendValue;
-  input.addEventListener('keypress', e=>{
-    if(e.key==='Enter') sendValue();
-  });
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(btn);
-  chat.appendChild(wrapper);
-  input.focus();
-  chat.scrollTop = chat.scrollHeight;
+function start(){
+  updateHeader();
+  addMessage(t.greeting);
+  addChoices(t.options);
+  container.classList.add('show');
 }
 
-// Gestion du choix utilisateur
 function handleChoice(choice){
   addMessage(choice,'user');
   document.querySelectorAll('.choices').forEach(c=>c.remove());
 
-  if(choice.includes("🍅") || choice.toLowerCase().includes("ingredients")){
+  if(choice.includes("🍅") || choice.includes("ingredients") || choice.includes("Create a recipe with what I have")){
     addMessage(t.askIngredients);
-    addInputField("Écrivez ici ce que vous avez comme ingrédients… 🥕🍗🍫", val=>{
+    addInputField("🥕🍗🍫 ...", (val)=>{
+      // Vérification simple
+      if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
+        addMessage(t.invalidInput);
+        handleChoice(choice); // redemande
+        return;
+      }
       userIngredients = val;
       askPersons("ingredients");
     });
 
-  } else if(choice.includes("🍰") || choice.toLowerCase().includes("cravings")){
+  } else if(choice.includes("🍰") || choice.includes("cravings")){
     addMessage(t.askEnvie);
-    addInputField("Écrivez ici votre envie gourmande… 🍰🍲😋", val=>{
+    addInputField("🍰🍲 ...", (val)=>{
+      if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
+        addMessage(t.invalidInput);
+        handleChoice(choice); 
+        return;
+      }
       userEnvie = val;
       askPersons("envie");
     });
 
-  } else if(choice.includes("🎁") || choice.toLowerCase().includes("surprise")){
+  } else if(choice.includes("🎁") || choice.includes("Surprise")){
     addMessage(t.surprise);
   }
 }
 
-// Demande du nombre d’invités
 function askPersons(type){
   addMessage(t.askPersons);
-  addInputField("Indiquez ici combien de personnes 😎", val=>{
-    const num = parseInt(val);
-    if(isNaN(num) || num<=0){
+  addInputField("ex: 2, 4, 6", (val)=>{
+    if(isNaN(val) || parseInt(val)<=0){
       addMessage(t.invalidNumber);
       askPersons(type);
       return;
     }
-    userPersons = num;
-    addMessage(type==="envie"? t.confirmEnvie : t.confirmIngredients);
-    // Ici on peut appeler l'API pour générer la recette
+    userPersons = parseInt(val);
+    if(type==="envie"){
+      addMessage(t.confirmEnvie);
+    } else {
+      addMessage(t.confirmIngredients);
+    }
   });
 }
 
-// CSS pour chat
-const style = document.createElement('style');
-style.innerHTML = `
-.input-wrapper {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-.chat-input {
-  flex: 1;
-  padding: 14px 18px;
-  border-radius: 25px;
-  border: 1px solid #e67e22;
-  font-size: 1em;
-  outline: none;
-  transition: 0.2s;
-}
-.chat-input::placeholder {
-  color: #d35400;
-  font-style: italic;
-  opacity: 0.8;
-}
-.chat-input:focus {
-  border-color: #d35400;
-  box-shadow: 0 0 5px rgba(230,126,34,0.5);
-}
-.send-btn {
-  padding: 0 16px;
-  border: none;
-  border-radius: 25px;
-  background-color: #e67e22;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
-.send-btn:hover {
-  background-color: #d35400;
-}
-`;
-document.head.appendChild(style);
-
-// Lancement
+// démarrage
 start();
