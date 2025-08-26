@@ -375,33 +375,37 @@ body { top: 0 !important; }
 .assistant-button-container {
   text-align: center;
   margin: 20px 0;
+  padding: 0 10px; /* petit padding pour mobile */
 }
 
 .assistant-button {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap; /* permet de passer sur 2 lignes sur petit écran */
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   background-color: #e07b39;
   color: white;
-  padding: 15px 25px;
+  padding: 15px 20px;
   border-radius: 12px;
   font-weight: bold;
   font-size: 1rem;
   text-decoration: none;
   transition: all 0.3s ease;
-  min-width: 350px;
+  max-width: 100%;
 }
 
 .assistant-button:hover {
   background-color: #ff914d;
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .assistant-text {
-  margin-right: 15px;
-  text-align: left;
+  margin-right: 10px;
+  text-align: center;
+  flex: 1 1 100%; /* permet de prendre toute la largeur sur petit écran */
 }
 
 .assistant-icon {
   font-size: 1.5rem;
+  margin-top: 10px;
 }
