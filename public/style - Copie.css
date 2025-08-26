@@ -371,21 +371,3 @@ body { top: 0 !important; }
 .map-popup button:hover {
   background-color: #d35400;
 }
-
-.assistant-button {
-  background-color: #e07b39;
-  color: white;
-  padding: 15px 30px;
-  text-decoration: none;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.assistant-button:hover {
-  background-color: #ff914d;
-  transform: scale(1.05);
-}
-
