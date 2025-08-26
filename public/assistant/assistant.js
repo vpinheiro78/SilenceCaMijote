@@ -1,9 +1,7 @@
 // assistant.js
 
-// Langue héritée automatiquement depuis index.html
 let currentLang = localStorage.getItem('siteLang') || 'fr';
 
-// 🔥 Textes multilingues
 const texts = {
   fr: {
     title: "👨‍🍳 Votre Chef Virtuel",
@@ -16,14 +14,13 @@ const texts = {
     ],
     askIngredients: "Dites-moi les ingrédients principaux 🥕🍗🍫 :",
     askType: "Vous avez envie d’un dessert 🍰 ou d’un plat 🍽️ ?",
-    askCustom: "Super ! Décrivez-moi votre envie (ex: tarte aux pommes, curry épicé…) :",
-    askPeople: "Pour combien de personnes devons-nous prévoir ce délice ? 👨‍👩‍👧‍👦",
-    askDessert: "Parfait 😍 ! Quel est l’ingrédient vedette (chocolat, fruit…) ?",
-    askPlat: "Super ! Vous préférez à base de viande 🥩 ou de poisson 🐟 ?",
+    askDessert: "Parfait 😍 ! Décrivez votre envie de dessert (ex: chocolat, fruit…) :",
+    askPlat: "Super ! Décrivez votre envie de plat (viande, poisson, pâtes…) :",
+    askPeople: "Pour combien de personnes voulez-vous la recette ? 👨‍👩‍👧‍👦",
     surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…",
     dessertBtn: "🍰 Dessert",
     platBtn: "🍽️ Plat",
-    sendBtn: "Envoyer"
+    inputPlaceholder: "Écrivez ici..."
   },
   en: {
     title: "👨‍🍳 Your Virtual Chef",
@@ -36,19 +33,18 @@ const texts = {
     ],
     askIngredients: "Tell me your main ingredients 🥕🍗🍫 :",
     askType: "Do you feel like a dessert 🍰 or a main dish 🍽️?",
-    askCustom: "Great! Describe your craving (e.g. apple pie, spicy curry…):",
-    askPeople: "For how many people should I prepare this delight? 👨‍👩‍👧‍👦",
-    askDessert: "Perfect 😍! What’s the star ingredient (chocolate, fruit…)?",
-    askPlat: "Great! Do you prefer meat 🥩 or fish 🐟?",
+    askDessert: "Perfect 😍! Describe your dessert craving (chocolate, fruit…) :",
+    askPlat: "Great! Describe your dish craving (meat, fish, pasta…) :",
+    askPeople: "For how many people should I make the recipe? 👨‍👩‍👧‍👦",
     surprise: "✨ Voilà! A seasonal recipe just for you…",
     dessertBtn: "🍰 Dessert",
     platBtn: "🍽️ Main Dish",
-    sendBtn: "Send"
+    inputPlaceholder: "Type here..."
   },
   es: {
     title: "👨‍🍳 Tu Chef Virtual",
-    subtitle: "Estoy aquí para imaginar contigo recetas únicas y personalizadas. ¡Entra en el universo gourmet 2.0 donde tú eres el protagonista! ✨",
-    greeting: "Hola 👋, soy Hugo, tu Chef Virtual. ¿Cómo puedo deleitarte hoy? 😋",
+    subtitle: "Estoy aquí para imaginar recetas únicas y personalizadas contigo. ¡Entra en el universo gourmet 2.0 donde TÚ eres la estrella! ✨",
+    greeting: "Hola 👋, soy Hugo, tu Chef Virtual! ¿Cómo puedo deleitarte hoy? 😋",
     options: [
       "🍅 Crear una receta con mis ingredientes",
       "🍰 Crear una receta según mis antojos",
@@ -56,18 +52,17 @@ const texts = {
     ],
     askIngredients: "Dime los ingredientes principales 🥕🍗🍫 :",
     askType: "¿Quieres un postre 🍰 o un plato 🍽️?",
-    askCustom: "¡Genial! Describe tu antojo (ej: tarta de manzana, curry picante…):",
-    askPeople: "¿Para cuántas personas debo preparar esta delicia? 👨‍👩‍👧‍👦",
-    askDessert: "¡Perfecto 😍! ¿Cuál es el ingrediente estrella (chocolate, fruta…)?",
-    askPlat: "¡Genial! ¿Prefieres carne 🥩 o pescado 🐟?",
-    surprise: "✨ ¡Tachán! Aquí tienes una idea de temporada solo para ti…",
+    askDessert: "¡Perfecto 😍! Describe tu postre deseado (chocolate, fruta…) :",
+    askPlat: "¡Genial! Describe tu plato deseado (carne, pescado, pasta…) :",
+    askPeople: "¿Para cuántas personas preparo la receta? 👨‍👩‍👧‍👦",
+    surprise: "✨ ¡Ta-daa! Una receta de temporada solo para ti…",
     dessertBtn: "🍰 Postre",
     platBtn: "🍽️ Plato",
-    sendBtn: "Enviar"
+    inputPlaceholder: "Escribe aquí..."
   },
   it: {
     title: "👨‍🍳 Il tuo Chef Virtuale",
-    subtitle: "Sono qui per immaginare con te ricette uniche e personalizzate. Entra nell’universo gourmet 2.0 dove tu sei il protagonista! ✨",
+    subtitle: "Sono qui per immaginare con te ricette uniche e personalizzate. Entra nell’universo gourmet 2.0 dove TU sei il protagonista! ✨",
     greeting: "Ciao 👋, sono Hugo, il tuo Chef Virtuale! Come posso deliziarti oggi? 😋",
     options: [
       "🍅 Crea una ricetta con i miei ingredienti",
@@ -75,70 +70,60 @@ const texts = {
       "🎁 Sorprendimi con una ricetta di stagione"
     ],
     askIngredients: "Dimmi gli ingredienti principali 🥕🍗🍫 :",
-    askType: "Vuoi un dessert 🍰 o un piatto 🍽️?",
-    askCustom: "Perfetto! Descrivimi il tuo desiderio (es: torta di mele, curry piccante…):",
-    askPeople: "Per quante persone devo preparare questa delizia? 👨‍👩‍👧‍👦",
-    askDessert: "Perfetto 😍! Qual è l’ingrediente principale (cioccolato, frutta…)?",
-    askPlat: "Ottimo! Preferisci carne 🥩 o pesce 🐟?",
-    surprise: "✨ Ta-daa! Ecco un’idea di stagione solo per te…",
-    dessertBtn: "🍰 Dessert",
+    askType: "Hai voglia di un dolce 🍰 o di un piatto 🍽️?",
+    askDessert: "Perfetto 😍! Descrivi il tuo dolce desiderato (cioccolato, frutta…) :",
+    askPlat: "Ottimo! Descrivi il tuo piatto desiderato (carne, pesce, pasta…) :",
+    askPeople: "Per quante persone preparo la ricetta? 👨‍👩‍👧‍👦",
+    surprise: "✨ Ta-daa! Una ricetta di stagione solo per te…",
+    dessertBtn: "🍰 Dolce",
     platBtn: "🍽️ Piatto",
-    sendBtn: "Invia"
+    inputPlaceholder: "Scrivi qui..."
   },
   pt: {
-    title: "👨‍🍳 O Seu Chef Virtual",
-    subtitle: "Estou aqui para imaginar consigo receitas únicas e personalizadas. Entre no universo gourmet 2.0 onde VOCÊ é o protagonista! ✨",
-    greeting: "Olá 👋, eu sou o Hugo, o seu Chef Virtual! Como posso deliciá-lo hoje? 😋",
+    title: "👨‍🍳 Seu Chef Virtual",
+    subtitle: "Estou aqui para imaginar receitas únicas e personalizadas com você. Entre no universo gourmet 2.0 onde VOCÊ é a estrela! ✨",
+    greeting: "Olá 👋, sou Hugo, seu Chef Virtual! Como posso te encantar hoje? 😋",
     options: [
-      "🍅 Criar uma receita com os meus ingredientes",
-      "🍰 Criar uma receita de acordo com os meus desejos",
+      "🍅 Criar uma receita com meus ingredientes",
+      "🍰 Criar uma receita de acordo com meus desejos",
       "🎁 Surpreenda-me com uma receita da estação"
     ],
     askIngredients: "Diga-me os ingredientes principais 🥕🍗🍫 :",
-    askType: "Prefere uma sobremesa 🍰 ou um prato 🍽️?",
-    askCustom: "Perfeito! Descreva o seu desejo (ex: tarte de maçã, caril picante…):",
-    askPeople: "Para quantas pessoas devo preparar esta delícia? 👨‍👩‍👧‍👦",
-    askDessert: "Ótimo 😍! Qual é o ingrediente principal (chocolate, fruta…)?",
-    askPlat: "Maravilha! Prefere carne 🥩 ou peixe 🐟?",
-    surprise: "✨ Tcharan! Aqui está uma ideia da estação só para você…",
+    askType: "Você quer uma sobremesa 🍰 ou um prato 🍽️?",
+    askDessert: "Perfeito 😍! Descreva sua sobremesa desejada (chocolate, fruta…) :",
+    askPlat: "Ótimo! Descreva seu prato desejado (carne, peixe, massa…) :",
+    askPeople: "Para quantas pessoas preparo a receita? 👨‍👩‍👧‍👦",
+    surprise: "✨ Ta-daa! Uma receita da estação só para você…",
     dessertBtn: "🍰 Sobremesa",
     platBtn: "🍽️ Prato",
-    sendBtn: "Enviar"
+    inputPlaceholder: "Escreva aqui..."
   },
   de: {
     title: "👨‍🍳 Dein Virtueller Koch",
-    subtitle: "Ich bin hier, um mit dir einzigartige und personalisierte Rezepte zu kreieren. Tritt ein in die Gourmet-Welt 2.0, in der DU der Star bist! ✨",
-    greeting: "Hallo 👋, ich bin Hugo, dein virtueller Koch! Wie darf ich dich heute verwöhnen? 😋",
+    subtitle: "Ich bin hier, um mit dir einzigartige und personalisierte Rezepte zu kreieren. Tauche ein in die Gourmet-2.0-Welt, in der DU der Star bist! ✨",
+    greeting: "Hallo 👋, ich bin Hugo, dein Virtueller Koch! Wie kann ich dich heute verwöhnen? 😋",
     options: [
       "🍅 Ein Rezept mit meinen Zutaten erstellen",
       "🍰 Ein Rezept nach meinen Wünschen erstellen",
       "🎁 Überrasche mich mit einem saisonalen Rezept"
     ],
-    askIngredients: "Nenne mir die Hauptzutaten 🥕🍗🍫 :",
+    askIngredients: "Sag mir die Hauptzutaten 🥕🍗🍫 :",
     askType: "Möchtest du ein Dessert 🍰 oder ein Hauptgericht 🍽️?",
-    askCustom: "Super! Beschreibe deinen Wunsch (z.B. Apfelkuchen, scharfes Curry…):",
-    askPeople: "Für wie viele Personen soll ich dieses Gericht zubereiten? 👨‍👩‍👧‍👦",
-    askDessert: "Perfekt 😍! Was ist die Hauptzutat (Schokolade, Obst…)?",
-    askPlat: "Toll! Bevorzugst du Fleisch 🥩 oder Fisch 🐟?",
-    surprise: "✨ Voilà! Eine saisonale Idee nur für dich…",
+    askDessert: "Perfekt 😍! Beschreibe dein Wunschdessert (Schokolade, Obst…) :",
+    askPlat: "Super! Beschreibe dein Wunschgericht (Fleisch, Fisch, Pasta…) :",
+    askPeople: "Für wie viele Personen soll ich das Rezept machen? 👨‍👩‍👧‍👦",
+    surprise: "✨ Voilà! Ein saisonales Rezept nur für dich…",
     dessertBtn: "🍰 Dessert",
     platBtn: "🍽️ Hauptgericht",
-    sendBtn: "Senden"
+    inputPlaceholder: "Schreibe hier..."
   }
 };
 
-// Sélection du bon jeu de textes
 const t = texts[currentLang] || texts['fr'];
-
-// Variables pour stocker les réponses
-let userIngredients = "";
-let userCustom = "";
-let userPeople = "";
 
 const chat = document.getElementById('chat');
 const container = document.getElementById('assistantContainer');
 
-// 🔥 Fonction mise à jour du header
 function updateHeader() {
   document.getElementById('title').innerText = t.title;
   document.getElementById('subtitle').innerText = t.subtitle;
@@ -152,36 +137,41 @@ function addMessage(text, type='bot'){
   chat.scrollTop = chat.scrollHeight;
 }
 
-// 🔥 Champ de saisie stylisé façon bulle de chat
-function addInput(placeholder, callback){
+// 🆕 champ de saisie stylé comme bulle de chat
+function addInputField(placeholder, callback){
   const wrapper = document.createElement('div');
-  wrapper.className = "message user input-wrapper";
+  wrapper.className = 'message user input-wrapper';
 
   const input = document.createElement('input');
-  input.type = "text";
-  input.placeholder = placeholder;
-  input.className = "chat-input";
+  input.type = 'text';
+  input.placeholder = placeholder || t.inputPlaceholder;
+  input.className = 'chat-input';
+  
+  const sendBtn = document.createElement('button');
+  sendBtn.innerText = "➤";
+  sendBtn.className = 'send-btn';
 
-  const btn = document.createElement('button');
-  btn.innerText = t.sendBtn;
-  btn.className = "send-btn";
-
-  btn.onclick = ()=>{
-    if(input.value.trim()!==""){
-      const val = input.value.trim();
+  sendBtn.onclick = ()=> {
+    if(input.value.trim() !== ""){
+      addMessage(input.value, 'user');
       wrapper.remove();
-      addMessage(val,'user');
-      callback(val);
+      callback(input.value.trim());
     }
   };
 
+  input.addEventListener("keypress", (e)=>{
+    if(e.key === "Enter" && input.value.trim() !== ""){
+      sendBtn.click();
+    }
+  });
+
   wrapper.appendChild(input);
-  wrapper.appendChild(btn);
+  wrapper.appendChild(sendBtn);
   chat.appendChild(wrapper);
   chat.scrollTop = chat.scrollHeight;
-  input.focus();
 }
 
+// reste identique
 function addChoices(options){
   const div = document.createElement('div');
   div.className = 'choices';
@@ -196,6 +186,10 @@ function addChoices(options){
   chat.scrollTop = chat.scrollHeight;
 }
 
+let userIngredients = "";
+let userCraving = "";
+let userPeople = "";
+
 function start(){
   updateHeader();
   addMessage(t.greeting);
@@ -207,38 +201,46 @@ function handleChoice(choice){
   addMessage(choice,'user');
   document.querySelectorAll('.choices').forEach(c=>c.remove());
 
-  if(choice.includes("🍅") || choice.includes("ingredients") || choice.includes("ingredientes") || choice.includes("ingredienti") || choice.includes("Zutaten")){
+  if(choice.includes("🍅") || choice.includes("ingredients")){
     addMessage(t.askIngredients);
-    addInput(t.askIngredients, (val)=>{
+    addInputField(t.inputPlaceholder, (val)=>{
       userIngredients = val;
       addMessage(t.askPeople);
-      addInput(t.askPeople,(val)=> userPeople = val);
+      addInputField(t.inputPlaceholder, (people)=>{
+        userPeople = people;
+        addMessage("✅ Merci, j’ai toutes les infos ! (API bientôt)");
+      });
     });
 
-  } else if(choice.includes("🍰") || choice.includes("cravings") || choice.includes("antojos") || choice.includes("desideri") || choice.includes("Wünschen")){
+  } else if(choice.includes("🍰") || choice.includes("cravings")){
     addMessage(t.askType);
     addChoices([t.dessertBtn, t.platBtn]);
 
-  } else if(choice.includes("🎁") || choice.includes("Surprise") || choice.includes("Sorpréndeme") || choice.includes("Sorprendimi") || choice.includes("Überrasche")){
+  } else if(choice.includes("🎁") || choice.includes("Surprise")){
     addMessage(t.surprise);
 
-  } else if(choice.includes("Dessert") || choice.includes("Postre") || choice.includes("Dolce") || choice.includes("Dessert")){
-    addMessage(t.askCustom);
-    addInput(t.askCustom, (val)=>{
-      userCustom = val;
+  } else if(choice.includes("Dessert") || choice.includes("Dolce") || choice.includes("Postre") || choice.includes("Sobremesa")){
+    addMessage(t.askDessert);
+    addInputField(t.inputPlaceholder, (val)=>{
+      userCraving = val;
       addMessage(t.askPeople);
-      addInput(t.askPeople,(val)=> userPeople = val);
+      addInputField(t.inputPlaceholder, (people)=>{
+        userPeople = people;
+        addMessage("✅ Merci, j’ai toutes les infos ! (API bientôt)");
+      });
     });
 
-  } else if(choice.includes("Plat") || choice.includes("Main Dish") || choice.includes("Plato") || choice.includes("Piatto") || choice.includes("Hauptgericht")){
-    addMessage(t.askCustom);
-    addInput(t.askCustom, (val)=>{
-      userCustom = val;
+  } else if(choice.includes("Plat") || choice.includes("Main Dish") || choice.includes("Plato") || choice.includes("Piatto") || choice.includes("Prato") || choice.includes("Hauptgericht")){
+    addMessage(t.askPlat);
+    addInputField(t.inputPlaceholder, (val)=>{
+      userCraving = val;
       addMessage(t.askPeople);
-      addInput(t.askPeople,(val)=> userPeople = val);
+      addInputField(t.inputPlaceholder, (people)=>{
+        userPeople = people;
+        addMessage("✅ Merci, j’ai toutes les infos ! (API bientôt)");
+      });
     });
   }
 }
 
-// 🚀 démarrage
 start();
