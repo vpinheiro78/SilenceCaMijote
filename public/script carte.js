@@ -101,6 +101,9 @@ async function loadRecipes() {
       note_moyenne,
       lien_youtube,
       nombre_votes,
+	  map_x,
+      map_y,
+      show_on_map,
       traductions:recettes_traductions(langue, titre, description)
     `)
     .order('id', { ascending: false })
@@ -121,7 +124,87 @@ async function loadRecipes() {
   })
 
   filterRecipes()
+  displayMap(allRecipes)   // 👈 ajoute cette ligne
 }
+
+// ----------------- CARTE MONDE ----------------- //
+function displayMap(recipes) {
+  const svg = document.getElementById('world-map');
+  if (!svg) return;
+
+  // Nettoyage des anciens marqueurs
+  svg.querySelectorAll('.recipe-flag').forEach(n => n.remove());
+
+  const vb = svg.viewBox.baseVal; // 0 0 1000 500
+
+  recipes.forEach(r => {
+    if (!r.show_on_map || r.map_x == null || r.map_y == null) return;
+
+    // Accepte des valeurs en pixels (0..1000/0..500) ou en ratio (0..1)
+    const x = (r.map_x <= 1 ? r.map_x * vb.width  : r.map_x);
+    const y = (r.map_y <= 1 ? r.map_y * vb.height : r.map_y);
+
+    // Groupe du marqueur
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('recipe-flag');
+    g.dataset.id = r.id;
+    g.setAttribute('transform', `translate(${x},${y})`);
+
+    // Pin
+    const pin = document.createElementNS('http://www.w3.org/2000/svg','path');
+    pin.setAttribute('d','M0,-18 C10,-18 18,-10 18,0 C18,12 0,28 0,28 C0,28 -18,12 -18,0 C-18,-10 -10,-18 0,-18 Z');
+    pin.setAttribute('fill','#ff5722');
+
+    // Drapeau
+    const img = document.createElementNS('http://www.w3.org/2000/svg','image');
+    const flag = (r.flag_code || 'fr').toLowerCase();
+    img.setAttribute('href', `assets/flags/${flag}.svg`);
+    img.setAttribute('x', -12);
+    img.setAttribute('y', -12);
+    img.setAttribute('width', 24);
+    img.setAttribute('height', 24);
+    img.setAttribute('clip-path','circle(12px)');
+
+    g.appendChild(pin);
+    g.appendChild(img);
+    svg.appendChild(g);
+  });
+
+  attachMapPopups(svg, recipes);
+}
+
+function attachMapPopups(svg, recipes) {
+  const popup = document.getElementById('map-popup');
+  const titleEl = document.getElementById('popup-title');
+  const btn = document.getElementById('popup-btn');
+  let current = null;
+
+  svg.querySelectorAll('.recipe-flag').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = +el.dataset.id;
+      current = recipes.find(r => r.id === id);
+      const rect = el.getBoundingClientRect();
+
+      // Positionne le popup au-dessus du marqueur
+      popup.style.left = (rect.left + rect.width/2 + window.scrollX) + 'px';
+      popup.style.top  = (rect.top + window.scrollY) + 'px';
+      titleEl.textContent = current.titre;
+      popup.style.display = 'block';
+    });
+  });
+
+  btn.addEventListener('click', () => {
+    if (current) window.location.href = `recette/recette.html?slug=${current.slug}`;
+  });
+
+  // Fermer si clic en dehors
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.recipe-flag') && !e.target.closest('#map-popup')) {
+      popup.style.display = 'none';
+    }
+  });
+}
+
 
 // Changer langue
 function changeLanguage(lang) {
