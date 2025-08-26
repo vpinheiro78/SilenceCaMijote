@@ -1,12 +1,10 @@
 // assistant.js
 
-// Langue héritée automatiquement depuis index.html
+// Langue héritée automatiquement
 let currentLang = localStorage.getItem('siteLang') || 'fr';
 
 const texts = {
   fr: {
-    title: "👨‍🍳 Votre Chef Virtuel",
-    subtitle: "Je suis là pour imaginer avec vous des recettes uniques et personnalisées. Entrez dans l’univers gourmand 2.0 où vous êtes l’acteur ! ✨",
     greeting: "Bonjour 👋, je suis Hugo, votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
     options: [
       "🍅 Créer une recette avec mes ingrédients",
@@ -22,8 +20,6 @@ const texts = {
     platBtn: "🍽️ Plat"
   },
   en: {
-    title: "👨‍🍳 Your Virtual Chef",
-    subtitle: "I’m here to imagine unique and personalized recipes with you. Step into the gourmet 2.0 universe where YOU are the star! ✨",
     greeting: "Hello 👋, I’m Hugo, your Virtual Chef! How can I delight you today? 😋",
     options: [
       "🍅 Create a recipe with my ingredients",
@@ -45,12 +41,6 @@ const t = texts[currentLang] || texts['fr'];
 
 const chat = document.getElementById('chat');
 const container = document.getElementById('assistantContainer');
-
-// 🔥 Fonction mise à jour du titre et sous-titre
-function updateHeader() {
-  document.getElementById('title').innerText = t.title;
-  document.getElementById('subtitle').innerText = t.subtitle;
-}
 
 function addMessage(text, type='bot'){
   const div = document.createElement('div');
@@ -75,7 +65,6 @@ function addChoices(options){
 }
 
 function start(){
-  updateHeader(); // 🔥 On applique la bonne langue au header
   addMessage(t.greeting);
   addChoices(t.options);
   container.classList.add('show');
