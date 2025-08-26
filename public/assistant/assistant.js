@@ -1,8 +1,13 @@
-// assistant.js
+// ===============================
+// Assistant Virtuel - Multi-langues
+// ===============================
 
-// Langue héritée automatiquement depuis index.html
-let currentLang = localStorage.getItem('siteLang') || 'fr';
+// Récupération de la langue sauvegardée ou détection automatique
+let currentLang = localStorage.getItem('siteLang') 
+  || navigator.language.slice(0, 2) 
+  || 'fr';
 
+// Toutes les traductions
 const texts = {
   fr: {
     title: "👨‍🍳 Votre Chef Virtuel",
@@ -37,71 +42,138 @@ const texts = {
     surprise: "✨ Voilà! A seasonal recipe just for you…",
     dessertBtn: "🍰 Dessert",
     platBtn: "🍽️ Main Dish"
+  },
+  es: {
+    title: "👨‍🍳 Tu Chef Virtual",
+    subtitle: "Estoy aquí para imaginar contigo recetas únicas y personalizadas. ¡Entra en el universo gourmet 2.0 donde tú eres el protagonista! ✨",
+    greeting: "¡Hola 👋! Soy Hugo, tu Chef Virtual. ¿Cómo puedo sorprenderte hoy? 😋",
+    options: [
+      "🍅 Crear una receta con mis ingredientes",
+      "🍰 Crear una receta según mis antojos",
+      "🎁 Sorpréndeme con una receta de temporada"
+    ],
+    askIngredients: "Dime los ingredientes principales 🥕🍗🍫 :",
+    askType: "¿Quieres un postre 🍰 o un plato principal 🍽️?",
+    askDessert: "¡Perfecto 😍! ¿Cuál es el ingrediente estrella (chocolate, fruta…)?",
+    askPlat: "¡Genial! ¿Prefieres carne 🥩 o pescado 🐟?",
+    surprise: "✨ ¡Voilà! Una receta de temporada solo para ti…",
+    dessertBtn: "🍰 Postre",
+    platBtn: "🍽️ Plato principal"
+  },
+  it: {
+    title: "👨‍🍳 Il Tuo Chef Virtuale",
+    subtitle: "Sono qui per immaginare con te ricette uniche e personalizzate. Entra nell’universo gourmet 2.0 dove TU sei il protagonista! ✨",
+    greeting: "Ciao 👋, sono Hugo, il tuo Chef Virtuale! Come posso deliziarti oggi? 😋",
+    options: [
+      "🍅 Crea una ricetta con i miei ingredienti",
+      "🍰 Crea una ricetta secondo i miei desideri",
+      "🎁 Sorprendimi con una ricetta di stagione"
+    ],
+    askIngredients: "Dimmi gli ingredienti principali 🥕🍗🍫 :",
+    askType: "Vuoi un dessert 🍰 o un piatto principale 🍽️?",
+    askDessert: "Perfetto 😍! Qual è l’ingrediente protagonista (cioccolato, frutta…)?",
+    askPlat: "Fantastico! Preferisci carne 🥩 o pesce 🐟?",
+    surprise: "✨ Voilà! Una ricetta di stagione solo per te…",
+    dessertBtn: "🍰 Dessert",
+    platBtn: "🍽️ Piatto principale"
+  },
+  pt: {
+    title: "👨‍🍳 O Seu Chef Virtual",
+    subtitle: "Estou aqui para imaginar consigo receitas únicas e personalizadas. Entre no universo gourmet 2.0 onde VOCÊ é a estrela! ✨",
+    greeting: "Olá 👋, sou o Hugo, o seu Chef Virtual! Como posso deliciá-lo hoje? 😋",
+    options: [
+      "🍅 Criar uma receita com os meus ingredientes",
+      "🍰 Criar uma receita de acordo com os meus desejos",
+      "🎁 Surpreenda-me com uma receita da estação"
+    ],
+    askIngredients: "Diga-me os ingredientes principais 🥕🍗🍫 :",
+    askType: "Prefere uma sobremesa 🍰 ou um prato principal 🍽️?",
+    askDessert: "Perfeito 😍! Qual é o ingrediente estrela (chocolate, fruta…)?",
+    askPlat: "Ótimo! Prefere carne 🥩 ou peixe 🐟?",
+    surprise: "✨ Voilà! Uma receita da estação só para você…",
+    dessertBtn: "🍰 Sobremesa",
+    platBtn: "🍽️ Prato principal"
+  },
+  de: {
+    title: "👨‍🍳 Dein Virtueller Chef",
+    subtitle: "Ich bin hier, um gemeinsam mit dir einzigartige und personalisierte Rezepte zu kreieren. Tauche ein in die Gourmet-Welt 2.0, in der DU die Hauptrolle spielst! ✨",
+    greeting: "Hallo 👋, ich bin Hugo, dein virtueller Chef! Wie darf ich dich heute verwöhnen? 😋",
+    options: [
+      "🍅 Ein Rezept mit meinen Zutaten erstellen",
+      "🍰 Ein Rezept nach meinen Wünschen erstellen",
+      "🎁 Überrasche mich mit einem saisonalen Rezept"
+    ],
+    askIngredients: "Nenne mir die Hauptzutaten 🥕🍗🍫 :",
+    askType: "Möchtest du ein Dessert 🍰 oder ein Hauptgericht 🍽️?",
+    askDessert: "Perfekt 😍! Was ist die Hauptzutat (Schokolade, Obst…)?",
+    askPlat: "Super! Bevorzugst du Fleisch 🥩 oder Fisch 🐟?",
+    surprise: "✨ Voilà! Ein saisonales Rezept nur für dich…",
+    dessertBtn: "🍰 Dessert",
+    platBtn: "🍽️ Hauptgericht"
   }
 };
 
-// Sélection du bon jeu de textes
+// Choix du pack de traduction
 const t = texts[currentLang] || texts['fr'];
 
-const chat = document.getElementById('chat');
-const container = document.getElementById('assistantContainer');
-
-// 🔥 Fonction mise à jour du titre et sous-titre
+// ===============================
+// Fonctions utilitaires
+// ===============================
 function updateHeader() {
-  document.getElementById('title').innerText = t.title;
-  document.getElementById('subtitle').innerText = t.subtitle;
+  document.getElementById("assistantTitle").innerText = t.title;
+  document.getElementById("assistantSubtitle").innerText = t.subtitle;
 }
 
-function addMessage(text, type='bot'){
-  const div = document.createElement('div');
-  div.className = `message ${type}`;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+function addMessage(content, sender = "assistant") {
+  const chatBox = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerHTML = content;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function addChoices(options){
-  const div = document.createElement('div');
-  div.className = 'choices';
-  options.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.innerText = opt;
-    btn.onclick = ()=> handleChoice(opt);
-    div.appendChild(btn);
+function showOptions() {
+  const options = t.options.map(opt => `<button class="option">${opt}</button>`).join("");
+  addMessage(options, "assistant");
+  document.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => handleOption(btn.innerText));
   });
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
 }
 
-function start(){
-  updateHeader(); // 🔥 On applique la bonne langue au header
-  addMessage(t.greeting);
-  addChoices(t.options);
-  container.classList.add('show');
-}
-
-function handleChoice(choice){
-  addMessage(choice,'user');
-  document.querySelectorAll('.choices').forEach(c=>c.remove());
-
-  if(choice.includes("🍅") || choice.includes("ingredients")){
-    addMessage(t.askIngredients);
-
-  } else if(choice.includes("🍰") || choice.includes("cravings")){
-    addMessage(t.askType);
-    addChoices([t.dessertBtn, t.platBtn]);
-
-  } else if(choice.includes("🎁") || choice.includes("Surprise")){
-    addMessage(t.surprise);
-
-  } else if(choice.includes("Dessert")){
-    addMessage(t.askDessert);
-
-  } else if(choice.includes("Plat") || choice.includes("Main Dish")){
-    addMessage(t.askPlat);
+// ===============================
+// Logique conversationnelle
+// ===============================
+function handleOption(choice) {
+  if (choice.includes("ingrédient") || choice.includes("ingrediente") || choice.includes("ingredient")) {
+    addMessage(t.askIngredients, "assistant");
+  }
+  else if (choice.includes("envie") || choice.includes("cravings") || choice.includes("antojos") || choice.includes("desideri") || choice.includes("desejos") || choice.includes("Wünschen")) {
+    addMessage(t.askType, "assistant");
+    addMessage(
+      `<button class="option">${t.dessertBtn}</button> <button class="option">${t.platBtn}</button>`,
+      "assistant"
+    );
+    document.querySelectorAll(".option").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.innerText.includes("Dessert") || btn.innerText.includes("Postre") || btn.innerText.includes("Dolce") || btn.innerText.includes("Sobremesa")) {
+          addMessage(t.askDessert, "assistant");
+        } else {
+          addMessage(t.askPlat, "assistant");
+        }
+      });
+    });
+  }
+  else if (choice.includes("Surpr") || choice.includes("surprise") || choice.includes("Sorpr") || choice.includes("Sorpresa") || choice.includes("Surpre") || choice.includes("Überrasch")) {
+    addMessage(t.surprise, "assistant");
   }
 }
 
-// démarrage
-start();
+// ===============================
+// Initialisation
+// ===============================
+window.onload = () => {
+  updateHeader();
+  addMessage(t.greeting, "assistant");
+  showOptions();
+};
