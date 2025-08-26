@@ -30,7 +30,7 @@ const texts = {
     invalidNumber: "⚠️ Please enter a valid number of people.",
     invalidInput: "🤔 That doesn’t sound like a food craving… try again!"
   }
-  // ajouter es, it, pt, de ici
+  // ajouter es, it, pt, de ici si besoin
 };
 
 const t = texts[currentLang] || texts['fr'];
@@ -70,7 +70,7 @@ function addChoices(options){
   chat.scrollTop = chat.scrollHeight;
 }
 
-// Champ style chat
+// Champ style chat amélioré fun
 function addInputField(placeholder, callback){
   const wrapper = document.createElement('div');
   wrapper.className = 'input-wrapper';
@@ -91,7 +91,9 @@ function addInputField(placeholder, callback){
   };
 
   btn.onclick = sendValue;
-  input.addEventListener('keypress', e=>{if(e.key==='Enter') sendValue();});
+  input.addEventListener('keypress', e=>{
+    if(e.key==='Enter') sendValue();
+  });
 
   wrapper.appendChild(input);
   wrapper.appendChild(btn);
@@ -100,20 +102,21 @@ function addInputField(placeholder, callback){
   chat.scrollTop = chat.scrollHeight;
 }
 
+// Gestion du choix utilisateur
 function handleChoice(choice){
   addMessage(choice,'user');
   document.querySelectorAll('.choices').forEach(c=>c.remove());
 
   if(choice.includes("🍅") || choice.toLowerCase().includes("ingredients")){
     addMessage(t.askIngredients);
-    addInputField("Écrivez ici ce que vous avez sous la main...", val=>{
+    addInputField("Écrivez ici ce que vous avez comme ingrédients… 🥕🍗🍫", val=>{
       userIngredients = val;
       askPersons("ingredients");
     });
 
   } else if(choice.includes("🍰") || choice.toLowerCase().includes("cravings")){
     addMessage(t.askEnvie);
-    addInputField("Écrivez ici votre envie gourmande...", val=>{
+    addInputField("Écrivez ici votre envie gourmande… 🍰🍲😋", val=>{
       userEnvie = val;
       askPersons("envie");
     });
@@ -123,9 +126,10 @@ function handleChoice(choice){
   }
 }
 
+// Demande du nombre d’invités
 function askPersons(type){
   addMessage(t.askPersons);
-  addInputField("Nombre d'invités...", val=>{
+  addInputField("Indiquez ici combien de personnes 😎", val=>{
     const num = parseInt(val);
     if(isNaN(num) || num<=0){
       addMessage(t.invalidNumber);
@@ -134,9 +138,51 @@ function askPersons(type){
     }
     userPersons = num;
     addMessage(type==="envie"? t.confirmEnvie : t.confirmIngredients);
-    // Ici on pourrait lancer l'API pour générer la recette
+    // Ici on peut appeler l'API pour générer la recette
   });
 }
+
+// CSS pour chat
+const style = document.createElement('style');
+style.innerHTML = `
+.input-wrapper {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+.chat-input {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 25px;
+  border: 1px solid #e67e22;
+  font-size: 1em;
+  outline: none;
+  transition: 0.2s;
+}
+.chat-input::placeholder {
+  color: #d35400;
+  font-style: italic;
+  opacity: 0.8;
+}
+.chat-input:focus {
+  border-color: #d35400;
+  box-shadow: 0 0 5px rgba(230,126,34,0.5);
+}
+.send-btn {
+  padding: 0 16px;
+  border: none;
+  border-radius: 25px;
+  background-color: #e67e22;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.send-btn:hover {
+  background-color: #d35400;
+}
+`;
+document.head.appendChild(style);
 
 // Lancement
 start();
