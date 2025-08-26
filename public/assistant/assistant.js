@@ -1,19 +1,38 @@
+// Variables globales pour stocker les réponses
+let userIngredients = "";
+let userCravings = "";
+let userPersons = 0;
+
+// Exemple simplifié du flow
+function proceedNextStep(questionType){
+  if(questionType === 'ingredients'){
+    addMessage(`👌 Parfait, j’ai noté vos ingrédients ! (${userIngredients})`);
+    // On peut ensuite demander le nombre de personnes
+    addInputField('persons');
+  } else if(questionType === 'cravings'){
+    addMessage(`👌 Parfait, j’ai noté votre envie ! (${userCravings})`);
+    // Demander nombre de personnes
+    addInputField('persons');
+  } else if(questionType === 'persons'){
+    addMessage(`👌 Super, pour ${userPersons} personne(s) !`);
+    // Ici on peut appeler l'API ChatGPT pour générer la recette
+  }
+}
+
 // Fonction pour créer un champ de saisie pour l'utilisateur
 function addInputField(questionType) {
   const containerDiv = document.createElement('div');
   containerDiv.className = 'user-input-container';
 
-  // Texte explicatif/question
   const label = document.createElement('div');
   label.className = 'input-label';
   label.innerText = questionType === 'ingredients' 
     ? t.askIngredients 
     : questionType === 'cravings' 
       ? t.askCravings 
-      : t.askPersons;
+      : "Pour combien de personnes ?";
   containerDiv.appendChild(label);
 
-  // Input texte
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'user-input';
@@ -24,7 +43,6 @@ function addInputField(questionType) {
       : "Nombre d'invités";
   containerDiv.appendChild(input);
 
-  // Bouton validation
   const submitBtn = document.createElement('button');
   submitBtn.innerText = "👌 Envoyer";
   submitBtn.className = 'submit-input-btn';
@@ -34,25 +52,20 @@ function addInputField(questionType) {
       alert("Merci de saisir une réponse valide 😊");
       return;
     }
-
-    // Vérifier si c'est le nombre de personnes
     if(questionType === 'persons'){
       const num = parseInt(value);
       if(isNaN(num) || num <= 0){
         alert("Merci d’indiquer un nombre valide d’invités 😋");
         return;
       }
-      userPersons = num; // variable globale
+      userPersons = num;
     } else {
-      // Sauvegarder le texte libre
       if(questionType === 'ingredients') userIngredients = value;
       if(questionType === 'cravings') userCravings = value;
     }
 
-    addMessage(value, 'user');
+    addMessage(value,'user');
     containerDiv.remove();
-
-    // Appeler la prochaine étape du chat selon le flow
     proceedNextStep(questionType);
   };
   containerDiv.appendChild(submitBtn);
@@ -62,7 +75,7 @@ function addInputField(questionType) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-// CSS à ajouter (ou dans votre style global)
+// Styles
 const style = document.createElement('style');
 style.innerHTML = `
 .user-input-container {
