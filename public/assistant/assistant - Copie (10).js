@@ -153,29 +153,9 @@ function handleChoice(choice){
       askPersons("envie");
     });
 
- } else if(choice.includes("🎁") || choice.includes("Surprise")){
-  addMessage("✨ Génération de la recette… Patientez un instant 🍳");
-
-  // Appel à la fonction Netlify recipe.js
-  fetch("/.netlify/functions/recipe", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: "Donne-moi une recette de saison détaillée pour 1 personne" })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if(data.reply){
-      addMessage(data.reply);
-    } else {
-      addMessage("⚠️ Oups, impossible de générer la recette. Réessayez.");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    addMessage("⚠️ Erreur serveur, réessayez plus tard.");
-  });
-}
-
+  } else if(choice.includes("🎁") || choice.includes("Surprise")){
+    addMessage(t.surprise);
+  }
 }
 
 function askPersons(type){
