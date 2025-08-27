@@ -40,8 +40,10 @@ const texts = {
     invalidNumber: "⚠️ Please enter a valid number of people (e.g., 2, 4, 6).",
     invalidInput: "🤔 That doesn’t sound like a food craving… let’s try again!"
   },
+  // (ajouter es, it, pt, de comme avant si besoin)
 };
 
+// Sélection du bon jeu de textes
 const t = texts[currentLang] || texts['fr'];
 
 const chat = document.getElementById('chat');
@@ -51,6 +53,7 @@ let userIngredients = "";
 let userEnvie = "";
 let userPersons = "";
 
+// Liste simple de mots-clés culinaires pour filtrer
 const foodKeywords = ["poulet","poisson","chocolat","tomate","pâtes","riz","légume","salade","gâteau","pizza","soupe","fromage","beurre","pain","steak","cake","fruit","épice","poivre","sel"];
 
 function updateHeader() {
@@ -66,6 +69,7 @@ function addMessage(text, type='bot'){
   chat.scrollTop = chat.scrollHeight;
 }
 
+// Champ de saisie style "chat"
 function addInputField(placeholder, callback){
   const wrapper = document.createElement('div');
   wrapper.className = 'input-wrapper';
@@ -127,9 +131,10 @@ function handleChoice(choice){
   if(choice.includes("🍅") || choice.includes("ingredients") || choice.includes("Create a recipe with what I have")){
     addMessage(t.askIngredients);
     addInputField("🥕🍗🍫 ...", (val)=>{
+      // Vérification simple
       if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
         addMessage(t.invalidInput);
-        addInputField(t.askIngredients, arguments.callee);
+        handleChoice(choice); // redemande
         return;
       }
       userIngredients = val;
@@ -141,46 +146,36 @@ function handleChoice(choice){
     addInputField("🍰🍲 ...", (val)=>{
       if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
         addMessage(t.invalidInput);
-        addInputField(t.askEnvie, arguments.callee);
+        handleChoice(choice); 
         return;
       }
       userEnvie = val;
       askPersons("envie");
     });
 
-  } else if(choice.includes("🎁") || choice.includes("Surprise")){
-    addMessage("✨ Génération de la recette… Patientez un instant 🍳");
+ } else if(choice.includes("🎁") || choice.includes("Surprise")){
+  addMessage("✨ Génération de la recette… Patientez un instant 🍳");
 
-    // Déterminer la saison actuelle
-    const month = new Date().getMonth(); // 0 = janvier
-    let season = "";
-    switch(month){
-      case 11: case 0: case 1: season = "hiver"; break;
-      case 2: case 3: case 4: season = "printemps"; break;
-      case 5: case 6: case 7: season = "été"; break;
-      case 8: case 9: case 10: season = "automne"; break;
+  // Appel à la fonction Netlify recipe.js
+  fetch("/.netlify/functions/recipe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: "Donne-moi une recette de saison détaillée pour 1 personne" })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.reply){
+      addMessage(data.reply);
+    } else {
+      addMessage("⚠️ Oups, impossible de générer la recette. Réessayez.");
     }
+  })
+  .catch(err => {
+    console.error(err);
+    addMessage("⚠️ Erreur serveur, réessayez plus tard.");
+  });
+}
 
-    const promptMessage = `Donne-moi une recette ${season} de saison détaillée pour 1 personne`;
-
-    fetch("/.netlify/functions/recipe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: promptMessage })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if(data.reply){
-        addMessage(data.reply);
-      } else {
-        addMessage("⚠️ Oups, impossible de générer la recette. Réessayez.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      addMessage("⚠️ Erreur serveur, réessayez plus tard.");
-    });
-  }
 }
 
 function askPersons(type){
