@@ -77,7 +77,7 @@ const texts = {
     surprise: "",
     invalidNumber: "",
     invalidInput: ""
-  }
+  },
   pt: {
   title: "👨‍🍳 Seu Chef Virtual",
   subtitle: "😅 Por enquanto, só falo francês!",
