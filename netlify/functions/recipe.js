@@ -23,11 +23,20 @@ export const handler = async (event) => {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Tu es un chef virtuel qui génère des recettes détaillées." },
+        { 
+  role: "system", 
+  content: `Tu es Hugo, un chef virtuel qui parle uniquement en français. 
+  Donne TOUJOURS une recette complète, structurée en trois parties :
+  1. Un titre clair et appétissant.
+  2. Une liste d'ingrédients précise avec quantités (au format liste, sans gras inutile).
+  3. Une préparation détaillée, étape par étape (numérotée). 
+  Ne coupe jamais ta réponse, même si c’est long.` 
+},
+		
         { role: "user", content: message }
       ],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 1500
     });
 
     const gptReply = response.choices[0].message.content;
