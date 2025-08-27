@@ -39,7 +39,7 @@ const texts = {
     surprise: "✨ Voilà! A seasonal recipe just for you…",
     invalidNumber: "⚠️ Please enter a valid number of people (e.g., 2, 4, 6).",
     invalidInput: "🤔 That doesn’t sound like a food craving… let’s try again!"
-  },
+  }
 };
 
 const t = texts[currentLang] || texts['fr'];
@@ -161,22 +161,28 @@ function handleChoice(choice){
       case 8: case 9: case 10: season = "automne"; break;
     }
 
-    const promptMessage = `Donne-moi une recette ${season} de saison détaillée pour 1 personne`;
+    const promptMessage = `Donne-moi une recette ${season} détaillée pour 1 personne`;
 
     fetch("/.netlify/functions/recipe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: promptMessage })
     })
-    .then(res => res.json())
-    .then(data => {
-      if(data.reply){
-        addMessage(data.reply);
-      } else {
-        addMessage("⚠️ Oups, impossible de générer la recette. Réessayez.");
+    .then(res => res.text())
+    .then(text => {
+      try {
+        const data = JSON.parse(text);
+        if(data.reply){
+          addMessage(data.reply);
+        } else {
+          addMessage("⚠️ Oups, réponse serveur vide.");
+        }
+      } catch(e){
+        console.error("Erreur JSON:", e, text);
+        addMessage("⚠️ Réponse serveur invalide.");
       }
     })
-    .catch(err => {
+    .catch(err=>{
       console.error(err);
       addMessage("⚠️ Erreur serveur, réessayez plus tard.");
     });
