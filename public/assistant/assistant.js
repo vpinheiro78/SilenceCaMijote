@@ -24,21 +24,59 @@ const texts = {
   },
   en: {
     title: "👨‍🍳 Your Virtual Chef",
-    subtitle: "I’m here to imagine unique and personalized recipes with you. Step into the gourmet 2.0 universe where YOU are the star! ✨",
-    greeting: "Hello 👋, I’m Hugo, your Virtual Chef! How can I delight you today? 😋",
-    options: [
-      "🍅 Create a recipe with what I have",
-      "🍰 Create a recipe based on my cravings",
-      "🎁 Surprise me with a seasonal recipe"
-    ],
-    askIngredients: "Tell me what you have at home 🥕🍗🍫 :",
-    askEnvie: "Tell me about your cravings (ex: a chocolate dessert, a spicy dish…) 😋 :",
-    askPersons: "For how many people do you want to prepare this dish? 👨‍👩‍👧‍👦",
-    confirmEnvie: "🍽️ Great, I’ve noted your cravings and the number of guests!",
-    confirmIngredients: "🥕 Perfect, I’ve noted your ingredients and how many people you’ll serve!",
-    surprise: "✨ Voilà! A seasonal recipe just for you…",
-    invalidNumber: "⚠️ Please enter a valid number of people (e.g., 2, 4, 6).",
-    invalidInput: "🤔 That doesn’t sound like a food craving… let’s try again!"
+    subtitle: "😅 For now, I only speak French!",
+    greeting: "😅 For now, I only speak French!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  es: {
+    title: "👨‍🍳 Tu Chef Virtual",
+    subtitle: "😅 ¡Por el momento, solo hablo francés!",
+    greeting: "😅 ¡Por el momento, solo hablo francés!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  it: {
+    title: "👨‍🍳 Il tuo Chef Virtuale",
+    subtitle: "😅 Per ora parlo solo francese!",
+    greeting: "😅 Per ora parlo solo francese!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  de: {
+    title: "👨‍🍳 Dein Virtueller Koch",
+    subtitle: "😅 Im Moment spreche ich nur Französisch!",
+    greeting: "😅 Im Moment spreche ich nur Französisch!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
   }
 };
 
