@@ -78,6 +78,20 @@ const texts = {
     invalidNumber: "",
     invalidInput: ""
   }
+  pt: {
+  title: "👨‍🍳 Seu Chef Virtual",
+  subtitle: "😅 Por enquanto, só falo francês!",
+  greeting: "😅 Por enquanto, só falo francês!",
+  options: [],
+  askIngredients: "",
+  askEnvie: "",
+  askPersons: "",
+  confirmEnvie: "",
+  confirmIngredients: "",
+  surprise: "",
+  invalidNumber: "",
+  invalidInput: ""
+}
 };
 
 const t = texts[currentLang] || texts['fr'];
