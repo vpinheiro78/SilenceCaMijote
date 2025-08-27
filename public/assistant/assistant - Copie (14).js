@@ -22,11 +22,76 @@ const texts = {
     invalidNumber: "⚠️ Merci d’indiquer un nombre valide de personnes (ex: 2, 4, 6).",
     invalidInput: "🤔 Ça ne ressemble pas à une envie culinaire… essayons encore !"
   },
-  en: { title: "👨‍🍳 Your Virtual Chef", subtitle: "😅 For now, I only speak French!", greeting: "😅 For now, I only speak French!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  es: { title: "👨‍🍳 Tu Chef Virtual", subtitle: "😅 ¡Por el momento, solo hablo francés!", greeting: "😅 ¡Por el momento, solo hablo francés!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  it: { title: "👨‍🍳 Il tuo Chef Virtuale", subtitle: "😅 Per ora parlo solo francese!", greeting: "😅 Per ora parlo solo francese!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  de: { title: "👨‍🍳 Dein Virtueller Koch", subtitle: "😅 Im Moment spreche ich nur Französisch!", greeting: "😅 Im Moment spreche ich nur Französisch!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  pt: { title: "👨‍🍳 Seu Chef Virtual", subtitle: "😅 Por enquanto, só falo francês!", greeting: "😅 Por enquanto, só falo francês!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" }
+  en: {
+    title: "👨‍🍳 Your Virtual Chef",
+    subtitle: "😅 For now, I only speak French!",
+    greeting: "😅 For now, I only speak French!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  es: {
+    title: "👨‍🍳 Tu Chef Virtual",
+    subtitle: "😅 ¡Por el momento, solo hablo francés!",
+    greeting: "😅 ¡Por el momento, solo hablo francés!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  it: {
+    title: "👨‍🍳 Il tuo Chef Virtuale",
+    subtitle: "😅 Per ora parlo solo francese!",
+    greeting: "😅 Per ora parlo solo francese!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  de: {
+    title: "👨‍🍳 Dein Virtueller Koch",
+    subtitle: "😅 Im Moment spreche ich nur Französisch!",
+    greeting: "😅 Im Moment spreche ich nur Französisch!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  },
+  pt: {
+    title: "👨‍🍳 Seu Chef Virtual",
+    subtitle: "😅 Por enquanto, só falo francês!",
+    greeting: "😅 Por enquanto, só falo francês!",
+    options: [],
+    askIngredients: "",
+    askEnvie: "",
+    askPersons: "",
+    confirmEnvie: "",
+    confirmIngredients: "",
+    surprise: "",
+    invalidNumber: "",
+    invalidInput: ""
+  }
 };
 
 // Sélection du bon jeu de textes
@@ -113,9 +178,19 @@ function addInputField(placeholder, callback){
   btn.innerText = "➤";
   btn.className = 'send-btn';
 
-  btn.onclick = ()=>{ if(input.value.trim() !== ""){ callback(input.value.trim()); wrapper.remove(); } };
+  btn.onclick = ()=>{
+    if(input.value.trim() !== ""){
+      callback(input.value.trim());
+      wrapper.remove();
+    }
+  };
 
-  input.addEventListener("keypress", (e)=>{ if(e.key === "Enter" && input.value.trim() !== ""){ callback(input.value.trim()); wrapper.remove(); } });
+  input.addEventListener("keypress", (e)=>{
+    if(e.key === "Enter" && input.value.trim() !== ""){
+      callback(input.value.trim());
+      wrapper.remove();
+    }
+  });
 
   wrapper.appendChild(input);
   wrapper.appendChild(btn);
@@ -175,6 +250,7 @@ function handleChoice(choice){
     });
 
   } else if(choice.includes("🎁") || choice.includes("Surprise")){
+    // Recette de saison
     generateSeasonRecipe();
   }
 }
@@ -199,7 +275,7 @@ function askPersons(type){
 // -------- Recette de saison : récupération + affichage harmonisé --------
 
 function getSeason(){
-  const m = new Date().getMonth();
+  const m = new Date().getMonth(); // 0 = janvier
   if([11,0,1].includes(m)) return "hiver";
   if([2,3,4].includes(m)) return "printemps";
   if([5,6,7].includes(m)) return "été";
@@ -208,30 +284,36 @@ function getSeason(){
 
 function stripMarkdown(s){
   return s
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/__([^_]+)__/g, '$1')
-    .replace(/`{1,3}[^`]*`{1,3}/g,'')
-    .replace(/^#{1,6}\s*/gm,'')
-    .replace(/^\s*[-*•]\s*/gm,'• ')
-    .replace(/^>\s?/gm,'')
+    .replace(/\*\*(.*?)\*\*/g, '$1')   // **gras**
+    .replace(/__([^_]+)__/g, '$1')     // __gras__
+    .replace(/`{1,3}[^`]*`{1,3}/g,'')  // code
+    .replace(/^#{1,6}\s*/gm,'')        // titres #
+    .replace(/^\s*[-*•]\s*/gm,'• ')    // puces uniformisées
+    .replace(/^>\s?/gm,'')             // citations
     .trim();
 }
 
 function normalize(s){
   return s
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // suppr. accents
 }
 
 function parseRecipe(raw){
   const clean = stripMarkdown(raw);
   const lines = clean.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+
+  // Chercher sections
   const idxIng = lines.findIndex(l => /ingr[ée]dients?/.test(normalize(l)));
   const idxPrep = lines.findIndex(l => /(pr[ée]paration|instructions?|etapes?)/.test(normalize(l)));
+
   let title = "Recette de saison";
+  // titre = première ligne “forte”
   if(lines[0] && !/ingr|prep|etapes/i.test(lines[0])) title = lines[0];
+
   let ingredients = [];
   let steps = [];
+
   if(idxIng !== -1){
     const start = idxIng + 1;
     const end = idxPrep !== -1 ? idxPrep : lines.length;
@@ -240,12 +322,15 @@ function parseRecipe(raw){
       .map(l => l.replace(/^•\s*/, '').replace(/^[-*]\s*/, '').trim())
       .filter(Boolean);
   }
+
   if(idxPrep !== -1){
     const start = idxPrep + 1;
     steps = lines.slice(start)
       .map(l => l.replace(/^\d+\.\s*/, '').replace(/^•\s*/, '').trim())
       .filter(Boolean);
   }
+
+  // fallback si pas d’extraction nette
   if(ingredients.length === 0 && steps.length === 0){
     return { title, ingredients: [], steps: [clean], season: getSeason(), raw: clean };
   }
@@ -279,7 +364,8 @@ function renderRecipeCard(recipe){
          <ol class="rc-list">
            ${recipe.steps.map(s=>`<li>${escapeHTML(s)}</li>`).join('')}
          </ol>
-       </div>` : '';
+       </div>`
+    : '';
 
   const actionsHTML = `
     <div class="rc-actions">
@@ -292,6 +378,7 @@ function renderRecipeCard(recipe){
   chat.appendChild(card);
   chat.scrollTop = chat.scrollHeight;
 
+  // Brancher actions
   card.querySelector('#btn-new-idea').addEventListener('click', ()=> generateSeasonRecipe(true));
   card.querySelector('#btn-accept').addEventListener('click', showFollowupOptions);
 }
@@ -319,7 +406,9 @@ function showFollowupOptions(){
 }
 
 function escapeHTML(s){
-  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return s.replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
 }
 
 function recipePlainText(){
@@ -327,7 +416,13 @@ function recipePlainText(){
   const { title, ingredients, steps, season } = lastRecipe;
   const ing = ingredients.length ? ingredients.map(i=>`• ${i}`).join('\n') : '(non précisé)';
   const stp = steps.length ? steps.map((s,i)=> `${i+1}. ${s}`).join('\n') : '(non précisé)';
-  return `${title} (${season})\n\nIngrédients :\n${ing}\n\nPréparation :\n${stp}`;
+  return `${title} (${season})
+  
+Ingrédients :
+${ing}
+
+Préparation :
+${stp}`;
 }
 
 function shareWhatsApp(){
@@ -337,31 +432,40 @@ function shareWhatsApp(){
   window.open(url, '_blank');
 }
 
+// Génère une image PNG simple avec le texte de la recette
 function saveAsImage(){
   const text = recipePlainText();
   if(!text) return;
 
+  // mise en page basique
   const lines = text.split('\n');
   const padding = 40;
   const lineHeight = 28;
   const width = 1080;
+
+  // calcul hauteur
   const height = Math.max(600, padding*2 + lines.length * lineHeight);
+
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
+  // fond
   ctx.fillStyle = '#fff8f0';
   ctx.fillRect(0, 0, width, height);
 
+  // cadre
   ctx.fillStyle = '#e67e22';
   ctx.fillRect(0, 0, width, 12);
 
+  // texte
   ctx.fillStyle = '#333';
   ctx.font = '20px Segoe UI, Arial, sans-serif';
   let y = padding;
 
   lines.forEach(line=>{
+    // wrap simple si trop long
     const maxWidth = width - padding*2;
     const words = line.split(' ');
     let buf = '';
@@ -391,16 +495,16 @@ function copyShoppingList(){
     return;
   }
   const list = lastRecipe.ingredients.map(i=>`• ${i}`).join('\n');
-  navigator.clipboard.writeText(list).then(()=>{ addMessage("🛒 Liste de courses copiée dans le presse-papiers !"); });
+  navigator.clipboard.writeText(list).then(()=>{
+    addMessage("🛒 Liste de courses copiée dans le presse-papiers !");
+  });
 }
 
-// -------- Modification ici : prendre en compte userPersons --------
+// Appel Netlify + rendu harmonisé
 function generateSeasonRecipe(fromAnotherIdea=false){
   addMessage("✨ Génération de la recette… Patientez un instant 🍳");
   const season = getSeason();
-  const personsText = userPersons && !isNaN(userPersons) ? userPersons : 1;
-  const promptMessage = `Donne-moi une recette ${season} détaillée pour ${personsText} personne(s), avec sections Ingrédients et Préparation. Réponds en français, complète et structurée.`;
-
+  const promptMessage = `Donne-moi une recette ${season} détaillée pour 1 personne, avec sections Ingrédients et Préparation. Réponds en français.`;
   fetch("/.netlify/functions/recipe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -411,6 +515,7 @@ function generateSeasonRecipe(fromAnotherIdea=false){
     try {
       const data = JSON.parse(text);
       if(data.reply){
+        // Nettoyage + parsing
         const parsed = parseRecipe(data.reply);
         renderRecipeCard(parsed);
         if(!fromAnotherIdea){
