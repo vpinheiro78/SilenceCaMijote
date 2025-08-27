@@ -1,35 +1,47 @@
-// netlify/functions/recipe.js
 import OpenAI from "openai";
 
-export default async function handler(req, res) {
+export const handler = async (event) => {
   try {
-    // ⚡ Récupérer le message envoyé depuis le front
-    const { message } = await req.json();
-
-    if (!message) {
-      return res.status(400).json({ error: "Message manquant" });
+    // Vérifier que la requête est POST
+    if (event.httpMethod !== "POST") {
+      return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    // ⚡ Initialiser OpenAI avec la clé stockée en variable d'environnement
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    // Lire le message depuis le body
+    const { message } = JSON.parse(event.body);
+
+    if (!message) {
+      return { statusCode: 400, body: JSON.stringify({ reply: "Message manquant" }) };
+    }
+
+    // Instanciation OpenAI avec la clé côté serveur
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
     });
 
-    // ⚡ Appeler GPT-4o mini
-    const response = await client.chat.completions.create({
+    // Appel à GPT-4o mini
+    const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Tu es un chef cuisinier créatif. Donne des recettes claires, simples et appétissantes." },
-        { role: "user", content: message },
+        { role: "system", content: "Tu es un chef virtuel qui génère des recettes détaillées." },
+        { role: "user", content: message }
       ],
+      temperature: 0.7,
+      max_tokens: 500
     });
 
-    // ⚡ Extraire la réponse
-    const reply = response.choices[0].message.content;
+    const gptReply = response.choices[0].message.content;
 
-    return res.status(200).json({ reply });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ reply: gptReply })
+    };
+
   } catch (error) {
-    console.error("Erreur API:", error);
-    return res.status(500).json({ error: "Erreur serveur" });
+    console.error(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ reply: "⚠️ Une erreur est survenue côté serveur." })
+    };
   }
-}
+};
