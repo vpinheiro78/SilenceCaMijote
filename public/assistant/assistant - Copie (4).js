@@ -3,10 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const chat = document.getElementById("chat");
   const inputContainer = document.getElementById("input-container");
 
-  let userIngredients = "";
-  let userEnvie = "";
-  let userPersons = 1;
-
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
@@ -22,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const btn = document.createElement("button");
       btn.className = "choice-btn";
       btn.innerText = opt.label;
-      btn.onclick = () => opt.action();
+      btn.onclick = () => handleChoice(opt.value);
       div.appendChild(btn);
     });
     chat.appendChild(div);
@@ -51,93 +47,46 @@ document.addEventListener("DOMContentLoaded", () => {
     textarea.focus();
   }
 
-  function askPersons(callbackMessage) {
+  function askPersons(mode, userMessage) {
     addInputField("Pour combien de personnes ?", (value) => {
       const persons = parseInt(value, 10);
       if (!isNaN(persons) && persons > 0) {
-        userPersons = persons;
-        addMessage("Je te concocte une recette rien que pour toi ... 🍳");
-        sendToBackend(callbackMessage);
+        sendToBackend(userMessage, persons);
       } else {
         addMessage("⚠️ Merci d’indiquer un nombre valide.");
-        askPersons(callbackMessage);
+        askPersons(mode, userMessage);
       }
     });
   }
 
-  async function sendToBackend(message) {
+  async function sendToBackend(message, persons = 1) {
     try {
       const res = await fetch("/.netlify/functions/recipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, persons: userPersons })
+        body: JSON.stringify({ message, persons })
       });
       const data = await res.json();
-      if (data.reply) {
-        addMessage(data.reply, "bot");
-        offerFeedback();
-      } else {
-        addMessage("⚠️ Pas de réponse du serveur.");
-      }
+      if (data.reply) addMessage(data.reply, "bot");
+      else addMessage("⚠️ Pas de réponse du serveur.");
     } catch (err) {
       console.error(err);
       addMessage("⚠️ Erreur de communication avec le serveur.");
     }
   }
 
-  function offerFeedback() {
-    addChoices([
-      { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
-      { label: "🔄 As-tu autre chose à me proposer ?", action: repeatRecipe },
-      { label: "✏️ Changer mes ingrédients ou envies", action: modifyInputs }
-    ]);
-  }
-
-  function satisfied() {
-    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette si tu veux.");
-    // ici tu peux appeler une fonction pour proposer téléchargement ou partage
-  }
-
-  function repeatRecipe() {
-    addMessage("Je te prépare une nouvelle suggestion ... 🍳");
-    // utilise les mêmes critères
-    if (userIngredients) sendToBackend(userIngredients);
-    else if (userEnvie) sendToBackend(userEnvie);
-  }
-
-  function modifyInputs() {
-    addChoices([
-      { label: "Modifier les ingrédients", action: () => {
-          addInputField("Quels ingrédients veux-tu changer ?", val => {
-            userIngredients = val;
-            addMessage("Je te concocte une nouvelle recette ... 🍳");
-            sendToBackend(userIngredients);
-          });
-      }},
-      { label: "Modifier l'envie / type de recette", action: () => {
-          addInputField("Quelles envies veux-tu modifier ?", val => {
-            userEnvie = val;
-            addMessage("Je te concocte une nouvelle recette ... 🍳");
-            sendToBackend(userEnvie);
-          });
-      }}
-    ]);
-  }
-
   function handleChoice(choice) {
     if (choice === "frigo") {
-      addInputField("Quels ingrédients as-tu sous la main ?", val => {
-        userIngredients = val;
-        askPersons(userIngredients);
+      addInputField("Quels ingrédients as-tu sous la main ?", (val) => {
+        askPersons("frigo", val);
       });
     } else if (choice === "envie") {
-      addInputField("Quelle recette te fait envie ? (ex: plat réconfortant, exotique...)", val => {
-        userEnvie = val;
-        askPersons(userEnvie);
+      addInputField("Quelle recette te fait envie ? (ex: plat réconfortant, exotique...)", (val) => {
+        askPersons("envie", val);
       });
     } else if (choice === "surprise") {
       addMessage("🎁 Super ! Je prépare une surprise culinaire...");
-      askPersons("Surprends-moi avec une recette originale !");
+      askPersons("surprise", "Surprends-moi avec une recette originale !");
     }
   }
 
