@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
 
-    // si text est un tableau (ingrédients ou étapes formatées)
     if (Array.isArray(text)) {
       text.forEach(t => div.appendChild(t));
     } else {
@@ -31,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.className = "choice-btn";
       btn.innerText = opt.label;
       btn.onclick = () => {
-        div.remove(); // supprime les choix pour éviter doublons
+        div.remove();
         opt.action();
       };
       div.appendChild(btn);
@@ -88,7 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
         userRecipeText = data.reply;
         const formatted = formatRecipeForDisplay(data.reply);
         addMessage(formatted, "bot");
-        offerFeedback();
+
+        // --- Affiche directement les boutons après la recette ---
+        showDownloadAndShareButtons();
       } else {
         addMessage("⚠️ Pas de réponse du serveur.");
       }
@@ -108,20 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function offerFeedback() {
-    addChoices([
-      { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
-      { label: "🔄 As-tu autre chose à me proposer ?", action: repeatRecipe },
-      { label: "✏️ Changer mes ingrédients ou envies", action: modifyInputs }
-    ]);
-  }
-
-  function satisfied() {
-    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette si tu veux.");
-
+  function showDownloadAndShareButtons() {
     const div = document.createElement("div");
     div.className = "choices";
-    chat.appendChild(div);
 
     // Télécharger
     const downloadBtn = document.createElement("button");
@@ -147,6 +137,19 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open(url, "_blank");
     };
     div.appendChild(whatsappBtn);
+
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Offre un feedback supplémentaire
+    offerFeedback();
+  }
+
+  function offerFeedback() {
+    addChoices([
+      { label: "🔄 As-tu autre chose à me proposer ?", action: repeatRecipe },
+      { label: "✏️ Changer mes ingrédients ou envies", action: modifyInputs }
+    ]);
   }
 
   function repeatRecipe() {
