@@ -6,23 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
-  let userRecipeText = ""; // stocke le texte complet de la recette
 
+  // --- Affichage d'un message ---
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
-
-    // si text est un tableau (ingrédients ou étapes formatées)
-    if (Array.isArray(text)) {
-      text.forEach(t => div.appendChild(t));
-    } else {
-      div.innerText = text;
-    }
-
+    div.innerText = text;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
   }
 
+  // --- Affichage des choix ---
   function addChoices(options) {
     const div = document.createElement("div");
     div.className = "choices";
@@ -30,16 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const btn = document.createElement("button");
       btn.className = "choice-btn";
       btn.innerText = opt.label;
-      btn.onclick = () => {
-        div.remove(); // supprime les choix pour éviter doublons
-        opt.action();
-      };
+      btn.onclick = opt.action;
       div.appendChild(btn);
     });
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
   }
 
+  // --- Affichage d'un champ texte ---
   function addInputField(placeholder, callback) {
     inputContainer.innerHTML = "";
     const textarea = document.createElement("textarea");
@@ -62,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     textarea.focus();
   }
 
+  // --- Demande du nombre de personnes ---
   function askPersons(callbackMessage) {
     addInputField("Pour combien de personnes ?", (value) => {
       const persons = parseInt(value, 10);
@@ -76,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- Envoi au backend ---
   async function sendToBackend(message) {
     try {
       const res = await fetch("/.netlify/functions/recipe", {
@@ -85,9 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (data.reply) {
-        userRecipeText = data.reply;
-        const formatted = formatRecipeForDisplay(data.reply);
-        addMessage(formatted, "bot");
+        addMessage(data.reply, "bot");
         offerFeedback();
       } else {
         addMessage("⚠️ Pas de réponse du serveur.");
@@ -98,16 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function formatRecipeForDisplay(text) {
-    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-    return lines.map(line => {
-      const div = document.createElement("div");
-      div.className = line.toLowerCase().startsWith("ingrédients") ? "ingredient-card" : "etape-card";
-      div.innerText = line;
-      return div;
-    });
-  }
-
+  // --- Feedback après recette ---
   function offerFeedback() {
     addChoices([
       { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
@@ -118,35 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function satisfied() {
     addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette si tu veux.");
-
-    const div = document.createElement("div");
-    div.className = "choices";
-    chat.appendChild(div);
-
-    // Télécharger
-    const downloadBtn = document.createElement("button");
-    downloadBtn.className = "choice-btn";
-    downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = () => {
-      const blob = new Blob([userRecipeText], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ma_recette.txt";
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-    div.appendChild(downloadBtn);
-
-    // WhatsApp
-    const whatsappBtn = document.createElement("button");
-    whatsappBtn.className = "choice-btn";
-    whatsappBtn.innerText = "💬 Partager sur WhatsApp";
-    whatsappBtn.onclick = () => {
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(userRecipeText)}`;
-      window.open(url, "_blank");
-    };
-    div.appendChild(whatsappBtn);
+    // Ici tu peux ajouter le téléchargement / partage WhatsApp
   }
 
   function repeatRecipe() {
@@ -174,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
+  // --- Gestion des choix principaux ---
   function handleChoice(choice) {
     if (choice === "frigo") {
       addInputField("Quels ingrédients as-tu sous la main ?", val => {
@@ -191,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Démarrage ---
   function start() {
     addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
     addMessage("Que veux-tu cuisiner aujourd’hui ?");
