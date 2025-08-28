@@ -30,12 +30,7 @@ p.subtitle {text-align:center;color:#555;margin-bottom:25px;}
   background:#fff8f0;
 }
 
-#input-container {
-  margin-top:15px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
+#input-container { margin-top:12px; }
 
 .message {
   max-width:70%;
@@ -67,26 +62,14 @@ p.subtitle {text-align:center;color:#555;margin-bottom:25px;}
 .choice-btn:hover {background:#d35400;}
 
 .big-textarea {
-  width:100%;
-  min-height:60px;
-  border-radius:12px;
-  padding:10px;
-  border:1px solid #ddd;
-  font-size:1em;
-  resize:vertical;
+  width:100%; min-height:60px; border-radius:12px; padding:10px;
+  border:1px solid #ddd; font-size:1em; resize:vertical;
 }
-
-button.send-btn {
-  align-self:flex-end;
-  background:#e67e22;
-  color:white;
-  border:none;
-  padding:8px 16px;
-  border-radius:20px;
-  cursor:pointer;
-  transition:0.2s;
+.send-btn {
+  margin-top:6px; padding:8px 16px; border-radius:20px;
+  border:none; background:#e67e22; color:#fff; cursor:pointer;
 }
-button.send-btn:hover{ background:#d35400; }
+.send-btn:hover { background:#d35400; }
 
 @keyframes fadeIn {
   from {opacity:0; transform:translateY(10px);}
@@ -100,14 +83,14 @@ button.send-btn:hover{ background:#d35400; }
 </style>
 </head>
 <body>
-<div class="container" id="assistantContainer">
+<div class="container show" id="assistantContainer">
   <h1 id="title">👨‍🍳 Votre Chef Virtuel</h1>
   <p class="subtitle" id="subtitle">
     Je suis là pour imaginer avec vous des recettes uniques et personnalisées.  
     Entrez dans l’univers gourmand 2.0 où <b>vous êtes l’acteur</b> ! ✨
   </p>
   <div id="chat"></div>
-  <div id="input-container"></div> <!-- Ajouté : container pour le textarea et bouton -->
+  <div id="input-container"></div>
 </div>
 
 <script type="module" src="assistant.js"></script>
