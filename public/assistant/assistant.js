@@ -1,188 +1,114 @@
-// assistant.js
+// /public/assistant/assistant.js
 
-// Langue héritée automatiquement depuis index.html
-let currentLang = localStorage.getItem('siteLang') || 'fr';
+document.addEventListener("DOMContentLoaded", () => {
+  const chatContainer = document.getElementById("chat");
+  const inputContainer = document.getElementById("input-container");
 
-const texts = {
-  fr: {
-    title: "👨‍🍳 Votre Chef Virtuel",
-    subtitle: "Je suis là pour imaginer avec vous des recettes uniques et personnalisées. Entrez dans l’univers gourmand 2.0 où vous êtes l’acteur ! ✨",
-    greeting: "Bonjour 👋, je suis Hugo, votre Chef Virtuel ! Comment puis-je vous régaler aujourd’hui ? 😋",
-    options: [
-      "🍅 Créer une recette avec ce que j’ai sous la main",
-      "🍰 Créer une recette selon mes envies",
-      "🎁 Surprenez-moi avec une recette de saison"
-    ],
-    askIngredients: "Dites-moi ce que vous avez sous la main 🥕🍗🍫 :",
-    askEnvie: "Parlez-moi de vos envies (ex: un dessert au chocolat, un plat épicé…) 😋 :",
-    askPersons: "Pour combien de personnes voulez-vous préparer ce plat ? 👨‍👩‍👧‍👦",
-    confirmEnvie: "🍽️ Super, j’ai noté vos envies et le nombre d’invités !",
-    confirmIngredients: "🥕 Super, j’ai noté vos ingrédients et combien vous serez à table !",
-    surprise: "✨ Ta-daa ! Voici une idée de saison rien que pour vous…",
-    invalidNumber: "⚠️ Merci d’indiquer un nombre valide de personnes (ex: 2, 4, 6).",
-    invalidInput: "🤔 Ça ne ressemble pas à une envie culinaire… essayons encore !"
-  },
-  en: { title: "👨‍🍳 Your Virtual Chef", subtitle: "😅 For now, I only speak French!", greeting: "😅 For now, I only speak French!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  es: { title: "👨‍🍳 Tu Chef Virtual", subtitle: "😅 ¡Por el momento, solo hablo francés!", greeting: "😅 ¡Por el momento, solo hablo francés!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  it: { title: "👨‍🍳 Il tuo Chef Virtuale", subtitle: "😅 Per ora parlo solo francese!", greeting: "😅 Per ora parlo solo francese!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  de: { title: "👨‍🍳 Dein Virtueller Koch", subtitle: "😅 Im Moment spreche ich nur Französisch!", greeting: "😅 Im Moment spreche ich nur Französisch!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" },
-  pt: { title: "👨‍🍳 Seu Chef Virtual", subtitle: "😅 Por enquanto, só falo francês!", greeting: "😅 Por enquanto, só falo francês!", options: [], askIngredients: "", askEnvie: "", askPersons: "", confirmEnvie: "", confirmIngredients: "", surprise: "", invalidNumber: "", invalidInput: "" }
-};
-
-// Sélection du bon jeu de textes
-const t = texts[currentLang] || texts['fr'];
-
-const chat = document.getElementById('chat');
-const container = document.getElementById('assistantContainer');
-
-let userIngredients = "";
-let userEnvie = "";
-let userPersons = "";
-let lastRecipe = null; // { title, ingredients[], steps[], season, raw }
-
-// Mots-clés culinaires
-const foodKeywords = ["poulet","poisson","chocolat","tomate","pâtes","riz","légume","salade","gâteau","pizza","soupe","fromage","beurre","pain","steak","cake","fruit","épice","poivre","sel"];
-
-// Injecte styles dynamiques pour recette + champ élargi
-function injectStyles(){
-  if (document.getElementById('assistantDynamicStyles')) return;
-  const css = `
-  .chat-input {
-    width: 100%;
-    min-height: 60px;
-    resize: vertical;
-    border-radius: 12px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    font-size: 1em;
-    line-height: 1.4;
-    margin-bottom: 8px;
-    box-sizing: border-box;
+  // --- Helpers pour l'UI ---
+  function addMessage(text, sender = "bot") {
+    const msg = document.createElement("div");
+    msg.className = sender === "bot" ? "bot-message" : "user-message";
+    msg.innerHTML = text;
+    chatContainer.appendChild(msg);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
   }
-  .input-wrapper {
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    margin-top:10px;
+
+  function addChoices(choices) {
+    const container = document.createElement("div");
+    container.className = "choices";
+    choices.forEach(({ label, value }) => {
+      const btn = document.createElement("button");
+      btn.textContent = label;
+      btn.onclick = () => handleChoice(value);
+      container.appendChild(btn);
+    });
+    chatContainer.appendChild(container);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
   }
-  .send-btn {
-    align-self:flex-end;
-    background:#e67e22;
-    color:white;
-    border:none;
-    padding:8px 16px;
-    border-radius:20px;
-    cursor:pointer;
-    transition:0.2s;
+
+  function addInputField(placeholder, onSubmit) {
+    inputContainer.innerHTML = "";
+
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = placeholder;
+    textarea.className = "big-textarea"; // style plus imposant
+    inputContainer.appendChild(textarea);
+
+    const btn = document.createElement("button");
+    btn.textContent = "Envoyer";
+    btn.onclick = () => {
+      const value = textarea.value.trim();
+      if (value) {
+        addMessage(value, "user");
+        inputContainer.innerHTML = "";
+        onSubmit(value);
+      }
+    };
+    inputContainer.appendChild(btn);
+
+    textarea.focus();
   }
-  .send-btn:hover{ background:#d35400; }
-  /* ... styles recette déjà présents ... */
-  `;
-  const style = document.createElement('style');
-  style.id = 'assistantDynamicStyles';
-  style.textContent = css;
-  document.head.appendChild(style);
-}
 
-function updateHeader() {
-  document.getElementById('title').innerText = t.title;
-  document.getElementById('subtitle').innerText = t.subtitle;
-}
+  // --- Fonction manquante : demander le nombre de personnes ---
+  function askPersons(mode, userMessage) {
+    addInputField("Pour combien de personnes ?", (value) => {
+      const persons = parseInt(value, 10);
+      if (!isNaN(persons) && persons > 0) {
+        send(userMessage, persons, mode);
+      } else {
+        addMessage("⚠️ Merci d’indiquer un nombre valide.");
+        askPersons(mode, userMessage);
+      }
+    });
+  }
 
-function addMessage(text, type='bot'){
-  const div = document.createElement('div');
-  div.className = `message ${type}`;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
+  // --- Envoi au backend ---
+  async function send(message, persons = 1, mode = "default") {
+    try {
+      const response = await fetch("/.netlify/functions/recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, persons, mode })
+      });
 
-function addInputField(placeholder, callback){
-  const wrapper = document.createElement('div');
-  wrapper.className = 'input-wrapper';
-
-  const input = document.createElement('textarea');
-  input.className = 'chat-input';
-  input.placeholder = placeholder;
-
-  const btn = document.createElement('button');
-  btn.innerText = "Envoyer ➤";
-  btn.className = 'send-btn';
-
-  const send = ()=> {
-    if(input.value.trim() !== ""){
-      callback(input.value.trim());
-      wrapper.remove();
+      const data = await response.json();
+      if (data.reply) {
+        addMessage(data.reply, "bot");
+      } else {
+        addMessage("⚠️ Pas de réponse du serveur.");
+      }
+    } catch (err) {
+      console.error(err);
+      addMessage("⚠️ Erreur de communication avec le serveur.");
     }
-  };
-
-  btn.onclick = send;
-  input.addEventListener("keypress", (e)=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(btn);
-  chat.appendChild(wrapper);
-  input.focus();
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function addChoices(options){
-  if(!options || !options.length) return;
-  const div = document.createElement('div');
-  div.className = 'choices';
-  options.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.innerText = opt;
-    btn.onclick = ()=> handleChoice(opt);
-    div.appendChild(btn);
-  });
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function start(){
-  injectStyles();
-  updateHeader();
-  addMessage(t.greeting);
-  addChoices(t.options);
-  container.classList.add('show');
-}
-
-function handleChoice(choice){
-  addMessage(choice,'user');
-  document.querySelectorAll('.choices').forEach(c=>c.remove());
-
-  if(choice.includes("🍅")){
-    addMessage(t.askIngredients);
-    addInputField("🥕🍗🍫 ...", (val)=>{
-      if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
-        addMessage(t.invalidInput);
-        addInputField(t.askIngredients, arguments.callee);
-        return;
-      }
-      userIngredients = val;
-      askPersons("ingredients");
-    });
-
-  } else if(choice.includes("🍰")){
-    addMessage(t.askEnvie);
-    addInputField("🍰🍲 ...", (val)=>{
-      if(!foodKeywords.some(k=>val.toLowerCase().includes(k))){
-        addMessage(t.invalidInput);
-        addInputField(t.askEnvie, arguments.callee);
-        return;
-      }
-      userEnvie = val;
-      askPersons("envie");
-    });
-
-  } else if(choice.includes("🎁")){
-    askPersons("surprise");
   }
-}
 
-// ... (les fonctions parseRecipe, renderRecipeCard, sendToOpenAI, generateSeasonRecipe, etc. restent identiques à ta version)
-// ⚠️ Pas besoin de les réécrire ici : elles fonctionnent déjà bien avec ce flux.
+  // --- Gestion des choix principaux ---
+  function handleChoice(choice) {
+    if (choice === "frigo") {
+      addInputField("Quels ingrédients as-tu sous la main ?", (value) => {
+        askPersons("frigo", value);
+      });
+    } else if (choice === "envie") {
+      addInputField("Quelle recette te fait envie ? (ex: plat réconfortant, exotique...)", (value) => {
+        askPersons("envie", value);
+      });
+    } else if (choice === "surprise") {
+      addMessage("🎁 Super ! Je prépare une surprise culinaire...");
+      askPersons("surprise", "Surprends-moi avec une recette originale !");
+    }
+  }
 
-start();
+  // --- Démarrage ---
+  function start() {
+    addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
+    addMessage("Que veux-tu cuisiner aujourd’hui ?");
+    addChoices([
+      { label: "🍅 Créer une recette avec ce que j’ai sous la main", value: "frigo" },
+      { label: "🍰 Créer une recette selon mes envies", value: "envie" },
+      { label: "🎁 Me laisser surprendre", value: "surprise" }
+    ]);
+  }
+
+  start();
+});
