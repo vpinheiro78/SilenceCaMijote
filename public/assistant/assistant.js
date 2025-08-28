@@ -6,8 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
-  let userRecipeText = ""; // texte complet brut pour WhatsApp
-  let userRecipeHTML = null; // div de la recette pour capture
+  let userRecipeText = ""; // texte complet pour téléchargement
 
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div");
@@ -88,9 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
         userRecipeText = data.reply;
         const formatted = formatRecipeForDisplay(data.reply);
         addMessage(formatted, "bot");
-
-        // On prépare un div invisible pour capture
-        userRecipeHTML = createRecipeDiv(data.reply);
         offerFeedback();
       } else {
         addMessage("⚠️ Pas de réponse du serveur.");
@@ -103,41 +99,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatRecipeForDisplay(text) {
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-    return lines.map(line => {
-      const div = document.createElement("div");
-      div.className = line.toLowerCase().startsWith("ingrédients") ? "ingredient-card" : "etape-card";
-      div.innerText = line;
-      return div;
+    const formatted = [];
+
+    lines.forEach(line => {
+      let div;
+      if (/^# /.test(line)) {
+        div = document.createElement('h1');
+        div.innerText = line.replace(/^# /, '');
+      } else if (/^## /.test(line)) {
+        div = document.createElement('h2');
+        div.innerText = line.replace(/^## /, '');
+      } else if (/^- /.test(line)) {
+        div = document.createElement('span');
+        div.className = 'ingredient-card';
+        div.innerText = line.replace(/^- /, '');
+      } else if (/^\d+\. /.test(line)) {
+        div = document.createElement('div');
+        div.className = 'etape-card';
+        const match = line.match(/^(\d+)\.\s+(.*)/);
+        div.innerHTML = `<span class="etape-num">${match[1]}</span> <p>${match[2]}</p>`;
+      } else {
+        div = document.createElement('p');
+        div.innerText = line;
+      }
+      formatted.push(div);
     });
-  }
 
-  function createRecipeDiv(text) {
-    const div = document.createElement("div");
-    div.style.padding = "20px";
-    div.style.background = "#fff8f0";
-    div.style.borderRadius = "15px";
-    div.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-    div.style.width = "400px";
-    div.style.textAlign = "left";
-    div.style.display = "none"; // invisible dans la page
-
-    // Logo
-    const logo = document.createElement("img");
-    logo.src = "logo.png";
-    logo.style.width = "80px";
-    logo.style.display = "block";
-    logo.style.margin = "0 auto 10px auto";
-    div.appendChild(logo);
-
-    // Texte
-    const pre = document.createElement("pre");
-    pre.style.whiteSpace = "pre-wrap";
-    pre.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-    pre.innerText = text;
-    div.appendChild(pre);
-
-    document.body.appendChild(div);
-    return div;
+    return formatted;
   }
 
   function offerFeedback() {
@@ -149,24 +137,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function satisfied() {
-    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette si tu veux.");
+    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.");
 
     const div = document.createElement("div");
     div.className = "choices";
     chat.appendChild(div);
 
-    // Télécharger image
+    // Télécharger
     const downloadBtn = document.createElement("button");
     downloadBtn.className = "choice-btn";
     downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = () => {
-      if (!window.html2canvas) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = () => captureRecipe(userRecipeHTML);
+    downloadBtn.onclick = async () => {
+      const tempDiv = document.createElement("div");
+      tempDiv.style.padding = "20px";
+      tempDiv.style.background = "#fff8f0";
+      tempDiv.style.borderRadius = "15px";
+      tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+      tempDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">` +
+                          userRecipeText.replace(/^# (.*)$/gm, '$1')
+                                        .replace(/^## (.*)$/gm, '$1')
+                                        .replace(/^- (.*)$/gm, '$1')
+                                        .replace(/^\d+\. (.*)$/gm, '<div class="etape-card"><p>$1</p></div>');
+
+      if(!window.html2canvas){
+        const script=document.createElement('script');
+        script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload=()=>capture(tempDiv);
         document.body.appendChild(script);
       } else {
-        captureRecipe(userRecipeHTML);
+        capture(tempDiv);
       }
     };
     div.appendChild(downloadBtn);
@@ -180,16 +179,16 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open(url, "_blank");
     };
     div.appendChild(whatsappBtn);
-  }
 
-  function captureRecipe(element) {
-    html2canvas(element).then(canvas => {
-      const img = canvas.toDataURL('image/png');
-      const link = document.createElement("a");
-      link.href = img;
-      link.download = "ma_recette.png";
-      link.click();
-    });
+    function capture(element){
+      html2canvas(element).then(canvas=>{
+        const img=canvas.toDataURL('image/png');
+        const a=document.createElement('a');
+        a.href=img;
+        a.download='ma_recette.png';
+        a.click();
+      });
+    }
   }
 
   function repeatRecipe() {
@@ -238,8 +237,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
     addMessage("Que veux-tu cuisiner aujourd’hui ?");
     addChoices([
-      { label: "🍅 Créer une recette avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
-      { label: "🍰 Créer une recette selon mes envies", action: () => handleChoice("envie") },
+      { label: "🍅 Avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
+      { label: "🍰 Selon mes envies", action: () => handleChoice("envie") },
       { label: "🎁 Me laisser surprendre", action: () => handleChoice("surprise") }
     ]);
   }
