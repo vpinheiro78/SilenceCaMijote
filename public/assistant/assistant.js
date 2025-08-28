@@ -6,18 +6,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
-  let userRecipeText = ""; // texte complet pour téléchargement
+  let userRecipeText = "";
 
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
-
     if (Array.isArray(text)) {
       text.forEach(t => div.appendChild(t));
     } else {
-      div.innerText = text;
+      div.innerHTML = text;
     }
-
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
   }
@@ -103,27 +101,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lines.forEach(line => {
       let div;
-      if (/^# /.test(line)) {
-        div = document.createElement('h1');
-        div.innerText = line.replace(/^# /, '');
-      } else if (/^## /.test(line)) {
+      if (/^Ingrédients/i.test(line)) {
         div = document.createElement('h2');
-        div.innerText = line.replace(/^## /, '');
-      } else if (/^- /.test(line)) {
-        div = document.createElement('span');
-        div.className = 'ingredient-card';
-        div.innerText = line.replace(/^- /, '');
-      } else if (/^\d+\. /.test(line)) {
+        div.innerText = line;
+      } else if (/^Préparation/i.test(line)) {
+        div = document.createElement('h2');
+        div.innerText = line;
+      } else if (/^\d+/.test(line)) {
         div = document.createElement('div');
         div.className = 'etape-card';
-        const match = line.match(/^(\d+)\.\s+(.*)/);
-        div.innerHTML = `<span class="etape-num">${match[1]}</span> <p>${match[2]}</p>`;
-      } else {
+        div.innerHTML = `<p>${line}</p>`;
+      } else if (line.match(/^\d*[\w\s]+$/)) {
         div = document.createElement('p');
         div.innerText = line;
+      } else {
+        div = document.createElement('span');
+        div.className = 'ingredient-card';
+        div.innerText = line;
+        div.style.display = "block"; // un ingrédient par ligne
       }
       formatted.push(div);
     });
+
+    // Ajoute la phrase finale
+    const fin = document.createElement('p');
+    fin.innerText = "Bonne dégustation !";
+    formatted.push(fin);
 
     return formatted;
   }
@@ -147,22 +150,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.createElement("button");
     downloadBtn.className = "choice-btn";
     downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = async () => {
+    downloadBtn.onclick = () => {
       const tempDiv = document.createElement("div");
       tempDiv.style.padding = "20px";
       tempDiv.style.background = "#fff8f0";
       tempDiv.style.borderRadius = "15px";
       tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-      tempDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">` +
-                          userRecipeText.replace(/^# (.*)$/gm, '$1')
-                                        .replace(/^## (.*)$/gm, '$1')
-                                        .replace(/^- (.*)$/gm, '$1')
-                                        .replace(/^\d+\. (.*)$/gm, '<div class="etape-card"><p>$1</p></div>');
+      tempDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">` + 
+                          userRecipeText.split("\n").map(line => `<p>${line}</p>`).join('');
 
-      if(!window.html2canvas){
-        const script=document.createElement('script');
-        script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload=()=>capture(tempDiv);
+      if (!window.html2canvas) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = () => capture(tempDiv);
         document.body.appendChild(script);
       } else {
         capture(tempDiv);
@@ -180,12 +180,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     div.appendChild(whatsappBtn);
 
-    function capture(element){
-      html2canvas(element).then(canvas=>{
-        const img=canvas.toDataURL('image/png');
-        const a=document.createElement('a');
-        a.href=img;
-        a.download='ma_recette.png';
+    function capture(element) {
+      html2canvas(element).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'ma_recette.png';
         a.click();
       });
     }
