@@ -6,13 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
-  let userRecipeText = ""; // texte complet pour téléchargement
+  let userRecipeText = ""; // stocke le texte complet de la recette
 
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
 
-    // si text est un tableau (éléments formatés)
     if (Array.isArray(text)) {
       text.forEach(t => div.appendChild(t));
     } else {
@@ -88,7 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
         userRecipeText = data.reply;
         const formatted = formatRecipeForDisplay(data.reply);
         addMessage(formatted, "bot");
-        offerFeedback();
+
+        // --- Affiche directement les boutons après la recette ---
+        showDownloadAndShareButtons();
       } else {
         addMessage("⚠️ Pas de réponse du serveur.");
       }
@@ -100,79 +101,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatRecipeForDisplay(text) {
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-    const formatted = [];
-
-    lines.forEach(line => {
-      let div;
-      if (/^# /.test(line)) {
-        // Titre principal
-        div = document.createElement('h1');
-        div.innerText = line.replace(/^# /, '');
-      } else if (/^## /.test(line)) {
-        // Sous-titres
-        div = document.createElement('h2');
-        div.innerText = line.replace(/^## /, '');
-      } else if (/^- /.test(line)) {
-        // Ingrédients
-        div = document.createElement('span');
-        div.className = 'ingredient-card';
-        div.innerText = line.replace(/^- /, '');
-      } else if (/^\d+\. /.test(line)) {
-        // Étapes
-        div = document.createElement('div');
-        div.className = 'etape-card';
-        const match = line.match(/^(\d+)\.\s+(.*)/);
-        div.innerHTML = `<span class="etape-num">${match[1]}</span> <p>${match[2]}</p>`;
-      } else {
-        div = document.createElement('p');
-        div.innerText = line;
-      }
-      formatted.push(div);
+    return lines.map(line => {
+      const div = document.createElement("div");
+      div.className = line.toLowerCase().startsWith("ingrédients") ? "ingredient-card" : "etape-card";
+      div.innerText = line;
+      return div;
     });
-
-    return formatted;
   }
 
-  function offerFeedback() {
-    addChoices([
-      { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
-      { label: "🔄 As-tu autre chose à me proposer ?", action: repeatRecipe },
-      { label: "✏️ Changer mes ingrédients ou envies", action: modifyInputs }
-    ]);
-  }
-
-  function satisfied() {
-    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.");
-
+  function showDownloadAndShareButtons() {
     const div = document.createElement("div");
     div.className = "choices";
-    chat.appendChild(div);
 
     // Télécharger
     const downloadBtn = document.createElement("button");
     downloadBtn.className = "choice-btn";
     downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = async () => {
-      // Crée un div temporaire pour le style
-      const tempDiv = document.createElement("div");
-      tempDiv.style.padding = "20px";
-      tempDiv.style.background = "#fff8f0";
-      tempDiv.style.borderRadius = "15px";
-      tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-      tempDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">` + 
-                          userRecipeText.replace(/^# (.*)$/gm, '<h1>$1</h1>')
-                                        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-                                        .replace(/^- (.*)$/gm, '<span class="ingredient-card">$1</span>')
-                                        .replace(/^\d+\. (.*)$/gm, '<div class="etape-card"><p>$1</p></div>');
-      
-      if(!window.html2canvas){
-        const script=document.createElement('script');
-        script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload=()=>capture(tempDiv);
-        document.body.appendChild(script);
-      } else {
-        capture(tempDiv);
-      }
+    downloadBtn.onclick = () => {
+      const blob = new Blob([userRecipeText], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ma_recette.txt";
+      a.click();
+      URL.revokeObjectURL(url);
     };
     div.appendChild(downloadBtn);
 
@@ -186,15 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     div.appendChild(whatsappBtn);
 
-    function capture(element){
-      html2canvas(element).then(canvas=>{
-        const img=canvas.toDataURL('image/png');
-        const a=document.createElement('a');
-        a.href=img;
-        a.download='ma_recette.png';
-        a.click();
-      });
-    }
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Offre un feedback supplémentaire
+    offerFeedback();
+  }
+
+  function offerFeedback() {
+    addChoices([
+      { label: "🔄 As-tu autre chose à me proposer ?", action: repeatRecipe },
+      { label: "✏️ Changer mes ingrédients ou envies", action: modifyInputs }
+    ]);
   }
 
   function repeatRecipe() {
@@ -243,8 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
     addMessage("Que veux-tu cuisiner aujourd’hui ?");
     addChoices([
-      { label: "🍅 Avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
-      { label: "🍰 Selon mes envies", action: () => handleChoice("envie") },
+      { label: "🍅 Créer une recette avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
+      { label: "🍰 Créer une recette selon mes envies", action: () => handleChoice("envie") },
       { label: "🎁 Me laisser surprendre", action: () => handleChoice("surprise") }
     ]);
   }
