@@ -101,43 +101,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lines.forEach(line => {
       let div;
-      if (/^# /.test(line)) { // titre principal
+      // Titre principal
+      if (/^# /.test(line)) {
         div = document.createElement("h1");
         div.innerText = line.replace(/^# /, '');
         div.style.fontSize = "28px";
         div.style.fontWeight = "bold";
         div.style.marginBottom = "10px";
-      } 
-      else if (/^## /.test(line)) { // sous-titre
-        div = document.createElement("div");
-        div.innerHTML = `<b>${line.replace(/^## /, '')}</b>`;
-        div.style.fontSize = "20px";
+      }
+      // Sous-titres
+      else if (/^## /.test(line)) {
+        div = document.createElement("h2");
+        div.innerText = line.replace(/^## /, '');
+        div.style.fontSize = "22px";
+        div.style.fontWeight = "600";
         div.style.marginTop = "15px";
         div.style.marginBottom = "5px";
-      } 
-      else if (/^### /.test(line)) { // sous-sous-titre
-        div = document.createElement("div");
-        div.innerHTML = `<b>${line.replace(/^### /, '')}</b>`;
-        div.style.fontSize = "18px";
-        div.style.marginTop = "10px";
-        div.style.marginBottom = "3px";
-      } 
-      else if (/^- /.test(line)) { // ingrédients
+      }
+      // Ingrédients
+      else if (/^- /.test(line)) {
         div = document.createElement('div');
+        div.className = 'ingredient-card';
         div.innerText = line.replace(/^- /, '');
+        div.style.display = "block";
         div.style.marginBottom = "3px";
-      } 
-      else if (/^\d+/.test(line)) { // étapes
+      }
+      // Étapes
+      else if (/^\d+/.test(line)) {
         div = document.createElement('div');
+        div.className = 'etape-card';
         div.innerText = line.replace(/\*\*/g,''); // supprime les **
         div.style.marginBottom = "5px";
-      } 
+      }
       else {
         div = document.createElement('p');
         div.innerText = line.replace(/\*\*/g,'');
       }
       formatted.push(div);
     });
+
+    const fin = document.createElement('p');
+    fin.innerText = "Bonne dégustation !";
+    fin.style.marginTop = "15px";
+    formatted.push(fin);
 
     return formatted;
   }
@@ -168,13 +174,13 @@ document.addEventListener("DOMContentLoaded", () => {
       tempDiv.style.borderRadius = "15px";
       tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
-      // convertir texte en HTML stylé sans # ni ##
+      // Reconstruire la recette avec les titres et ingrédients stylés
       tempDiv.innerHTML = userRecipeText
         .replace(/^# (.*)$/gm, '<h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">$1</h1>')
-        .replace(/^## (.*)$/gm, '<b style="font-size:20px;margin-top:15px;margin-bottom:5px;">$1</b>')
-        .replace(/^### (.*)$/gm, '<b style="font-size:18px;margin-top:10px;margin-bottom:3px;">$1</b>')
+        .replace(/^## (.*)$/gm, '<h2 style="font-size:22px;font-weight:600;margin-top:15px;margin-bottom:5px;">$1</h2>')
         .replace(/^- (.*)$/gm, '<div style="margin-bottom:3px;">$1</div>')
-        .replace(/\*\*/g,''); // supprime **
+        .replace(/\*\*/g,'') +
+        '<p style="margin-top:15px;">Bonne dégustation !</p>';
 
       if (!window.html2canvas) {
         const script = document.createElement('script');
@@ -198,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     div.appendChild(whatsappBtn);
 
     function capture(element) {
-      html2canvas(element, { useCORS: true, scale: 2 }).then(canvas => {
+      html2canvas(element, { useCORS: true }).then(canvas => {
         const img = canvas.toDataURL('image/png');
         const a = document.createElement('a');
         a.href = img;
