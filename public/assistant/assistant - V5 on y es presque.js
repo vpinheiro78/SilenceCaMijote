@@ -150,107 +150,63 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
-function satisfied() {
-  addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.");
+  function satisfied() {
+    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.");
 
-  const div = document.createElement("div");
-  div.className = "choices";
-  chat.appendChild(div);
+    const div = document.createElement("div");
+    div.className = "choices";
+    chat.appendChild(div);
 
-  // Télécharger
-  const downloadBtn = document.createElement("button");
-  downloadBtn.className = "choice-btn";
-  downloadBtn.innerText = "⬇️ Télécharger ma recette";
-  downloadBtn.onclick = () => {
-    const tempDiv = document.createElement("div");
-    tempDiv.style.padding = "20px";
-    tempDiv.style.background = "#fff8f0";
-    tempDiv.style.borderRadius = "15px";
-    tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-    tempDiv.style.width = "600px";
+    // Télécharger
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "choice-btn";
+    downloadBtn.innerText = "⬇️ Télécharger ma recette";
+    downloadBtn.onclick = () => {
+      const tempDiv = document.createElement("div");
+      tempDiv.style.padding = "20px";
+      tempDiv.style.background = "#fff8f0";
+      tempDiv.style.borderRadius = "15px";
+      tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
-    // logo
-    const logo = document.createElement("img");
-    logo.src = "logo.png";
-    logo.style.width = "80px";
-    logo.style.display = "block";
-    logo.style.marginBottom = "10px";
-    tempDiv.appendChild(logo);
+      // convertir texte en HTML stylé sans # ni ##
+      tempDiv.innerHTML = userRecipeText
+        .replace(/^# (.*)$/gm, '<h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">$1</h1>')
+        .replace(/^## (.*)$/gm, '<b style="font-size:20px;margin-top:15px;margin-bottom:5px;">$1</b>')
+        .replace(/^### (.*)$/gm, '<b style="font-size:18px;margin-top:10px;margin-bottom:3px;">$1</b>')
+        .replace(/^- (.*)$/gm, '<div style="margin-bottom:3px;">$1</div>')
+        .replace(/\*\*/g,''); // supprime **
 
-    // titre principal
-    const titre = document.createElement("h1");
-    titre.innerText = userRecipeText.split("\n")[0].replace(/^# /, '');
-    titre.style.fontSize = "28px";
-    titre.style.fontWeight = "bold";
-    titre.style.marginBottom = "10px";
-    tempDiv.appendChild(titre);
-
-    // ingrédients et préparation
-    const lines = userRecipeText.split("\n").map(l=>l.trim()).filter(Boolean);
-    let inIngredients=false, inPreparation=false;
-
-    lines.forEach(line=>{
-      if(/^## Ingrédients/i.test(line)){ inIngredients=true; inPreparation=false; return; }
-      if(/^## Préparation/i.test(line)){ inPreparation=true; inIngredients=false; return; }
-      if(inIngredients && line.startsWith('- ')){
-        const card=document.createElement('span');
-        card.className='ingredient-card';
-        card.style.display='inline-block';
-        card.style.background='#ffe6d1';
-        card.style.padding='8px 12px';
-        card.style.margin='5px';
-        card.style.borderRadius='10px';
-        card.style.fontWeight='bold';
-        card.style.fontSize='0.95em';
-        card.innerText=line.replace(/^- /,'');
-        tempDiv.appendChild(card);
-      } else if(inPreparation && /^\d+/.test(line)){
-        const divEtape=document.createElement('div');
-        divEtape.className='etape-card';
-        divEtape.style.background='#fff3e0';
-        divEtape.style.borderRadius='12px';
-        divEtape.style.marginBottom='15px';
-        divEtape.style.padding='15px';
-        divEtape.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';
-        const match=line.match(/^(\d+)\. (.*)/);
-        if(match){
-          divEtape.innerHTML=`<span class="etape-num" style="display:inline-block;background:#e67e22;color:white;font-weight:bold;border-radius:50%;width:30px;height:30px;line-height:30px;text-align:center;margin-right:10px;">${match[1]}</span> <p>${match[2].replace(/\*\*/g,'')}</p>`;
-        } else { divEtape.innerText=line.replace(/\*\*/g,''); }
-        tempDiv.appendChild(divEtape);
+      if (!window.html2canvas) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = () => capture(tempDiv);
+        document.body.appendChild(script);
+      } else {
+        capture(tempDiv);
       }
-    });
+    };
+    div.appendChild(downloadBtn);
 
-    // capture html2canvas
-    if(!window.html2canvas){
-      const script=document.createElement('script');
-      script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      script.onload=()=>capture(tempDiv);
-      document.body.appendChild(script);
-    } else { capture(tempDiv); }
+    // WhatsApp
+    const whatsappBtn = document.createElement("button");
+    whatsappBtn.className = "choice-btn";
+    whatsappBtn.innerText = "💬 Partager sur WhatsApp";
+    whatsappBtn.onclick = () => {
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(userRecipeText)}`;
+      window.open(url, "_blank");
+    };
+    div.appendChild(whatsappBtn);
 
-    function capture(element){
-      html2canvas(element,{useCORS:true,scale:2}).then(canvas=>{
-        const img=canvas.toDataURL('image/png');
-        const a=document.createElement('a');
-        a.href=img;
-        a.download='ma_recette.png';
+    function capture(element) {
+      html2canvas(element, { useCORS: true, scale: 2 }).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'ma_recette.png';
         a.click();
       });
     }
-  };
-  div.appendChild(downloadBtn);
-
-  // WhatsApp
-  const whatsappBtn = document.createElement("button");
-  whatsappBtn.className = "choice-btn";
-  whatsappBtn.innerText = "💬 Partager sur WhatsApp";
-  whatsappBtn.onclick = () => {
-    const url=`https://api.whatsapp.com/send?text=${encodeURIComponent(userRecipeText)}`;
-    window.open(url,"_blank");
-  };
-  div.appendChild(whatsappBtn);
-}
-
+  }
 
   function repeatRecipe() {
     addMessage("Je te prépare une nouvelle suggestion ... 🍳");
