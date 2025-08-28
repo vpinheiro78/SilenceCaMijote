@@ -179,6 +179,7 @@ function satisfied() {
     logo.style.width = "80px";
     logo.style.display = "block";
     logo.style.marginBottom = "10px";
+	logo.onload = () => capture(tempDiv); // capture après que le logo est chargé
     tempDiv.appendChild(logo);
 
     // titre principal
