@@ -8,13 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let userPersons = 1;
   let userRecipeText = "";
 
-  function addMessage(text, sender = "bot") {
+  function addMessage(content, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
-    if (Array.isArray(text)) {
-      text.forEach(t => div.appendChild(t));
+    if (Array.isArray(content)) {
+      content.forEach(c => div.appendChild(c));
     } else {
-      div.innerHTML = text;
+      div.innerHTML = content;
     }
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
@@ -101,31 +101,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lines.forEach(line => {
       let div;
-      if (/^Ingrédients/i.test(line)) {
-        div = document.createElement('h2');
-        div.innerText = line;
-      } else if (/^Préparation/i.test(line)) {
-        div = document.createElement('h2');
-        div.innerText = line;
-      } else if (/^\d+/.test(line)) {
+      // Titre principal
+      if (/^# /.test(line)) {
+        div = document.createElement("h1");
+        div.innerText = line.replace(/^# /, '');
+        div.style.fontSize = "28px";
+        div.style.fontWeight = "bold";
+        div.style.marginBottom = "10px";
+      }
+      // Sous-titres
+      else if (/^## /.test(line)) {
+        div = document.createElement("h2");
+        div.innerText = line.replace(/^## /, '');
+        div.style.fontSize = "22px";
+        div.style.fontWeight = "600";
+        div.style.marginTop = "15px";
+        div.style.marginBottom = "5px";
+      }
+      // Ingrédients
+      else if (/^- /.test(line)) {
+        div = document.createElement('div');
+        div.className = 'ingredient-card';
+        div.innerText = line.replace(/^- /, '');
+        div.style.display = "block";
+        div.style.marginBottom = "3px";
+      }
+      // Étapes
+      else if (/^\d+/.test(line)) {
         div = document.createElement('div');
         div.className = 'etape-card';
-        div.innerHTML = `<p>${line}</p>`;
-      } else if (line.match(/^\d*[\w\s]+$/)) {
+        div.innerText = line.replace(/\*\*/g,''); // supprime les **
+        div.style.marginBottom = "5px";
+      }
+      else {
         div = document.createElement('p');
-        div.innerText = line;
-      } else {
-        div = document.createElement('span');
-        div.className = 'ingredient-card';
-        div.innerText = line;
-        div.style.display = "block"; // un ingrédient par ligne
+        div.innerText = line.replace(/\*\*/g,'');
       }
       formatted.push(div);
     });
 
-    // Ajoute la phrase finale
     const fin = document.createElement('p');
     fin.innerText = "Bonne dégustation !";
+    fin.style.marginTop = "15px";
     formatted.push(fin);
 
     return formatted;
@@ -156,8 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
       tempDiv.style.background = "#fff8f0";
       tempDiv.style.borderRadius = "15px";
       tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-      tempDiv.innerHTML = `<img src="logo.png" alt="Logo" style="width:80px;margin-bottom:10px;">` + 
-                          userRecipeText.split("\n").map(line => `<p>${line}</p>`).join('');
+
+      // Reconstruire la recette avec les titres et ingrédients stylés
+      tempDiv.innerHTML = userRecipeText
+        .replace(/^# (.*)$/gm, '<h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">$1</h1>')
+        .replace(/^## (.*)$/gm, '<h2 style="font-size:22px;font-weight:600;margin-top:15px;margin-bottom:5px;">$1</h2>')
+        .replace(/^- (.*)$/gm, '<div style="margin-bottom:3px;">$1</div>')
+        .replace(/\*\*/g,'') +
+        '<p style="margin-top:15px;">Bonne dégustation !</p>';
 
       if (!window.html2canvas) {
         const script = document.createElement('script');
@@ -181,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     div.appendChild(whatsappBtn);
 
     function capture(element) {
-      html2canvas(element).then(canvas => {
+      html2canvas(element, { useCORS: true }).then(canvas => {
         const img = canvas.toDataURL('image/png');
         const a = document.createElement('a');
         a.href = img;
