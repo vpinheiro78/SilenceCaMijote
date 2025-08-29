@@ -1,4 +1,3 @@
-// assistant.js
 document.addEventListener("DOMContentLoaded", () => {
   const chat = document.getElementById("chat");
   const inputContainer = document.getElementById("input-container");
@@ -7,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let userEnvie = "";
   let userPersons = 1;
   let userRecipeText = "";
-  let finishAnimation = null;
 
   function addMessage(content, sender = "bot") {
     const div = document.createElement("div");
@@ -73,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function showPreparationAnimation() {
+  function showPreparationAnimation(callbackMessage) {
     const anim = document.createElement("div");
     anim.className = "preparation-animation";
     anim.innerHTML = "⏳ Je prépare pour vous une belle recette...";
@@ -88,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bar.style.width = "0%";
     bar.style.height = "100%";
     bar.style.background = "#e67e22";
-    bar.style.transition = "width 0.1s linear";
 
     barContainer.appendChild(bar);
     anim.appendChild(barContainer);
@@ -97,27 +94,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let width = 0;
     const interval = setInterval(() => {
-      if (width < 95) { // progresse doucement jusqu'à 95%
-        width += 0.3;
+      if (width < 100) {
+        width += 0.3; // progression douce
         bar.style.width = width + "%";
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          anim.remove();
+          sendToBackend(callbackMessage);
+        }, 300);
       }
     }, 50);
-
-    return () => {
-      clearInterval(interval);
-      bar.style.width = "100%";
-      setTimeout(() => {
-        anim.remove();
-        sendToBackend(callbackMessage);
-      }, 300);
-    };
   }
 
   function startPreparation(callbackMessage) {
-    const finish = showPreparationAnimation();
-    finish(); // <-- appel pour déclencher la suite
-}
-
+    showPreparationAnimation(callbackMessage);
+  }
 
   async function sendToBackend(message) {
     try {
@@ -196,10 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
-  // --- téléchargement et partage
   function satisfied() {
     addMessage("Top ! Je suis ravi 😄. Vous pouvez télécharger ou partager votre recette.");
-
     const div = document.createElement("div");
     div.className = "choices";
     chat.appendChild(div);
