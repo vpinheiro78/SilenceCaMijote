@@ -114,8 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startPreparation(callbackMessage) {
-    finishAnimation = showPreparationAnimation();
-  }
+    const finish = showPreparationAnimation();
+    finish(); // <-- appel pour déclencher la suite
+}
+
 
   async function sendToBackend(message) {
     try {
