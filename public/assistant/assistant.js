@@ -1,52 +1,12 @@
-// assistant.js
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Elements de base
   const chat = document.getElementById("chat");
   const inputContainer = document.getElementById("input-container");
 
-  // --- Etat global
   let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
   let userRecipeText = "";
 
-  // --- Injecter le mini CSS nécessaire (effet live + progress bar)
-  (function injectMiniCSS() {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      .message { margin: 10px 0; line-height: 1.5; }
-      .message.bot { background:#fff; }
-      .choices { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-      .choice-btn, .send-btn { cursor:pointer; border:none; padding:10px 14px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
-      .choice-btn { background:#fff; }
-      .send-btn { background:#e67e22; color:#fff; font-weight:600; }
-      .big-textarea { width:100%; min-height:90px; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:8px; }
-
-      /* Effet "Hugo cuisine en live" */
-      .live-cooking {
-        display:flex; align-items:center; gap:8px; font-style:italic; opacity:.9;
-        background:#fffaf4; border:1px solid #ffe5cc; padding:10px 12px; border-radius:12px;
-      }
-      .live-cooking .dots span { animation: blink 1.4s infinite both; font-size:18px; }
-      .live-cooking .dots span:nth-child(2){ animation-delay:.2s; }
-      .live-cooking .dots span:nth-child(3){ animation-delay:.4s; }
-      @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-
-      /* Progress bar */
-      .prep-wrap { margin:8px 0 4px; }
-      .prep-title { font-size:14px; opacity:.85; margin-bottom:6px; }
-      .prep-bar { width:100%; height:6px; background:#eee; border-radius:999px; overflow:hidden; }
-      .prep-bar > div { height:100%; width:0%; background:#e67e22; transition:width .12s linear; }
-
-      /* Petites cartes "étape" lors du rendu pour le PNG */
-      .png-ingredient { display:inline-block; background:#ffe6d1; padding:8px 12px; margin:5px; border-radius:10px; font-weight:600; }
-      .png-step { background:#fff3e0; border-radius:12px; margin-bottom:15px; padding:15px; box-shadow:0 4px 12px rgba(0,0,0,.08); }
-      .png-step .num { display:inline-block; background:#e67e22; color:#fff; font-weight:700; border-radius:50%; width:30px; height:30px; line-height:30px; text-align:center; margin-right:10px; }
-    `;
-    document.head.appendChild(style);
-  })();
-
-  // --- UI helpers
   function addMessage(content, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
@@ -98,72 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     textarea.focus();
   }
 
-  // --- Effet "Hugo cuisine en live" + Progression douce + messages patience
-  function showLiveCookingUI() {
-    // Bulle "Hugo est en cuisine..."
-    const live = document.createElement("div");
-    live.className = "message bot live-cooking";
-    live.id = "liveCooking";
-    live.innerHTML = `
-      <span>👨‍🍳 Hugo est en cuisine...</span>
-      <span class="dots"><span>.</span><span>.</span><span>.</span></span>
-    `;
-    chat.appendChild(live);
-
-    // Progress bar
-    const wrap = document.createElement("div");
-    wrap.className = "prep-wrap message bot";
-    wrap.id = "prepWrap";
-    wrap.innerHTML = `
-      <div class="prep-title">⏳ Je prépare pour vous une belle recette...</div>
-      <div class="prep-bar"><div id="prepFill"></div></div>
-    `;
-    chat.appendChild(wrap);
-    chat.scrollTop = chat.scrollHeight;
-
-    // Progression douce : monte jusqu'à 92%, termine sur callback
-    const fill = wrap.querySelector("#prepFill");
-    let width = 0;
-    const interval = setInterval(() => {
-      if (width < 92) {
-        width += 0.25; // douceur
-        fill.style.width = width + "%";
-      }
-    }, 60);
-
-    // Messages de patience
-    const patienceMsgs = [
-      "Je hache vos ingrédients... 🔪",
-      "Je fais mijoter la sauce... 🍲",
-      "Je dispose joliment les herbes... 🌿",
-    ];
-    let pmIdx = 0;
-    const patienceInterval = setInterval(() => {
-      if (pmIdx < patienceMsgs.length) {
-        addMessage(patienceMsgs[pmIdx], "bot");
-        pmIdx++;
-      } else {
-        clearInterval(patienceInterval);
-      }
-    }, 3500);
-
-    // Nettoyage + fin
-    function finish() {
-      clearInterval(interval);
-      clearInterval(patienceInterval);
-      fill.style.width = "100%";
-      setTimeout(() => {
-        const liveEl = document.getElementById("liveCooking");
-        const wrapEl = document.getElementById("prepWrap");
-        if (liveEl) liveEl.remove();
-        if (wrapEl) wrapEl.remove();
-      }, 180);
-    }
-
-    return { finish };
-  }
-
-  // --- Flow "combien de personnes"
   function askPersons(callbackMessage) {
     addInputField("Pour combien de personnes ?", (value) => {
       const persons = parseInt(value, 10);
@@ -177,19 +71,70 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Lancer la préparation (UI + appel backend)
-  async function startPreparation(callbackMessage) {
-    const prep = showLiveCookingUI(); // affiche UI attente
+  // --- Barre de progression douce avec messages de patience ---
+  function showPreparationAnimation() {
+    return new Promise((resolve) => {
+      const anim = document.createElement("div");
+      anim.className = "preparation-animation";
+      anim.innerHTML = "⏳ Je prépare pour vous une belle recette...";
 
-    try {
-      await sendToBackend(callbackMessage); // dès que la recette arrive, on affiche
-    } finally {
-      // quoi qu'il arrive, on termine l'UI d'attente
-      prep.finish();
-    }
+      const barContainer = document.createElement("div");
+      barContainer.style.width = "100%";
+      barContainer.style.height = "6px";
+      barContainer.style.background = "#eee";
+      barContainer.style.marginTop = "5px";
+
+      const bar = document.createElement("div");
+      bar.style.width = "0%";
+      bar.style.height = "100%";
+      bar.style.background = "#e67e22";
+      barContainer.appendChild(bar);
+      anim.appendChild(barContainer);
+      chat.appendChild(anim);
+      chat.scrollTop = chat.scrollHeight;
+
+      let width = 0;
+      const interval = setInterval(() => {
+        if (width < 90) {
+          width += 0.2; // progression douce
+          bar.style.width = width + "%";
+        }
+      }, 50);
+
+      // messages de patience
+      const messages = [
+        "Je hache vos ingrédients... 🔪",
+        "Je fais mijoter la sauce... 🍲",
+        "Je dispose joliment les épices... 🌿"
+      ];
+      let msgIndex = 0;
+      const msgInterval = setInterval(() => {
+        if (msgIndex < messages.length) {
+          addMessage(messages[msgIndex]);
+          msgIndex++;
+        } else {
+          clearInterval(msgInterval);
+        }
+      }, 4000);
+
+      resolve({
+        finish: () => {
+          clearInterval(interval);
+          bar.style.width = "100%";
+          anim.remove();
+        }
+      });
+    });
   }
 
-  // --- Appel backend (Netlify Function)
+  async function startPreparation(callbackMessage) {
+    const prepAnim = await showPreparationAnimation();
+    // en parallèle, on lance le fetch
+    sendToBackend(callbackMessage).then(() => {
+      prepAnim.finish(); // barre complète dès que la recette est prête
+    });
+  }
+
   async function sendToBackend(message) {
     try {
       const res = await fetch("/.netlify/functions/recipe", {
@@ -198,21 +143,20 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ message, persons: userPersons })
       });
       const data = await res.json();
-      if (data && data.reply) {
+      if (data.reply) {
         userRecipeText = data.reply;
         const formatted = formatRecipeForDisplay(data.reply);
         addMessage(formatted, "bot");
         offerFeedback();
       } else {
-        addMessage("⚠️ Pas de réponse du serveur.", "bot");
+        addMessage("⚠️ Pas de réponse du serveur.");
       }
     } catch (err) {
       console.error(err);
-      addMessage("⚠️ Erreur de communication avec le serveur.", "bot");
+      addMessage("⚠️ Erreur de communication avec le serveur.");
     }
   }
 
-  // --- Mise en forme recette (Markdown simple → DOM)
   function formatRecipeForDisplay(text) {
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
     const formatted = [];
@@ -253,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return formatted;
   }
 
-  // --- After-recipe actions
   function offerFeedback() {
     addChoices([
       { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
@@ -262,42 +205,31 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
-  // --- Télécharger joli PNG + Partage WhatsApp
-  function satisfied() {
-    addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.", "bot");
+  // Téléchargement / partage
 
-    const div = document.createElement("div");
-    div.className = "choices";
-    chat.appendChild(div);
+function satisfied() {
+  addMessage("Top ! Je suis ravi 😄. Tu peux télécharger ou partager ta recette.");
 
-    const downloadBtn = document.createElement("button");
-    downloadBtn.className = "choice-btn";
-    downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = downloadRecipePNG;
-    div.appendChild(downloadBtn);
+  const div = document.createElement("div");
+  div.className = "choices";
+  chat.appendChild(div);
 
-    const whatsappBtn = document.createElement("button");
-    whatsappBtn.className = "choice-btn";
-    whatsappBtn.innerText = "💬 Partager sur WhatsApp";
-    whatsappBtn.onclick = () => {
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(userRecipeText)}`;
-      window.open(url, "_blank");
-    };
-    div.appendChild(whatsappBtn);
-  }
-
-  function downloadRecipePNG() {
+  // Télécharger
+  const downloadBtn = document.createElement("button");
+  downloadBtn.className = "choice-btn";
+  downloadBtn.innerText = "⬇️ Télécharger ma recette";
+  downloadBtn.onclick = () => {
     const tempDiv = document.createElement("div");
     tempDiv.style.padding = "20px";
     tempDiv.style.background = "#fff8f0";
     tempDiv.style.borderRadius = "15px";
     tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
     tempDiv.style.width = "600px";
-    tempDiv.style.position = "absolute";
+    tempDiv.style.position = "absolute"; 
     tempDiv.style.left = "-9999px";
     document.body.appendChild(tempDiv);
 
-    // logo (facultatif : modifie le chemin si besoin)
+    // logo
     const logo = document.createElement("img");
     logo.src = "assistant/logo.png";
     logo.style.width = "80px";
@@ -305,41 +237,51 @@ document.addEventListener("DOMContentLoaded", () => {
     logo.style.marginBottom = "10px";
     tempDiv.appendChild(logo);
 
-    // titre
+    // titre principal
     const titre = document.createElement("h1");
-    titre.innerText = (userRecipeText.split("\n")[0] || "").replace(/^#\s*/, '');
+    titre.innerText = userRecipeText.split("\n")[0].replace(/^#\s*/, '');
     titre.style.fontSize = "28px";
     titre.style.fontWeight = "bold";
     titre.style.marginBottom = "10px";
     tempDiv.appendChild(titre);
 
-    // contenu (ingrédients / préparation)
+    // ingrédients et préparation
     const lines = userRecipeText.split("\n").map(l => l.trim()).filter(Boolean);
     let inIngredients = false, inPreparation = false;
 
     lines.forEach(line => {
-      if (/^##\s*ingrédients/i.test(line)) { inIngredients = true; inPreparation = false; return; }
-      if (/^##\s*préparation/i.test(line)) { inPreparation = true; inIngredients = false; return; }
+      if (/ingrédients/i.test(line)) { inIngredients = true; inPreparation = false; return; }
+      if (/préparation/i.test(line)) { inPreparation = true; inIngredients = false; return; }
 
       if (inIngredients && line.startsWith('- ')) {
         const card = document.createElement('span');
-        card.className = 'png-ingredient';
+        card.className = 'ingredient-card';
+        card.style.display = 'inline-block';
+        card.style.background = '#ffe6d1';
+        card.style.padding = '8px 12px';
+        card.style.margin = '5px';
+        card.style.borderRadius = '10px';
+        card.style.fontWeight = 'bold';
+        card.style.fontSize = '0.95em';
         card.innerText = line.replace(/^- /, '');
         tempDiv.appendChild(card);
-      } else if (inPreparation && /^\d+/.test(line)) {
-        const step = document.createElement('div');
-        step.className = 'png-step';
-        const match = line.match(/^(\d+)\.\s?(.*)/);
+      } 
+      else if (inPreparation && /^\d+/.test(line)) {
+        const divEtape = document.createElement('div');
+        divEtape.className = 'etape-card';
+        divEtape.style.background = '#fff3e0';
+        divEtape.style.borderRadius = '12px';
+        divEtape.style.marginBottom = '15px';
+        divEtape.style.padding = '15px';
+        divEtape.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+        const match = line.match(/^(\d+)\. (.*)/);
         if (match) {
-          step.innerHTML = `<span class="num">${match[1]}</span> <span>${match[2].replace(/\*\*/g,'')}</span>`;
-        } else {
-          step.innerText = line.replace(/\*\*/g,'');
-        }
-        tempDiv.appendChild(step);
+          divEtape.innerHTML = `<span class="etape-num" style="display:inline-block;background:#e67e22;color:white;font-weight:bold;border-radius:50%;width:30px;height:30px;line-height:30px;text-align:center;margin-right:10px;">${match[1]}</span> <p>${match[2].replace(/\*\*/g,'')}</p>`;
+        } else { divEtape.innerText = line.replace(/\*\*/g,''); }
+        tempDiv.appendChild(divEtape);
       }
     });
 
-    // capture html2canvas
     function capture(element){
       html2canvas(element, { useCORS: true, scale: 2 }).then(canvas => {
         const img = canvas.toDataURL('image/png');
@@ -357,9 +299,30 @@ document.addEventListener("DOMContentLoaded", () => {
       script.onload = () => capture(tempDiv);
       document.body.appendChild(script);
     } else { capture(tempDiv); }
+  };
+  div.appendChild(downloadBtn);
+
+  // WhatsApp
+  const whatsappBtn = document.createElement("button");
+  whatsappBtn.className = "choice-btn";
+  whatsappBtn.innerText = "💬 Partager sur WhatsApp";
+  whatsappBtn.onclick = () => {
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(userRecipeText)}`;
+    window.open(url, "_blank");
+  };
+  div.appendChild(whatsappBtn);
+}
+
+
+  function downloadRecipe() {
+    const blob = new Blob([userRecipeText], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "ma_recette.txt";
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
-  // --- Actions secondaires
   function repeatRecipe() {
     addMessage("Je te prépare une nouvelle suggestion ... 🍳");
     if (userIngredients) startPreparation(userIngredients);
@@ -375,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
       }},
       { label: "Modifier l'envie / type de recette", action: () => {
-          addInputField("Quelles envies veux-tu modifier ?", val => {
+          addInputField("Quelles envies voulez-vous modifier ?", val => {
             userEnvie = val;
             startPreparation(userEnvie);
           });
@@ -383,17 +346,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
-  // --- Choix init
   function handleChoice(choice) {
     if (choice === "frigo") {
       addInputField("Quels ingrédients as-tu sous la main ?", val => {
         userIngredients = val;
-        // petite confirmation ingrédients + possibilité d'ajouter
-        addMessage(`Parfait ! Donc tu as : <b>${val}</b>. Veux-tu ajouter autre chose ? (sinon, dis “non”)`);
-        addInputField("Ajoute des ingrédients (ou tape “non”)", more => {
-          if (more.toLowerCase() !== "non") userIngredients += ", " + more;
-          askPersons(userIngredients);
-        });
+        askPersons(userIngredients);
       });
     } else if (choice === "envie") {
       addChoices([
@@ -402,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         { label: "🥩 Viande", action: () => { userEnvie = "Plat avec viande"; askPersons(userEnvie); }},
         { label: "🐟 Poisson / fruits de mer", action: () => { userEnvie = "Plat avec poisson"; askPersons(userEnvie); }},
         { label: "🥗 Végétarien", action: () => { userEnvie = "Végétarien"; askPersons(userEnvie); }},
-        { label: "📝 Autre (écrire moi)", action: () => addInputField("Décris ton envie (ex: plat réconfortant, sans lactose, mexicain...)", val => { userEnvie = val; askPersons(userEnvie); })}
+        { label: "📝 Autre / écrire moi", action: () => addInputField("Quelle recette souhaitez-vous ?", val => { userEnvie = val; askPersons(userEnvie); })}
       ]);
     } else if (choice === "surprise") {
       addMessage("🎁 Super ! Je prépare une surprise culinaire...");
@@ -410,10 +367,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Démarrage
   function start() {
     addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
-    addMessage("Que veux-tu cuisiner aujourd’hui ?");
+    addMessage("Que voulez-vous cuisiner aujourd’hui ?");
     addChoices([
       { label: "🍅 Avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
       { label: "🍰 Selon mes envies", action: () => handleChoice("envie") },
