@@ -162,6 +162,7 @@ function satisfied() {
   downloadBtn.className = "choice-btn";
   downloadBtn.innerText = "⬇️ Télécharger ma recette";
   downloadBtn.onclick = () => {
+    // Crée un conteneur temporaire dans le DOM
     const tempDiv = document.createElement("div");
     tempDiv.style.padding = "20px";
     tempDiv.style.background = "#fff8f0";
@@ -169,20 +170,21 @@ function satisfied() {
     tempDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
     tempDiv.style.width = "600px";
     tempDiv.style.position = "absolute"; 
-    tempDiv.style.left = "-9999px";
+    tempDiv.style.left = "-9999px"; // hors écran pour ne pas gêner
     document.body.appendChild(tempDiv);
 
     // logo
     const logo = document.createElement("img");
-    logo.src = "assistant/logo.png";
+    logo.src = "assistant/logo.png"; // chemin corrigé
     logo.style.width = "80px";
     logo.style.display = "block";
     logo.style.marginBottom = "10px";
+	logo.onload = () => capture(tempDiv); // capture après que le logo est chargé
     tempDiv.appendChild(logo);
 
     // titre principal
     const titre = document.createElement("h1");
-    titre.innerText = userRecipeText.split("\n")[0].replace(/^#\s*/, '');
+    titre.innerText = userRecipeText.split("\n")[0].replace(/^# /, '');
     titre.style.fontSize = "28px";
     titre.style.fontWeight = "bold";
     titre.style.marginBottom = "10px";
@@ -193,11 +195,8 @@ function satisfied() {
     let inIngredients = false, inPreparation = false;
 
     lines.forEach(line => {
-      // Détection flexible des sections
-      if (/ingrédients/i.test(line)) { inIngredients = true; inPreparation = false; return; }
-      if (/préparation/i.test(line)) { inPreparation = true; inIngredients = false; return; }
-
-      // Ingrédients
+      if (/^## Ingrédients/i.test(line)) { inIngredients = true; inPreparation = false; return; }
+      if (/^## Préparation/i.test(line)) { inPreparation = true; inIngredients = false; return; }
       if (inIngredients && line.startsWith('- ')) {
         const card = document.createElement('span');
         card.className = 'ingredient-card';
@@ -210,9 +209,7 @@ function satisfied() {
         card.style.fontSize = '0.95em';
         card.innerText = line.replace(/^- /, '');
         tempDiv.appendChild(card);
-      } 
-      // Étapes de préparation
-      else if (inPreparation && /^\d+/.test(line)) {
+      } else if (inPreparation && /^\d+/.test(line)) {
         const divEtape = document.createElement('div');
         divEtape.className = 'etape-card';
         divEtape.style.background = '#fff3e0';
@@ -236,7 +233,7 @@ function satisfied() {
         a.href = img;
         a.download = 'ma_recette.png';
         a.click();
-        element.remove();
+        element.remove(); // supprime le conteneur temporaire
       }).catch(err => { console.error("Erreur capture:", err); element.remove(); });
     }
 
