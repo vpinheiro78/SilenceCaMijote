@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- Barre de progression douce avec messages de patience ---
   function showPreparationAnimation() {
     return new Promise((resolve) => {
       const anim = document.createElement("div");
@@ -94,17 +95,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let width = 0;
       const interval = setInterval(() => {
-        if (width < 95) {
-          width += 0.3;
+        if (width < 90) {
+          width += 0.2; // progression douce
           bar.style.width = width + "%";
         }
       }, 50);
+
+      // messages de patience
+      const messages = [
+        "Je hache vos ingrédients... 🔪",
+        "Je fais mijoter la sauce... 🍲",
+        "Je dispose joliment les épices... 🌿"
+      ];
+      let msgIndex = 0;
+      const msgInterval = setInterval(() => {
+        if (msgIndex < messages.length) {
+          addMessage(messages[msgIndex]);
+          msgIndex++;
+        } else {
+          clearInterval(msgInterval);
+        }
+      }, 4000);
 
       resolve({
         finish: () => {
           clearInterval(interval);
           bar.style.width = "100%";
-          setTimeout(() => anim.remove(), 300);
+          anim.remove();
         }
       });
     });
@@ -112,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function startPreparation(callbackMessage) {
     const prepAnim = await showPreparationAnimation();
-    // on lance le fetch asynchrone
+    // en parallèle, on lance le fetch
     sendToBackend(callbackMessage).then(() => {
       prepAnim.finish(); // barre complète dès que la recette est prête
     });
@@ -145,38 +162,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const formatted = [];
     lines.forEach(line => {
       let div;
-      if (/^# /.test(line)) { 
+      if (/^# /.test(line)) {
         div = document.createElement("h1");
         div.innerText = line.replace(/^# /, '');
         div.style.fontSize = "28px";
         div.style.fontWeight = "bold";
         div.style.marginBottom = "10px";
-      } 
-      else if (/^## /.test(line)) { 
+      } else if (/^## /.test(line)) {
         div = document.createElement("div");
         div.innerHTML = `<b>${line.replace(/^## /, '')}</b>`;
         div.style.fontSize = "20px";
         div.style.marginTop = "15px";
         div.style.marginBottom = "5px";
-      } 
-      else if (/^### /.test(line)) { 
+      } else if (/^### /.test(line)) {
         div = document.createElement("div");
         div.innerHTML = `<b>${line.replace(/^### /, '')}</b>`;
         div.style.fontSize = "18px";
         div.style.marginTop = "10px";
         div.style.marginBottom = "3px";
-      } 
-      else if (/^- /.test(line)) { 
+      } else if (/^- /.test(line)) {
         div = document.createElement('div');
         div.innerText = line.replace(/^- /, '');
         div.style.marginBottom = "3px";
-      } 
-      else if (/^\d+/.test(line)) { 
+      } else if (/^\d+/.test(line)) {
         div = document.createElement('div');
-        div.innerText = line.replace(/\*\*/g,''); 
+        div.innerText = line.replace(/\*\*/g,'');
         div.style.marginBottom = "5px";
-      } 
-      else {
+      } else {
         div = document.createElement('p');
         div.innerText = line.replace(/\*\*/g,'');
       }
@@ -218,8 +230,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function downloadRecipe() {
-    // contenu identique à votre version précédente
-    // ...
+    const blob = new Blob([userRecipeText], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "ma_recette.txt";
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   function repeatRecipe() {
