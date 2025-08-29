@@ -3,13 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const chat = document.getElementById("chat");
   const inputContainer = document.getElementById("input-container");
 
-  let userIngredients = [];
+  let userIngredients = "";
   let userEnvie = "";
   let userPersons = 1;
   let userRecipeText = "";
-  let usedIngredientsHistory = [];
+  let finishAnimation = null;
 
-  // === Fonctions utilitaires ===
   function addMessage(content, sender = "bot") {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
@@ -61,40 +60,12 @@ document.addEventListener("DOMContentLoaded", () => {
     textarea.focus();
   }
 
-  // === Barre de progression / sablier ===
-  function showPreparationAnimation(callback) {
-    const anim = document.createElement("div");
-    anim.className = "preparation-animation";
-    anim.innerHTML = "⏳ Je vous prépare une recette rien que pour vous…";
-    const bar = document.createElement("div");
-    bar.style.width = "0%";
-    bar.style.height = "6px";
-    bar.style.background = "#e67e22";
-    bar.style.marginTop = "5px";
-    anim.appendChild(bar);
-    chat.appendChild(anim);
-    chat.scrollTop = chat.scrollHeight;
-
-    let width = 0;
-    const interval = setInterval(() => {
-      width += 2 + Math.random() * 3;
-      if (width >= 100) width = 100;
-      bar.style.width = width + "%";
-      if (width === 100) {
-        clearInterval(interval);
-        anim.remove();
-        callback();
-      }
-    }, 50);
-  }
-
-  // === Gestion nombre de personnes ===
   function askPersons(callbackMessage) {
     addInputField("Pour combien de personnes ?", (value) => {
       const persons = parseInt(value, 10);
       if (!isNaN(persons) && persons > 0) {
         userPersons = persons;
-        showPreparationAnimation(() => sendToBackend(callbackMessage));
+        startPreparation(callbackMessage);
       } else {
         addMessage("⚠️ Merci d’indiquer un nombre valide.");
         askPersons(callbackMessage);
@@ -102,12 +73,51 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Backend ===
+  function showPreparationAnimation() {
+    const anim = document.createElement("div");
+    anim.className = "preparation-animation";
+    anim.innerHTML = "⏳ Je prépare pour vous une belle recette...";
+
+    const barContainer = document.createElement("div");
+    barContainer.style.width = "100%";
+    barContainer.style.height = "6px";
+    barContainer.style.background = "#eee";
+    barContainer.style.marginTop = "5px";
+
+    const bar = document.createElement("div");
+    bar.style.width = "0%";
+    bar.style.height = "100%";
+    bar.style.background = "#e67e22";
+    bar.style.transition = "width 0.1s linear";
+
+    barContainer.appendChild(bar);
+    anim.appendChild(barContainer);
+    chat.appendChild(anim);
+    chat.scrollTop = chat.scrollHeight;
+
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width < 95) { // progresse doucement jusqu'à 95%
+        width += 0.3;
+        bar.style.width = width + "%";
+      }
+    }, 50);
+
+    return () => {
+      clearInterval(interval);
+      bar.style.width = "100%";
+      setTimeout(() => {
+        anim.remove();
+        sendToBackend(callbackMessage);
+      }, 300);
+    };
+  }
+
+  function startPreparation(callbackMessage) {
+    finishAnimation = showPreparationAnimation();
+  }
+
   async function sendToBackend(message) {
-    if (!message || message.trim().length === 0) {
-      addMessage("⚠️ Message manquant. Merci de préciser vos ingrédients ou envies.");
-      return;
-    }
     try {
       const res = await fetch("/.netlify/functions/recipe", {
         method: "POST",
@@ -117,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.reply) {
         userRecipeText = data.reply;
-        usedIngredientsHistory.push(...userIngredients);
         const formatted = formatRecipeForDisplay(data.reply);
         addMessage(formatted, "bot");
         offerFeedback();
@@ -130,42 +139,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === Formatage Markdown ===
   function formatRecipeForDisplay(text) {
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
     const formatted = [];
 
     lines.forEach(line => {
       let div;
-      if (/^# /.test(line)) { // titre principal
+      if (/^# /.test(line)) { 
         div = document.createElement("h1");
-        div.innerText = line.replace(/^#\s*/, '');
+        div.innerText = line.replace(/^# /, '');
         div.style.fontSize = "28px";
         div.style.fontWeight = "bold";
         div.style.marginBottom = "10px";
       } 
-      else if (/^## /.test(line)) { // sous-titre
+      else if (/^## /.test(line)) { 
         div = document.createElement("div");
         div.innerHTML = `<b>${line.replace(/^## /, '')}</b>`;
         div.style.fontSize = "20px";
         div.style.marginTop = "15px";
         div.style.marginBottom = "5px";
       } 
-      else if (/^### /.test(line)) { // sous-sous-titre
+      else if (/^### /.test(line)) { 
         div = document.createElement("div");
         div.innerHTML = `<b>${line.replace(/^### /, '')}</b>`;
         div.style.fontSize = "18px";
         div.style.marginTop = "10px";
         div.style.marginBottom = "3px";
       } 
-      else if (/^- /.test(line)) { // ingrédients
+      else if (/^- /.test(line)) { 
         div = document.createElement('div');
         div.innerText = line.replace(/^- /, '');
         div.style.marginBottom = "3px";
       } 
-      else if (/^\d+/.test(line)) { // étapes
+      else if (/^\d+/.test(line)) { 
         div = document.createElement('div');
-        div.innerText = line.replace(/\*\*/g,'');
+        div.innerText = line.replace(/\*\*/g,''); 
         div.style.marginBottom = "5px";
       } 
       else {
@@ -178,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return formatted;
   }
 
-  // === Feedback ===
   function offerFeedback() {
     addChoices([
       { label: "👍 Top ! Merci, je vais essayer", action: satisfied },
@@ -187,21 +194,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
   }
 
-  // === Téléchargement et partage ===
+  // --- téléchargement et partage
   function satisfied() {
-    addMessage("Top ! 😄 Tu peux télécharger ou partager ta recette.");
+    addMessage("Top ! Je suis ravi 😄. Vous pouvez télécharger ou partager votre recette.");
+
     const div = document.createElement("div");
     div.className = "choices";
     chat.appendChild(div);
 
-    // Télécharger
     const downloadBtn = document.createElement("button");
     downloadBtn.className = "choice-btn";
     downloadBtn.innerText = "⬇️ Télécharger ma recette";
-    downloadBtn.onclick = () => downloadRecipe(userRecipeText);
+    downloadBtn.onclick = downloadRecipe;
     div.appendChild(downloadBtn);
 
-    // WhatsApp
     const whatsappBtn = document.createElement("button");
     whatsappBtn.className = "choice-btn";
     whatsappBtn.innerText = "💬 Partager sur WhatsApp";
@@ -212,8 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
     div.appendChild(whatsappBtn);
   }
 
-  function downloadRecipe(recipeText) {
-    if (!recipeText) return;
+  function downloadRecipe() {
     const tempDiv = document.createElement("div");
     tempDiv.style.padding = "20px";
     tempDiv.style.background = "#fff8f0";
@@ -224,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tempDiv.style.left = "-9999px";
     document.body.appendChild(tempDiv);
 
-    // logo
     const logo = document.createElement("img");
     logo.src = "assistant/logo.png";
     logo.style.width = "80px";
@@ -232,16 +236,14 @@ document.addEventListener("DOMContentLoaded", () => {
     logo.style.marginBottom = "10px";
     tempDiv.appendChild(logo);
 
-    // titre
     const titre = document.createElement("h1");
-    titre.innerText = recipeText.split("\n")[0].replace(/^#\s*/, '');
+    titre.innerText = userRecipeText.split("\n")[0].replace(/^#\s*/, '');
     titre.style.fontSize = "28px";
     titre.style.fontWeight = "bold";
     titre.style.marginBottom = "10px";
     tempDiv.appendChild(titre);
 
-    // contenu ingrédients & préparation
-    const lines = recipeText.split("\n").map(l => l.trim()).filter(Boolean);
+    const lines = userRecipeText.split("\n").map(l => l.trim()).filter(Boolean);
     let inIngredients = false, inPreparation = false;
 
     lines.forEach(line => {
@@ -296,53 +298,53 @@ document.addEventListener("DOMContentLoaded", () => {
     } else { capture(tempDiv); }
   }
 
-  // === Répéter ou modifier ===
   function repeatRecipe() {
-    addMessage("🔄 Je te prépare une nouvelle suggestion ... 🍳");
-    const msg = userIngredients.length ? `Recette avec ${userIngredients.join(", ")}` : userEnvie;
-    askPersons(msg);
+    addMessage("Je te prépare une nouvelle suggestion ... 🍳");
+    if (userIngredients) startPreparation(userIngredients);
+    else if (userEnvie) startPreparation(userEnvie);
   }
 
   function modifyInputs() {
     addChoices([
       { label: "Modifier les ingrédients", action: () => {
-        addInputField("Quels ingrédients veux-tu changer ?", val => {
-          userIngredients = val.split(",").map(s => s.trim());
-          addMessage("Je vous prépare une nouvelle recette rien que pour vous... 🍳");
-          const msg = `Recette avec ${userIngredients.join(", ")}` + (userEnvie ? `, type: ${userEnvie}` : "");
-          askPersons(msg);
-        });
+          addInputField("Quels ingrédients veux-tu changer ?", val => {
+            userIngredients = val;
+            startPreparation(userIngredients);
+          });
       }},
-      { label: "Modifier l'envie / type de recette", action: () => handleChoice("envie") }
+      { label: "Modifier l'envie / type de recette", action: () => {
+          addInputField("Quelles envies veux-tu modifier ?", val => {
+            userEnvie = val;
+            startPreparation(userEnvie);
+          });
+      }}
     ]);
   }
 
-  // === Choix principal ===
   function handleChoice(choice) {
     if (choice === "frigo") {
-      addInputField("Quels ingrédients as-tu sous la main ? (séparés par des virgules)", val => {
-        userIngredients = val.split(",").map(s => s.trim());
-        const msg = `Recette avec ${userIngredients.join(", ")}`;
-        askPersons(msg);
+      addInputField("Quels ingrédients as-tu sous la main ?", val => {
+        userIngredients = val;
+        askPersons(userIngredients);
       });
     } else if (choice === "envie") {
       addChoices([
-        { label: "Plat rapide", action: () => { userEnvie="rapide et sain"; askPersons(userEnvie); } },
-        { label: "Plat familial", action: () => { userEnvie="plat réconfortant"; askPersons(userEnvie); } },
-        { label: "Exotique", action: () => { userEnvie="exotique"; askPersons(userEnvie); } },
-        { label: "Végétarien", action: () => { userEnvie="végétarien"; askPersons(userEnvie); } },
-        { label: "Festif", action: () => { userEnvie="festif"; askPersons(userEnvie); } },
-        { label: "Écrire mes envies", action: () => addInputField("Décris ce qui te fait envie...", val => { userEnvie=val; askPersons(userEnvie); }) }
+        { label: "🍽 Plat rapide / sain", action: () => { userEnvie = "Plat rapide et sain"; askPersons(userEnvie); }},
+        { label: "🍛 Exotique", action: () => { userEnvie = "Exotique"; askPersons(userEnvie); }},
+        { label: "🥩 Viande", action: () => { userEnvie = "Plat avec viande"; askPersons(userEnvie); }},
+        { label: "🐟 Poisson / fruits de mer", action: () => { userEnvie = "Plat avec poisson"; askPersons(userEnvie); }},
+        { label: "🥗 Végétarien", action: () => { userEnvie = "Végétarien"; askPersons(userEnvie); }},
+        { label: "📝 Autre / écrire moi", action: () => addInputField("Quelle recette souhaitez-vous ?", val => { userEnvie = val; askPersons(userEnvie); })}
       ]);
     } else if (choice === "surprise") {
-      showPreparationAnimation(() => sendToBackend("Surprends-moi avec une recette originale !"));
+      addMessage("🎁 Super ! Je prépare une surprise culinaire...");
+      askPersons("Surprends-moi avec une recette originale !");
     }
   }
 
-  // === Démarrage ===
   function start() {
     addMessage("👨‍🍳 Bonjour ! Je suis Hugo, ton chef virtuel.");
-    addMessage("Que veux-tu cuisiner aujourd’hui ?");
+    addMessage("Que voulez-vous cuisiner aujourd’hui ?");
     addChoices([
       { label: "🍅 Avec ce que j’ai sous la main", action: () => handleChoice("frigo") },
       { label: "🍰 Selon mes envies", action: () => handleChoice("envie") },
